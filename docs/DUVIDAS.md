@@ -29,3 +29,6 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
     - **Áreas terapêuticas (Perfil D):** a spec diz "Múltipla" sem listar valores. Foi criada uma lista provisória: oncologia, doenças infecciosas, imunologia, sistema nervoso central, cardiovascular, dermatologia, metabólico, saúde animal, bens de consumo, outro. **Precisa de validação.**
     - **Perfil de clientes (Perfil D):** a spec diz "perfil" sem lista; foi usada a mesma do Perfil C (startups, farma nacional, multinacionais).
 14. **Exportações têm formatos diferentes por perfil**, como na spec: Perfil C usa valor em USD por ano ou "não exporta"; Perfis D e F usam percentual do faturamento + destinos.
+15. **Foto da liderança.** A spec (5.5) pede nome, cargo e uma linha de experiência, sem foto. A página mostra as iniciais num círculo no lugar da foto.
+16. **Dois rodapés no perfil.** O rodapé do perfil (texto do programa + data da última aprovação, spec 6.2 item 7) fica no fim da página, e o rodapé geral do site (com o link da equipe) fica logo abaixo.
+17. **Perfil provisório no rodapé.** Sem aprovação, o rodapé mostra "Perfil provisório montado pela equipe… aguardando a validação da empresa" no lugar da data da última aprovação.

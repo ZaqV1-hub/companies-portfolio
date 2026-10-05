@@ -148,7 +148,8 @@ button { font-family: var(--font-body); }
 .badge-updating { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; background: #fdf3d6; color: #8a6d14; padding: 5px 10px; border-radius: 20px; }
 
 .profile-body { max-width: 1200px; margin: 0 auto; padding: 40px 32px 56px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); column-gap: 36px; row-gap: 40px;
-  grid-template-areas: 'sel sel' 'main side' 'lead lead' 'gal gal' 'foot foot'; align-items: start; }
+  grid-template-areas: 'main side' 'lead lead' 'gal gal' 'foot foot'; align-items: start; }
+.profile-body.has-projects { grid-template-areas: 'sel sel' 'main side' 'lead lead' 'gal gal' 'foot foot'; }
 .project-selector-wrap { grid-area: sel; }
 .profile-cta-mobile { display: none; }
 .profile-main { grid-area: main; display: flex; flex-direction: column; gap: 40px; min-width: 0; }
@@ -257,7 +258,8 @@ button { font-family: var(--font-body); }
   .profile-hero-inner, .profile-body { padding-left: 16px; padding-right: 16px; }
   .profile-hero h1 { font-size: 32px; }
   .hero-plate { width: 100%; max-width: 300px; height: 160px; }
-  .profile-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'sel' 'cta' 'main' 'side' 'lead' 'gal' 'foot'; row-gap: 28px; }
+  .profile-body { grid-template-columns: minmax(0, 1fr); grid-template-areas: 'cta' 'main' 'side' 'lead' 'gal' 'foot'; row-gap: 28px; }
+  .profile-body.has-projects { grid-template-areas: 'sel' 'cta' 'main' 'side' 'lead' 'gal' 'foot'; }
   .profile-cta-mobile { display: block; grid-area: cta; }
   .profile-cta-desktop { display: none; }
   .profile-side { position: static; }

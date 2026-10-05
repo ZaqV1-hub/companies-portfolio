@@ -10,7 +10,14 @@ export function ReadMore({ text, className }) {
   const [overflows, setOverflows] = useState(false);
   useEffect(() => {
     const el = ref.current;
-    if (el && !open) setOverflows(el.scrollHeight > el.clientHeight + 1);
+    if (!el || open) return undefined;
+    const measure = () => setOverflows(el.scrollHeight > el.clientHeight + 1);
+    measure();
+    // re-measure after web fonts load and on resize (line breaks change)
+    const ro = new ResizeObserver(measure);
+    ro.observe(el);
+    if (document.fonts) document.fonts.ready.then(measure);
+    return () => ro.disconnect();
   }, [text, open]);
   return html`
     <div>

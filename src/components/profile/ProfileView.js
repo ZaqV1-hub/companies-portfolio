@@ -121,7 +121,7 @@ export function ProfileView({ org, projectId, onSelectProject, onRequestContact,
   const side = otherSideCards(org, project, i18n);
   return html`<div class="profile">
     <${Header} org=${org} project=${project} i18n=${i18n} backHref=${backHref} />
-    <div class="profile-body">
+    <div class=${cx('profile-body', org.projects.length > 1 && 'has-projects')}>
       <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
       <div class="profile-cta-mobile">${cta}</div>
       <main class="profile-main">${mainBlocks(org, project, i18n)}</main>
