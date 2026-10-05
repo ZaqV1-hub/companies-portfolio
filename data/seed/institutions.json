@@ -1,0 +1,158 @@
+[
+  {
+    "id": "in-01",
+    "name": "Meridian Capital",
+    "investor_type": "vc",
+    "niche": "vc",
+    "ticket_min_musd": 1,
+    "ticket_max_musd": 10,
+    "interest_type": "direct",
+    "sectors": [
+      "health",
+      "biotechnology"
+    ],
+    "description_original": "Boston-based life-sciences VC investing from seed to Series B.",
+    "description_pt": "VC de ciências da vida sediado em Boston, investe de seed a Série B.",
+    "website": "https://www.meridiancapital.example",
+    "hq_country": "US",
+    "hq_city": "Boston"
+  },
+  {
+    "id": "in-02",
+    "name": "Blue Harbor Ventures",
+    "investor_type": "cvc",
+    "niche": "vc",
+    "ticket_min_musd": 2,
+    "ticket_max_musd": 15,
+    "interest_type": "direct_and_coinvestment",
+    "sectors": [
+      "pharmaceutical"
+    ],
+    "description_original": "Corporate venture arm of a European pharmaceutical group.",
+    "description_pt": "Braço de venture capital corporativo de um grupo farmacêutico europeu.",
+    "website": "https://www.blueharbor.example",
+    "hq_country": "DE",
+    "hq_city": "Frankfurt"
+  },
+  {
+    "id": "in-03",
+    "name": "Andes Growth Partners",
+    "investor_type": "pe_firm",
+    "niche": "pe",
+    "ticket_min_musd": 10,
+    "ticket_max_musd": 50,
+    "interest_type": "direct",
+    "sectors": [
+      "health",
+      "multisector"
+    ],
+    "description_original": null,
+    "description_pt": null,
+    "website": null,
+    "hq_country": "CL",
+    "hq_city": "Santiago"
+  },
+  {
+    "id": "in-04",
+    "name": "Northstar Health Fund",
+    "investor_type": "vc",
+    "niche": "vc_impact",
+    "ticket_min_musd": 0.5,
+    "ticket_max_musd": 5,
+    "interest_type": "direct",
+    "sectors": [
+      "health"
+    ],
+    "description_original": "Impact fund focused on access to healthcare in emerging markets.",
+    "description_pt": "Fundo de impacto focado em acesso à saúde em mercados emergentes.",
+    "website": "https://www.northstarhealth.example",
+    "hq_country": "GB",
+    "hq_city": "London"
+  },
+  {
+    "id": "in-05",
+    "name": "Cascade Life Sciences",
+    "investor_type": "organization",
+    "niche": null,
+    "ticket_min_musd": null,
+    "ticket_max_musd": null,
+    "interest_type": "licensing",
+    "sectors": [
+      "biotechnology",
+      "pharmaceutical"
+    ],
+    "description_original": null,
+    "description_pt": null,
+    "website": null,
+    "hq_country": "US",
+    "hq_city": "Seattle"
+  },
+  {
+    "id": "in-06",
+    "name": "Ipê Investimentos",
+    "investor_type": "family_office",
+    "niche": "pevc",
+    "ticket_min_musd": 1,
+    "ticket_max_musd": 8,
+    "interest_type": "direct",
+    "sectors": [
+      "health"
+    ],
+    "description_original": null,
+    "description_pt": "Family office brasileiro com tese em saúde.",
+    "website": null,
+    "hq_country": "BR",
+    "hq_city": "São Paulo"
+  },
+  {
+    "id": "in-07",
+    "name": "Union Bay Capital",
+    "investor_type": "vc",
+    "niche": "vc",
+    "ticket_min_musd": 3,
+    "ticket_max_musd": 20,
+    "interest_type": "coinvestment",
+    "sectors": [
+      "biotechnology"
+    ],
+    "description_original": null,
+    "description_pt": null,
+    "website": null,
+    "hq_country": "US",
+    "hq_city": "San Francisco"
+  },
+  {
+    "id": "in-08",
+    "name": "Kyoto BioPartners",
+    "investor_type": "organization",
+    "niche": null,
+    "ticket_min_musd": null,
+    "ticket_max_musd": null,
+    "interest_type": "tech_transfer",
+    "sectors": [
+      "pharmaceutical"
+    ],
+    "description_original": "Japanese mid-size pharma seeking in-licensing.",
+    "description_pt": null,
+    "website": null,
+    "hq_country": "JP",
+    "hq_city": "Kyoto"
+  },
+  {
+    "id": "in-09",
+    "name": "Solace Partners",
+    "investor_type": "angel_network",
+    "niche": "vc",
+    "ticket_min_musd": 0.1,
+    "ticket_max_musd": 1,
+    "interest_type": "direct",
+    "sectors": [
+      "health"
+    ],
+    "description_original": null,
+    "description_pt": null,
+    "website": null,
+    "hq_country": "PT",
+    "hq_city": "Lisboa"
+  }
+]

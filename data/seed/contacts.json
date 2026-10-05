@@ -1,0 +1,112 @@
+[
+  {
+    "id": "ct-01",
+    "institution_id": "in-01",
+    "name": "Sarah Chen",
+    "email": "sarah.chen@meridiancapital.example",
+    "country": "US",
+    "city": "Boston",
+    "role": "Partner",
+    "linkedin": "https://www.linkedin.com/in/sarah-chen-example",
+    "phone": "+1 617 555 0101"
+  },
+  {
+    "id": "ct-02",
+    "institution_id": "in-02",
+    "name": "Michael Bennett",
+    "email": "m.bennett@blueharbor.example",
+    "country": "DE",
+    "city": "Frankfurt",
+    "role": "Investment Director",
+    "linkedin": null,
+    "phone": null
+  },
+  {
+    "id": "ct-03",
+    "institution_id": "in-03",
+    "name": "Elena Reyes",
+    "email": "elena.reyes@andesgrowth.example",
+    "country": "CL",
+    "city": "Santiago",
+    "role": null,
+    "linkedin": null,
+    "phone": null
+  },
+  {
+    "id": "ct-04",
+    "institution_id": "in-04",
+    "name": "James Okafor",
+    "email": "james@northstarhealth.example",
+    "country": "GB",
+    "city": "London",
+    "role": "Principal",
+    "linkedin": "https://www.linkedin.com/in/james-okafor-example",
+    "phone": "+44 20 5555 0104"
+  },
+  {
+    "id": "ct-05",
+    "institution_id": "in-05",
+    "name": "Priya Kapoor",
+    "email": "priya.kapoor@cascadels.example",
+    "country": "US",
+    "city": "Seattle",
+    "role": "BD Director",
+    "linkedin": null,
+    "phone": null
+  },
+  {
+    "id": "ct-06",
+    "institution_id": "in-06",
+    "name": "Fernanda Costa",
+    "email": "fernanda@ipeinvest.example",
+    "country": "BR",
+    "city": "São Paulo",
+    "role": "Sócia",
+    "linkedin": null,
+    "phone": "+55 11 95555-0106"
+  },
+  {
+    "id": "ct-07",
+    "institution_id": "in-07",
+    "name": "Thomas Nakamura",
+    "email": "t.nakamura@unionbay.example",
+    "country": "US",
+    "city": "San Francisco",
+    "role": "Associate",
+    "linkedin": null,
+    "phone": null
+  },
+  {
+    "id": "ct-08",
+    "institution_id": "in-08",
+    "name": "Kenji Sato",
+    "email": "k.sato@kyotobio.example",
+    "country": "JP",
+    "city": "Kyoto",
+    "role": "Head of Licensing",
+    "linkedin": null,
+    "phone": null
+  },
+  {
+    "id": "ct-09",
+    "institution_id": "in-09",
+    "name": "Olivia Park",
+    "email": "olivia@solace.example",
+    "country": "PT",
+    "city": "Lisboa",
+    "role": null,
+    "linkedin": null,
+    "phone": null
+  },
+  {
+    "id": "ct-10",
+    "institution_id": "in-02",
+    "name": "Michael Bennet",
+    "email": "michael.bennett@gmail.example",
+    "country": "DE",
+    "city": "Frankfurt",
+    "role": null,
+    "linkedin": null,
+    "phone": null
+  }
+]

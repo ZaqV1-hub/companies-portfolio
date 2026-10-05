@@ -1,0 +1,77 @@
+[
+  {
+    "id": "settings",
+    "launch_date": "2026-10-01",
+    "deadlines": {
+      "provisional_profile_days": 60,
+      "provisional_warning_days": [
+        15,
+        7
+      ],
+      "validation_reminder_days": [
+        7,
+        14
+      ],
+      "validation_reminder_repeat_days": 14,
+      "quarterly_update_reminder_days": 90,
+      "outdated_profile_alert_days": 120,
+      "contact_warning_business_days": 10,
+      "contact_overdue_business_days": 15
+    },
+    "goals": {
+      "2026": {
+        "lead": 60,
+        "nia": 20,
+        "npia": 4
+      },
+      "2027": {
+        "lead": 80,
+        "nia": 30,
+        "npia": 6
+      }
+    },
+    "origins": [
+      "BIO Convention",
+      "RESI",
+      "JPM",
+      "Deep Tech Summit",
+      "Invest in Brazil Day",
+      "Portfólio",
+      "Contato da empresa",
+      "Indicação de investidor",
+      "Indicação de parceiro",
+      "Cold call"
+    ],
+    "apex_strategic_categories": [
+      "Indústria da saúde (CNDI Missão 2)"
+    ],
+    "holidays": [
+      "2026-01-01",
+      "2026-02-16",
+      "2026-02-17",
+      "2026-04-03",
+      "2026-04-21",
+      "2026-05-01",
+      "2026-06-04",
+      "2026-09-07",
+      "2026-10-12",
+      "2026-11-02",
+      "2026-11-15",
+      "2026-11-20",
+      "2026-12-25",
+      "2027-01-01",
+      "2027-02-08",
+      "2027-02-09",
+      "2027-03-26",
+      "2027-04-21",
+      "2027-05-01",
+      "2027-05-27",
+      "2027-09-07",
+      "2027-10-12",
+      "2027-11-02",
+      "2027-11-15",
+      "2027-11-20",
+      "2027-12-25"
+    ]
+  }
+]
