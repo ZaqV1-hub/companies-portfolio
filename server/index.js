@@ -41,7 +41,7 @@ app.use(session({
 }));
 app.use('/api', (req,res,next) => {
   if (!['POST','PUT','PATCH','DELETE'].includes(req.method) || !req.get('origin')) return next();
-  try { const expected=req.get('x-forwarded-host')||req.get('host');if (new URL(req.get('origin')).host.toLowerCase() !== String(expected).toLowerCase()) return res.status(403).json({ error:'origin_forbidden' }); }
+  try { const expected=process.env.PUBLIC_ORIGIN?new URL(process.env.PUBLIC_ORIGIN).host:(req.get('x-forwarded-host')||req.get('host'));if (new URL(req.get('origin')).host.toLowerCase() !== String(expected).toLowerCase()) return res.status(403).json({ error:'origin_forbidden' }); }
   catch { return res.status(403).json({ error:'origin_forbidden' }); }
   next();
 });
@@ -384,9 +384,12 @@ app.post('/api/contacts/:id/interactions', requireRole('company_user','team'), a
   if (!validDateNotFuture(date) || !String(description || '').trim() || String(description).length > 500) return res.json({ ok:false,error:'invalid' });
   try {
     if ((type && !interactionTypes.has(type)) || (apex_product && !apexProducts.has(apex_product))) return res.json({ok:false,error:'invalid'});
-    const [rows] = await pool.execute(`SELECT id FROM relationships WHERE id=? ${req.user.role === 'company_user' ? 'AND organization_id=?' : ''}`,
+    const [rows] = await pool.execute(`SELECT id,organization_id FROM relationships WHERE id=? ${req.user.role === 'company_user' ? 'AND organization_id=?' : ''}`,
       req.user.role === 'company_user' ? [req.params.id,req.user.organization_id] : [req.params.id]);
     if (!rows.length) return res.status(404).json({ error:'not_found' });
+    const [settings]=await pool.execute('SELECT origins FROM settings WHERE id=?',['settings']);
+    if(event&&!(settings[0]?.origins||[]).includes(event))return res.json({ok:false,error:'invalid'});
+    if(project_id){const [project]=await pool.execute('SELECT id FROM projects WHERE id=? AND organization_id=?',[project_id,rows[0].organization_id]);if(!project.length)return res.json({ok:false,error:'invalid'});}
     const id = `it-${crypto.randomUUID()}`;
     await pool.execute('INSERT INTO interactions (id,relationship_id,date,description,type,apex_product,event,project_id,created_by,created_at) VALUES (?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',
       [id,req.params.id,date,String(description).trim(),type || null,apex_product || null,event || null,project_id || null,req.user.id]);
@@ -410,6 +413,7 @@ app.patch('/api/contacts/:id', requireRole('company_user','team'), async (req,re
     if (relationship.status && !relationshipStatuses.has(relationship.status)) { await db.rollback(); return res.json({ok:false,error:'invalid'}); }
     if (relationship.deal_expectation && (!validUsdTree(relationship.deal_expectation) || relationship.deal_expectation.type && !dealTypes.has(relationship.deal_expectation.type))) { await db.rollback(); return res.json({ok:false,error:'invalid'}); }
     await db.beginTransaction();
+    if(relationship.origin){const [settings]=await db.execute('SELECT origins FROM settings WHERE id=?',['settings']);if(relationship.origin!=='Portfólio'&&!(settings[0]?.origins||[]).includes(relationship.origin)){await db.rollback();return res.json({ok:false,error:'invalid'});}}
     if (cSet.length) await db.execute(`UPDATE contacts SET ${cSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...cSet.map((key) => key === 'country' ? String(contact[key]).toUpperCase() : contact[key]),rels[0].contact_id]);
     if (iSet.length) await db.execute(`UPDATE institutions SET ${iSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...iSet.map((key) => ['sectors'].includes(key) ? jsonColumn(institution[key]) : institution[key]),rels[0].institution_id]);
     if (rSet.length) await db.execute(`UPDATE relationships SET ${rSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...rSet.map((key) => key === 'deal_expectation' ? jsonColumn(relationship[key]) : relationship[key]),req.params.id]);
@@ -580,15 +584,17 @@ const getOpenDraft = async (db, orgId) => {
 };
 
 app.get('/api/me/profile-form', requireRole('company_user'), async (req, res) => {
+  const db=await pool.getConnection();
   try {
+    await db.beginTransaction();
     const orgId = req.user.organization_id;
-    const [orgRows] = await pool.execute('SELECT * FROM organizations WHERE id=?', [orgId]);
-    if (!orgRows.length) return res.status(404).json({ error: 'not_found' });
+    const [orgRows] = await db.execute('SELECT * FROM organizations WHERE id=? FOR UPDATE', [orgId]);
+    if (!orgRows.length) { await db.rollback(); return res.status(404).json({ error: 'not_found' }); }
     const org = orgRows[0];
     const firstValidation = !org.last_approved_at;
-    const [projects] = await pool.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [orgId]);
-    const [imports] = firstValidation ? await pool.execute('SELECT project_id,field,mode,previous_answer FROM form_imports WHERE organization_id=?', [orgId]) : [[]];
-    let draft = await getOpenDraft(pool, orgId);
+    const [projects] = await db.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [orgId]);
+    const [imports] = firstValidation ? await db.execute('SELECT project_id,field,mode,previous_answer FROM form_imports WHERE organization_id=?', [orgId]) : [[]];
+    let draft = await getOpenDraft(db, orgId);
     if (!draft) {
       const content = profileSnapshot(org, projects);
       for (const row of imports.filter((item) => item.mode === 'reference')) {
@@ -596,12 +602,14 @@ app.get('/api/me/profile-form', requireRole('company_user'), async (req, res) =>
         if (project?.fields) { delete project.fields[row.field]; if (row.field === 'raised') delete project.fields.raised_none; }
       }
       draft = { id: `pv-${crypto.randomUUID()}`, organization_id: orgId, kind: 'draft', status: 'filling', content, reviewed_steps: {}, created_at: new Date(), updated_at: new Date() };
-      await pool.execute('INSERT INTO profile_versions (id,organization_id,kind,status,content,reviewed_steps,created_at,updated_at) VALUES (?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())',
+      await db.execute('INSERT INTO profile_versions (id,organization_id,kind,status,content,reviewed_steps,created_at,updated_at) VALUES (?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())',
         [draft.id, orgId, draft.kind, draft.status, jsonColumn(content), jsonColumn({})]);
     }
+    await db.commit();
     res.json({ organization: { id: org.id,name: org.name,status: org.status,public_state: org.public_state,last_approved_at: org.last_approved_at }, draft,
       imports: imports.map(({ project_id, field, mode, previous_answer }) => ({ project_id,field,mode,previous_answer })), firstValidation });
-  } catch (error) { routeError(res, error); }
+  } catch (error) { await db.rollback();routeError(res, error); }
+  finally {db.release();}
 });
 
 async function storeCompanyDraft(req, content, reviewedSteps, submitting = false) {
