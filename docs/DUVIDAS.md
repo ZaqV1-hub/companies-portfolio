@@ -1,5 +1,7 @@
 # Dúvidas e decisões tomadas
 
+**Para decidir com a Abiquifi/B2H (mais importantes):** itens 13 (lista de áreas terapêuticas do Perfil D), 37 (textos dos termos e da política de privacidade), 44 (regra de contagem anual de Lead/NIA/NPIA) e 50 (lista de categorias estratégicas Apex).
+
 Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, docs/especificacao-contatos.md = **spec 2**) deixam margem, ou em que o protótipo e a especificação divergem. Em cada caso foi seguida a opção mais simples; tudo pode ser revisto.
 
 ## Dados de exemplo
@@ -78,3 +80,9 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 49. **Tíquete estimado.** Em USD milhões, aceitando decimais (ex.: 0,5), como diz a spec ("USD milhões"). É o único campo de valor que aceita decimal.
 50. **Lista de categorias estratégicas Apex.** Só o valor padrão foi informado ("Indústria da saúde (CNDI Missão 2)"). A lista fica em `settings.apex_strategic_categories` para a equipe completar.
 51. **Exportação.** O botão "Exportar para ApexBrasil" mostra os filtros e a mensagem "disponível na versão com banco de dados". O mapeamento de colunas está em HANDOFF_CODEX.md.
+
+
+## Outros
+
+52. **Fotos de exemplo.** As capas das organizações sem imagem própria usam fotos aleatórias (picsum.photos), como o protótipo fazia. A capa é opcional na spec (5.5); na plataforma real, sem capa, o cabeçalho fica no fundo navy.
+53. **Pasta `prototype-v1/`.** Guarda o protótipo original desempacotado só como referência visual; não faz parte do app novo e pode ser removida na publicação.
