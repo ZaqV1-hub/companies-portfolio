@@ -150,7 +150,7 @@ export function ContactRecordPage({ relId, base, team }) {
       </div>
       <${ClassificationBadge} rel=${rel} />
     </header>
-    ${days && html`<div class="notice warn">${t('crm.request_line', { date: formatDate(days.requested_at, lang) })} — ${t('crm.next_interaction_due', { n: days.business_days, max: 15 })}</div>`}
+    ${days && html`<div class="notice warn">${t('crm.request_line', { date: formatDate(days.requested_at, lang) })} — ${t('crm.next_interaction_due', { n: days.business_days, max: rec.deadlines.contact_overdue_business_days })}</div>`}
     ${rel.npia && rel.npia.state !== 'pending' && html`<div class="notice">${t('crm.announcement')}: ${t('enum.npia_types.' + rel.npia.type)} · ${formatUSD(rel.npia.amount_usd, lang)} · ${label('classification', 'npia')} ${rel.npia.state === 'validated' ? '✓' : '✗'}${rel.npia.confidential ? ' · ' + t('crm.confidential') : ''}</div>`}
 
     <div class="record-actions">

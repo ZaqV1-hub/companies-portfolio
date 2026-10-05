@@ -15,6 +15,7 @@ import { ContactsListPage } from './pages/crm/ContactsListPage.js';
 import { NewContactPage } from './pages/crm/NewContactPage.js';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js';
 import { CrmDashboardPage } from './pages/team/CrmDashboardPage.js';
+import { SettingsPage } from './pages/team/SettingsPage.js';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -24,9 +25,9 @@ function PublicFooter() {
   </footer>`;
 }
 
-function Placeholder({ title }) {
+function NotFound() {
   const { t } = useI18n();
-  return html`<div><h1 class="page-title">${title}</h1><p class="page-subtitle">${t('common.coming_soon')}</p></div>`;
+  return html`<div class="empty-state"><strong>${t('common.not_found')}</strong></div>`;
 }
 
 function CompanyArea({ user, route, onLogout }) {
@@ -47,7 +48,7 @@ function CompanyArea({ user, route, onLogout }) {
   } else if (section === 'contacts') {
     content = html`<${ContactsListPage} />`;
   } else {
-    content = html`<${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />`;
+    content = html`<${NotFound} />`;
   }
   return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }
@@ -70,7 +71,8 @@ function TeamArea({ user, route, onLogout }) {
   else if (section === 'crm' && route.parts[2] === 'new') content = html`<${NewContactPage} base="/team/crm" team=${true} />`;
   else if (section === 'crm' && route.parts[2]) content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/team/crm" team=${true} />`;
   else if (section === 'crm') content = html`<${CrmDashboardPage} />`;
-  else content = html`<${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />`;
+  else if (section === 'settings') content = html`<${SettingsPage} />`;
+  else content = html`<${NotFound} />`;
   return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }
 

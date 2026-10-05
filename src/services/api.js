@@ -528,6 +528,7 @@ export async function getContactRecord(relationshipId) {
     completeness: completeness(contact, institution, rel),
     pending_request: requestState(rel, interactions, settings.holidays),
     origins: settings.origins,
+    deadlines: settings.deadlines,
     apex_categories: user.role === 'team' ? settings.apex_strategic_categories : undefined,
   };
 }
@@ -822,4 +823,38 @@ export async function getCrmDashboard(year) {
       .sort((a, b) => b.overdue - a.overdue || a.avg_completeness - b.avg_completeness),
     years: Object.keys(settings.goals || {}),
   };
+}
+
+// ------------------------------------------------------------------ team settings (spec 1, 8 and spec 2, 9) — values only;
+// the automations that use them (e-mails, provisional profiles going offline) run on the server.
+
+export async function getSettings() {
+  await requireUser('team');
+  return store.get('settings', 'settings');
+}
+
+/** Saves deadlines, yearly goals and team-maintained lists. Numbers must be positive whole numbers. */
+export async function updateSettings(patch) {
+  await requireUser('team');
+  const errors = [];
+  const d = patch.deadlines || {};
+  Object.entries(d).forEach(([k, v]) => {
+    const list = Array.isArray(v) ? v : [v];
+    if (!list.length || list.some((n) => !(Number.isInteger(n) && n > 0))) errors.push('deadlines.' + k);
+  });
+  Object.entries(patch.goals || {}).forEach(([y, g]) => {
+    if (!/^\d{4}$/.test(y)) errors.push('goals.' + y);
+    ['lead', 'nia', 'npia'].forEach((k) => { if (!(Number.isInteger(g[k]) && g[k] >= 0)) errors.push('goals.' + y + '.' + k); });
+  });
+  if (errors.length) return { ok: false, error: 'invalid', fields: errors };
+  const current = store.get('settings', 'settings');
+  const next = store.update('settings', 'settings', {
+    deadlines: { ...current.deadlines, ...d },
+    goals: patch.goals || current.goals,
+    origins: patch.origins || current.origins,
+    apex_strategic_categories: patch.apex_strategic_categories || current.apex_strategic_categories,
+    launch_date: patch.launch_date || current.launch_date,
+    updated_at: now(),
+  });
+  return { ok: true, settings: next };
 }
