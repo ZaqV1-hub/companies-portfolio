@@ -65,3 +65,16 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 39. **Login exige e-mail confirmado.** Uma conta não confirmada volta à tela "Verifique seu e-mail", com "Reenviar link". No protótipo, o link de confirmação aparece numa "caixa de entrada simulada".
 40. **Pedido de contato repetido.** Se o investidor pede contato de novo com a mesma empresa, o relacionamento existente é reaproveitado (não se cria um segundo) e uma nova interação "Pedido de contato pela plataforma" é registrada, reiniciando a contagem dos 15 dias úteis.
 41. **Projeto do pedido.** O relacionamento é com a organização (spec 2, seção 4); o projeto de onde veio o pedido fica registrado na interação (`project_id`).
+
+## Registro de contatos
+
+42. **Produto Apex sugerido.** A spec dá dois exemplos (reunião → Matchmaking de investimentos; envio de material → Portfólio de oportunidades). Para os demais tipos foi usado: e-mail → Informações básicas para o investidor; NDA e Proposta/term sheet → Matchmaking de investimentos; Outro → sem sugestão. A empresa pode trocar.
+43. **Completude.** Conta os 11 campos "recomendados" da spec 2, 6.2: cargo, LinkedIn, tipo de investidor, nicho, tíquete, tipo de interesse, setores, descrição da instituição, site, origem e status. "Registro incompleto" = qualquer um desses faltando; esses registros aparecem primeiro na lista.
+44. **Contagem dos indicadores por ano.** Leads: relacionamentos criados no ano (exceto BR e "Contato incompleto"). NIAs: relacionamentos validados como NIA ou NPIA no ano. NPIAs: anúncios validados no ano. Reuniões: interações do tipo reunião presencial ou virtual no ano. Empresas em eventos: empresas com interação de produto "Evento/seminário de promoção" no ano. **Precisa de confirmação da equipe Abiquifi/ApexBrasil.**
+45. **Pedido sem interação.** O pedido sai das pendências quando a empresa registra qualquer interação manual com data igual ou posterior à do pedido. A contagem usa dias úteis com os feriados nacionais listados em `settings.holidays`.
+46. **Possíveis duplicados.** Contatos com nomes muito parecidos (até 2 letras de diferença) e instituições com nomes parecidos entram na fila. "Unir" mantém o primeiro registro e move relacionamentos e interações do segundo.
+47. **E-mail existente no "Novo contato".** Preenche contato e instituição com os dados-base (nome, país, cidade, cargo, LinkedIn, dados da instituição), como pede a spec. Isso revela que a pessoa já está na base, mas nunca mostra relacionamentos, interações ou empresas.
+48. **Dados de instituição compartilhados.** A empresa pode editar os dados da instituição na ficha, e eles valem para todas as empresas (spec 2, 5.6). Ao criar contato com e-mail ou instituição existente, o sistema só preenche campos vazios e nunca sobrescreve.
+49. **Tíquete estimado.** Em USD milhões, aceitando decimais (ex.: 0,5), como diz a spec ("USD milhões"). É o único campo de valor que aceita decimal.
+50. **Lista de categorias estratégicas Apex.** Só o valor padrão foi informado ("Indústria da saúde (CNDI Missão 2)"). A lista fica em `settings.apex_strategic_categories` para a equipe completar.
+51. **Exportação.** O botão "Exportar para ApexBrasil" mostra os filtros e a mensagem "disponível na versão com banco de dados". O mapeamento de colunas está em HANDOFF_CODEX.md.

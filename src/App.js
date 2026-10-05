@@ -11,6 +11,10 @@ import { ProfilePage } from './pages/public/ProfilePage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
+import { ContactsListPage } from './pages/crm/ContactsListPage.js';
+import { NewContactPage } from './pages/crm/NewContactPage.js';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js';
+import { CrmDashboardPage } from './pages/team/CrmDashboardPage.js';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -36,6 +40,12 @@ function CompanyArea({ user, route, onLogout }) {
   let content;
   if (section === 'profile') {
     content = html`<${ProfileFormPage} stepParam=${route.query.step} onNavigateStep=${(id) => navigate('/company/profile?step=' + encodeURIComponent(id))} />`;
+  } else if (section === 'contacts' && route.parts[2] === 'new') {
+    content = html`<${NewContactPage} base="/company/contacts" />`;
+  } else if (section === 'contacts' && route.parts[2]) {
+    content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/company/contacts" />`;
+  } else if (section === 'contacts') {
+    content = html`<${ContactsListPage} />`;
   } else {
     content = html`<${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />`;
   }
@@ -57,6 +67,9 @@ function TeamArea({ user, route, onLogout }) {
   if (section === 'review' && route.parts[2]) content = html`<${ReviewPage} key=${route.parts[2]} versionId=${route.parts[2]} />`;
   else if (section === 'review') content = html`<${ReviewQueuePage} key=${route.path} />`;
   else if (section === 'orgs') content = html`<${OrganizationsPage} />`;
+  else if (section === 'crm' && route.parts[2] === 'new') content = html`<${NewContactPage} base="/team/crm" team=${true} />`;
+  else if (section === 'crm' && route.parts[2]) content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/team/crm" team=${true} />`;
+  else if (section === 'crm') content = html`<${CrmDashboardPage} />`;
   else content = html`<${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />`;
   return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }

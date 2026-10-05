@@ -478,3 +478,64 @@ button { font-family: var(--font-body); }
 .sim-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
 .investor-chip { font-size: 13px; font-weight: 700; color: var(--navy); background: var(--line-soft); padding: 8px 12px; border-radius: 20px; }
 @media (max-width: 600px) { .auth-grid { grid-template-columns: 1fr; } .modal { padding: 22px 18px; } }
+
+/* ---------- contacts registry ---------- */
+.crm-page { max-width: 1180px; }
+.crm-sticky { position: sticky; top: 0; z-index: 20; background: var(--bg); display: flex; justify-content: space-between; align-items: center; gap: 16px; flex-wrap: wrap; padding: 6px 0 16px; border-bottom: 1px solid var(--line); margin-bottom: 18px; }
+.crm-section { margin-bottom: 24px; }
+.section-label { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--accent); margin: 0 0 10px; }
+h3.section-label { margin-top: 18px; }
+.pending-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 16px; }
+.pending-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 10px; font-size: 13.5px; }
+.pending-list li { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; justify-content: space-between; border-bottom: 1px dashed var(--line-soft); padding-bottom: 8px; }
+.days { font-size: 12px; font-weight: 800; color: var(--text-2); }
+.days.warning { color: #8a6d14; }
+.days.overdue { color: #b42318; }
+.stat-card.static { cursor: default; }
+.indicator small { font-size: 16px; color: var(--muted); }
+.goal-bar { height: 6px; background: var(--line-soft); border-radius: 3px; overflow: hidden; margin-top: 8px; }
+.goal-bar span { display: block; height: 100%; background: linear-gradient(90deg, var(--navy), var(--accent)); }
+.link-row { color: inherit; }
+.link-row:hover { background: var(--bg); color: inherit; }
+.table-tools .filters { flex: 1; }
+.filter input[type=date] { padding: 8px 10px; border-radius: 10px; border: 1.5px solid var(--line); font-family: var(--font-body); font-size: 13px; }
+.class-wrap { display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.class-badge { font-size: 11px; font-weight: 800; letter-spacing: 0.3px; padding: 4px 9px; border-radius: 20px; background: var(--line-soft); color: var(--text-2); }
+.class-badge.c-lead { background: #e7ecff; color: #3548a8; }
+.class-badge.c-nia { background: var(--lime); color: var(--navy); }
+.class-badge.c-npia { background: var(--navy); color: #fff; }
+.class-badge.c-br { background: #ddf3e4; color: #1f7a43; }
+.class-badge.c-incomplete { background: #fde4e1; color: #b42318; }
+.class-pending { font-size: 11.5px; font-weight: 700; color: #8a6d14; }
+.help-i { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: var(--navy); color: var(--lime); font-weight: 800; font-size: 12px; border: none; cursor: pointer; flex-shrink: 0; }
+.help-i.small { width: 17px; height: 17px; font-size: 10px; }
+.help-icon-wrap { position: relative; display: inline-flex; }
+.help-pop { position: absolute; z-index: 40; top: 22px; left: 50%; transform: translateX(-50%); width: 240px; background: var(--navy); color: #fff; font-size: 12px; font-weight: 500; line-height: 1.45; padding: 10px 12px; border-radius: 10px; box-shadow: 0 10px 24px rgba(20,27,52,.3); text-transform: none; letter-spacing: 0; }
+.help-block { background: #fff; border-radius: var(--radius-card); box-shadow: var(--shadow-card); margin-top: 18px; }
+.help-toggle { width: 100%; display: flex; align-items: center; gap: 10px; padding: 16px 20px; border: none; background: none; cursor: pointer; font-family: var(--font-heading); font-weight: 800; font-size: 15px; color: var(--text); text-align: left; }
+.help-toggle .chev { margin-left: auto; color: var(--muted); }
+.help-body { padding: 0 20px 18px; font-size: 14px; color: var(--text-2); line-height: 1.6; }
+.help-card { background: var(--bg); border-radius: 12px; padding: 12px 16px; margin: 10px 0; }
+.help-card p { margin: 6px 0 0; }
+.help-card ul { margin: 6px 0 0; padding-left: 18px; }
+.completeness { display: inline-flex; align-items: center; gap: 8px; }
+.completeness-bar { width: 70px; height: 6px; background: var(--line-soft); border-radius: 3px; overflow: hidden; display: inline-block; }
+.completeness.big { display: flex; } .completeness.big .completeness-bar { width: 100%; height: 10px; border-radius: 5px; }
+.completeness-bar span { display: block; height: 100%; }
+.completeness-bar .low { background: #e05a47; } .completeness-bar .mid { background: #e2b93b; } .completeness-bar .full { background: var(--accent); }
+.completeness-pct { font-size: 12px; font-weight: 700; color: var(--text-2); }
+.missing { font-size: 13.5px; color: var(--text-2); margin: 10px 0 0; }
+.missing a { color: var(--accent); font-weight: 700; text-decoration: underline; }
+.crm-block { margin-bottom: 16px; }
+.crm-block .block-title { margin-bottom: 14px; }
+.crm-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px 16px; margin-bottom: 14px; }
+.crm-field { display: flex; flex-direction: column; border-radius: 10px; transition: background .3s; }
+.crm-field.wide { grid-column: 1 / -1; }
+.crm-field.has-error .input { border-color: #b42318; }
+.crm-field.flash { background: #f4f9dc; box-shadow: 0 0 0 6px #f4f9dc; }
+.apex-mark { font-size: 10px; font-weight: 700; color: #3548a8; background: #e7ecff; padding: 2px 7px; border-radius: 10px; text-transform: none; letter-spacing: 0; }
+.record-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin: 10px 0 14px; }
+.record-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 14px; }
+.action-panel { background: #fff; border-radius: 14px; box-shadow: var(--shadow-card); padding: 18px; margin-bottom: 16px; display: flex; flex-direction: column; gap: 12px; }
+.action-panel.crm-grid { display: grid; }
+.team-only { border-left: 4px solid var(--navy); }

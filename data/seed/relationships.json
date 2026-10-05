@@ -11,7 +11,8 @@
       "value": "nia",
       "justification": "Três reuniões e NDA assinado.",
       "at": "2026-09-12",
-      "by": "u-nintx"
+      "by": "u-nintx",
+      "state": "validated"
     },
     "validated_at": "2026-09-15",
     "validated_by": "u-team-1",
@@ -93,7 +94,7 @@
       "amount_usd": 8000000,
       "description": "Term sheet assinado para liderar a Série B.",
       "confidential": true,
-      "state": "suggested",
+      "state": "pending",
       "at": "2026-10-01",
       "by": "u-nintx"
     },
@@ -154,7 +155,8 @@
       "value": "nia",
       "justification": "Reuniões mensais desde agosto.",
       "at": "2026-10-02",
-      "by": "u-huna"
+      "by": "u-huna",
+      "state": "pending"
     },
     "owner_user_id": "u-huna",
     "deal_expectation": null,
@@ -209,7 +211,8 @@
       "value": "br",
       "justification": "Investidor brasileiro.",
       "at": "2026-09-29",
-      "by": "u-techtrials"
+      "by": "u-techtrials",
+      "state": "pending"
     },
     "owner_user_id": "u-techtrials",
     "deal_expectation": null,

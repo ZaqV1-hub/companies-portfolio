@@ -4,6 +4,7 @@
 // inputs and outputs (see docs/HANDOFF_CODEX.md). All functions are async on purpose.
 import * as store from './mockStore.js';
 import { validateDraft } from '../lib/profileValidation.js';
+import { businessDaysBetween, completeness } from '../lib/crm.js';
 
 export async function init() {
   await store.init();
@@ -71,8 +72,9 @@ function readSession() {
 
 function publicUser(u) {
   if (!u) return null;
+  const org = u.organization_id ? store.get('organizations', u.organization_id) : null;
   return { id: u.id, role: u.role, name: u.name, email: u.email, organization_id: u.organization_id || null,
-    email_verified: !!u.email_verified_at };
+    organization_name: org ? org.name : null, email_verified: !!u.email_verified_at };
 }
 
 /** @returns {Promise<User|null>} the logged-in user, without secrets. */
@@ -435,4 +437,389 @@ export async function requestContact(organizationId, projectId) {
   queueEmail('contact_request_company', 'company', { organization_id: organizationId, relationship_id: rel.id });
   queueEmail('contact_request_team', 'team', { organization_id: organizationId, relationship_id: rel.id });
   return { ok: true, relationship_id: rel.id, reused };
+}
+
+// ------------------------------------------------------------------ contacts registry (spec 2) — CONFIDENTIAL
+// Rule enforced in every function below (and mandatory on the server, spec 2, section 10):
+// a company only ever receives ITS OWN relationships and interactions; the team sees everything;
+// investors see nothing. The Apex control block is team-only.
+
+const PROGRAM_ORG = { id: 'program', name: 'Programa Abiquifi' };
+
+async function crmUser() {
+  const u = await getCurrentUser();
+  if (!u || (u.role !== 'company_user' && u.role !== 'team')) throw new Error('forbidden');
+  return u;
+}
+
+/** Relationships the user may see. */
+function visibleRelationships(user) {
+  return user.role === 'team' ? store.all('relationships') : store.find('relationships', (r) => r.organization_id === user.organization_id);
+}
+
+function canSee(user, rel) {
+  return rel && (user.role === 'team' || rel.organization_id === user.organization_id);
+}
+
+function orgName(id) {
+  if (id === PROGRAM_ORG.id) return PROGRAM_ORG.name;
+  const o = store.get('organizations', id);
+  return o ? o.name : id;
+}
+
+function stripForCompany(rel, user) {
+  if (user.role === 'team') return rel;
+  const { apex_control, ...rest } = rel; // eslint-disable-line no-unused-vars
+  return rest;
+}
+
+/** Whether a platform contact request still waits for the company's next interaction. */
+function requestState(rel, interactions, holidays) {
+  if (!rel.contact_request_at) return null;
+  const answered = interactions.some((i) => !i.auto && i.date >= rel.contact_request_at);
+  if (answered) return null;
+  return { requested_at: rel.contact_request_at, business_days: businessDaysBetween(rel.contact_request_at, todayDate(), holidays) };
+}
+
+function rowFor(rel, user, settings) {
+  const contact = store.get('contacts', rel.contact_id) || {};
+  const institution = store.get('institutions', contact.institution_id) || {};
+  const interactions = store.find('interactions', (i) => i.relationship_id === rel.id).sort((a, b) => b.date.localeCompare(a.date));
+  return {
+    relationship: stripForCompany(rel, user),
+    organization_name: orgName(rel.organization_id),
+    contact: { id: contact.id, name: contact.name, email: contact.email, country: contact.country, city: contact.city, role: contact.role },
+    institution: { id: institution.id, name: institution.name },
+    last_interaction: interactions[0] ? interactions[0].date : null,
+    interaction_count: interactions.length,
+    events: Array.from(new Set(interactions.map((i) => i.event).filter(Boolean))),
+    interaction_dates: interactions.map((i) => i.date),
+    completeness: completeness(contact, institution, rel),
+    pending_request: requestState(rel, interactions, settings.holidays),
+  };
+}
+
+/**
+ * Contacts list: the company's own relationships (company user) or the whole base (team).
+ * @returns {Promise<{rows: object[], deadlines: object, origins: string[]}>}
+ */
+export async function listContactRows() {
+  const user = await crmUser();
+  const settings = store.get('settings', 'settings');
+  return { rows: visibleRelationships(user).map((r) => rowFor(r, user, settings)), deadlines: settings.deadlines, origins: settings.origins };
+}
+
+/** Contact record (ficha do contato). Returns null when the user may not see it. */
+export async function getContactRecord(relationshipId) {
+  const user = await crmUser();
+  const rel = store.get('relationships', relationshipId);
+  if (!canSee(user, rel)) return null;
+  const contact = store.get('contacts', rel.contact_id);
+  const institution = store.get('institutions', contact.institution_id);
+  const settings = store.get('settings', 'settings');
+  const interactions = store.find('interactions', (i) => i.relationship_id === rel.id).sort((a, b) => b.date.localeCompare(a.date) || (b.created_at || '').localeCompare(a.created_at || ''));
+  const users = store.all('users');
+  return {
+    relationship: stripForCompany(rel, user),
+    organization_name: orgName(rel.organization_id),
+    owner_name: (users.find((u) => u.id === rel.owner_user_id) || {}).name || null,
+    contact, institution,
+    interactions: interactions.map((i) => ({ ...i, created_by_name: (users.find((u) => u.id === i.created_by) || {}).name || null })),
+    completeness: completeness(contact, institution, rel),
+    pending_request: requestState(rel, interactions, settings.holidays),
+    origins: settings.origins,
+    apex_categories: user.role === 'team' ? settings.apex_strategic_categories : undefined,
+  };
+}
+
+/**
+ * "Novo contato": typing an e-mail that already exists fills contact and institution (spec 2, 5.2).
+ * Never returns relationships or interactions of other companies; only says whether the CURRENT
+ * company already has a relationship with this person.
+ */
+export async function lookupContactByEmail(email, organizationId) {
+  const user = await crmUser();
+  const contact = store.find('contacts', (c) => normEmail(c.email) === normEmail(email))[0];
+  if (!contact) return null;
+  const orgId = user.role === 'team' ? organizationId : user.organization_id;
+  const own = store.find('relationships', (r) => r.contact_id === contact.id && r.organization_id === orgId)[0];
+  return { contact, institution: store.get('institutions', contact.institution_id), existing_relationship_id: own ? own.id : null };
+}
+
+/** Institution search for the "Nome da instituição" field (existing ones are reused). */
+export async function searchInstitutions(query) {
+  await crmUser();
+  const q = String(query || '').trim().toLowerCase();
+  if (q.length < 2) return [];
+  return store.find('institutions', (i) => i.name.toLowerCase().includes(q)).slice(0, 8);
+}
+
+/** Companies the team can register contacts for, plus "Programa Abiquifi". */
+export async function listContactOwners() {
+  await requireUser('team');
+  return [PROGRAM_ORG].concat(store.all('organizations').map((o) => ({ id: o.id, name: o.name })).sort((a, b) => a.name.localeCompare(b.name)));
+}
+
+const INSTITUTION_KEYS = ['name', 'investor_type', 'niche', 'ticket_min_musd', 'ticket_max_musd', 'interest_type', 'sectors', 'description_original', 'description_pt', 'website'];
+const CONTACT_KEYS = ['name', 'email', 'country', 'city', 'role', 'linkedin', 'phone'];
+
+function pickKeys(obj, keys) {
+  const out = {};
+  keys.forEach((k) => { if (obj && obj[k] !== undefined) out[k] = obj[k]; });
+  return out;
+}
+
+function interactionProblems(it) {
+  const errors = [];
+  if (!it || !it.date) errors.push('interaction.date');
+  else if (it.date > todayDate()) errors.push('interaction.date_future');
+  if (!it || !String(it.description || '').trim()) errors.push('interaction.description');
+  else if (it.description.length > 500) errors.push('interaction.description_long');
+  return errors;
+}
+
+/**
+ * Creates a contact record: contact + institution (reused when they exist) + relationship (Lead) + first interaction.
+ * Only name, institution, e-mail, country, city and the interaction date/description are required (spec 2, 2 and 11).
+ * @param {{organization_id?: string, contact: object, institution: object, relationship: object, interaction: object}} payload
+ */
+export async function createContactRecord(payload) {
+  const user = await crmUser();
+  const orgId = user.role === 'team' ? payload.organization_id : user.organization_id;
+  const c = payload.contact || {};
+  const ins = payload.institution || {};
+  const errors = [];
+  ['name', 'email', 'country', 'city'].forEach((k) => { if (!String(c[k] || '').trim()) errors.push('contact.' + k); });
+  if (c.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(c.email)) errors.push('contact.email_invalid');
+  if (!String(ins.name || '').trim()) errors.push('institution.name');
+  if (!orgId) errors.push('organization');
+  errors.push(...interactionProblems(payload.interaction));
+  if (errors.length) return { ok: false, error: 'invalid', fields: errors };
+
+  let contact = store.find('contacts', (x) => normEmail(x.email) === normEmail(c.email))[0];
+  let institution = contact ? store.get('institutions', contact.institution_id) : findOrCreateInstitution(ins.name, { country: c.country, city: c.city });
+  // fill blanks of an existing institution / contact (never overwrite what is there)
+  const fillBlanks = (current, incoming) => Object.fromEntries(Object.entries(incoming).filter(([k, v]) => v != null && v !== '' && !(Array.isArray(v) && !v.length)
+    && (current[k] == null || current[k] === '' || (Array.isArray(current[k]) && !current[k].length))));
+  institution = store.update('institutions', institution.id, fillBlanks(institution, pickKeys(ins, INSTITUTION_KEYS.filter((k) => k !== 'name'))));
+  if (!contact) contact = store.insert('contacts', { id: store.newId('ct'), institution_id: institution.id, ...pickKeys(c, CONTACT_KEYS), email: normEmail(c.email), created_at: now() });
+  else contact = store.update('contacts', contact.id, fillBlanks(contact, pickKeys(c, CONTACT_KEYS.filter((k) => k !== 'email'))));
+
+  const existing = store.find('relationships', (r) => r.contact_id === contact.id && r.organization_id === orgId)[0];
+  if (existing) return { ok: false, error: 'already_exists', relationship_id: existing.id };
+  const r = payload.relationship || {};
+  const rel = store.insert('relationships', {
+    id: store.newId('rel'), contact_id: contact.id, organization_id: orgId, owner_user_id: user.id,
+    origin: r.origin || null, status: r.status || 'in_progress', deal_expectation: r.deal_expectation || null,
+    classification: 'lead', classification_state: 'validated', suggested: null, npia: null,
+    contact_request_at: null, validated_at: null, validated_by: null, created_at: now(),
+    apex_control: { dynamics_account: false, contact_registered: false, opportunity_inserted: false, opportunity_word: false,
+      strategic_category: 'Indústria da saúde (CNDI Missão 2)', notes: '' },
+  });
+  const it = payload.interaction;
+  store.insert('interactions', { id: store.newId('it'), relationship_id: rel.id, date: it.date, description: it.description.trim(), type: it.type || null,
+    apex_product: it.apex_product || null, event: it.event || null, auto: false, created_by: user.id, created_at: now() });
+  return { ok: true, relationship_id: rel.id };
+}
+
+/** "Nova interação" (spec 2, 5.3): date and description required; date cannot be in the future. */
+export async function addInteraction(relationshipId, data) {
+  const user = await crmUser();
+  const rel = store.get('relationships', relationshipId);
+  if (!canSee(user, rel)) return { ok: false, error: 'forbidden' };
+  const errors = interactionProblems(data);
+  if (errors.length) return { ok: false, error: 'invalid', fields: errors };
+  const it = store.insert('interactions', { id: store.newId('it'), relationship_id: rel.id, date: data.date, description: data.description.trim(),
+    type: data.type || null, apex_product: data.apex_product || null, event: data.event || null, auto: false, created_by: user.id, created_at: now() });
+  return { ok: true, interaction: it };
+}
+
+/** Edits contact, institution and relationship data from the contact record (spec 2, 7.2 item 6). */
+export async function updateContactRecord(relationshipId, { contact, institution, relationship }) {
+  const user = await crmUser();
+  const rel = store.get('relationships', relationshipId);
+  if (!canSee(user, rel)) return { ok: false, error: 'forbidden' };
+  if (contact) {
+    const patch = pickKeys(contact, CONTACT_KEYS.filter((k) => k !== 'email'));
+    ['name', 'country', 'city'].forEach((k) => { if (k in patch && !String(patch[k] || '').trim()) delete patch[k]; }); // required stay filled
+    store.update('contacts', rel.contact_id, patch);
+  }
+  if (institution) {
+    const c = store.get('contacts', rel.contact_id);
+    const patch = pickKeys(institution, INSTITUTION_KEYS);
+    if ('name' in patch && !String(patch.name || '').trim()) delete patch.name;
+    store.update('institutions', c.institution_id, patch);
+  }
+  if (relationship) store.update('relationships', rel.id, pickKeys(relationship, ['origin', 'status', 'deal_expectation']));
+  return { ok: true };
+}
+
+/** "Sugerir classificação": NIA or BR, optional justification ≤ 300 (spec 2, 5.4 and 6.4). */
+export async function suggestClassification(relationshipId, value, justification) {
+  const user = await crmUser();
+  const rel = store.get('relationships', relationshipId);
+  if (!canSee(user, rel)) return { ok: false, error: 'forbidden' };
+  if (!['nia', 'br'].includes(value)) return { ok: false, error: 'invalid_value' };
+  if ((justification || '').length > 300) return { ok: false, error: 'too_long' };
+  store.update('relationships', rel.id, { suggested: { value, justification: (justification || '').trim(), at: now(), by: user.id, state: 'pending' } });
+  queueEmail('classification_suggested', 'team', { relationship_id: rel.id, organization_id: rel.organization_id });
+  return { ok: true };
+}
+
+/** "Informar anúncio" (NPIA): type a–h, date, amount in USD, description ≤ 500 and confidential flag, all required. */
+export async function reportAnnouncement(relationshipId, data) {
+  const user = await crmUser();
+  const rel = store.get('relationships', relationshipId);
+  if (!canSee(user, rel)) return { ok: false, error: 'forbidden' };
+  const errors = [];
+  if (!'abcdefgh'.includes(data.type || 'x') || !data.type) errors.push('type');
+  if (!data.date) errors.push('date');
+  if (!(Number.isInteger(data.amount_usd) && data.amount_usd >= 0)) errors.push('amount_usd');
+  if (!String(data.description || '').trim() || data.description.length > 500) errors.push('description');
+  if (typeof data.confidential !== 'boolean') errors.push('confidential');
+  if (errors.length) return { ok: false, error: 'invalid', fields: errors };
+  store.update('relationships', rel.id, { npia: { type: data.type, date: data.date, amount_usd: data.amount_usd, description: data.description.trim(),
+    confidential: data.confidential, state: 'pending', at: now(), by: user.id } });
+  queueEmail('npia_reported', 'team', { relationship_id: rel.id, organization_id: rel.organization_id });
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------- team only
+
+/** Validates or adjusts a suggested classification (spec 2, 5.4). Only validated classifications count for goals. */
+export async function validateClassification(relationshipId, finalValue, comment) {
+  const user = await requireUser('team');
+  const rel = store.get('relationships', relationshipId);
+  const s = rel.suggested || {};
+  store.update('relationships', rel.id, {
+    classification: finalValue, classification_state: 'validated', validated_at: now(), validated_by: user.id,
+    suggested: { ...s, state: s.value === finalValue ? 'validated' : 'adjusted', team_comment: comment || null, decided_at: now() },
+  });
+  queueEmail('classification_validated', 'company', { relationship_id: rel.id, organization_id: rel.organization_id, value: finalValue });
+  return { ok: true };
+}
+
+/** Validates (→ NPIA) or rejects an announcement (spec 2, 5.5). */
+export async function validateAnnouncement(relationshipId, accept, comment) {
+  const user = await requireUser('team');
+  const rel = store.get('relationships', relationshipId);
+  const npia = { ...rel.npia, state: accept ? 'validated' : 'rejected', validated_at: now(), validated_by: user.id, team_comment: comment || null };
+  const patch = { npia };
+  if (accept) Object.assign(patch, { classification: 'npia', classification_state: 'validated', validated_at: now(), validated_by: user.id });
+  store.update('relationships', rel.id, patch);
+  queueEmail('npia_validated', 'company', { relationship_id: rel.id, organization_id: rel.organization_id, accepted: accept });
+  return { ok: true };
+}
+
+/** "Controle Apex" (spec 2, 6.5) — team only. */
+export async function updateApexControl(relationshipId, data) {
+  await requireUser('team');
+  const rel = store.get('relationships', relationshipId);
+  store.update('relationships', rel.id, { apex_control: { ...rel.apex_control, ...pickKeys(data, ['dynamics_account', 'contact_registered',
+    'opportunity_inserted', 'opportunity_word', 'strategic_category', 'notes']) } });
+  return { ok: true };
+}
+
+function normName(s) {
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/[^a-z0-9 ]/g, '').replace(/\s+/g, ' ').trim();
+}
+
+function editDistance(a, b) {
+  const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+  for (let j = 1; j <= b.length; j++) d[0][j] = j;
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+  }
+  return d[a.length][b.length];
+}
+
+/** Possible duplicates: same person with different e-mails, same institution with different names (spec 2, 5.6). */
+export async function listDuplicateCandidates() {
+  await requireUser('team');
+  const out = [];
+  const contacts = store.all('contacts');
+  for (let i = 0; i < contacts.length; i++) {
+    for (let j = i + 1; j < contacts.length; j++) {
+      const a = normName(contacts[i].name); const b = normName(contacts[j].name);
+      if (a && b && editDistance(a, b) <= 2) out.push({ kind: 'contact', a: contacts[i], b: contacts[j] });
+    }
+  }
+  const inst = store.all('institutions');
+  for (let i = 0; i < inst.length; i++) {
+    for (let j = i + 1; j < inst.length; j++) {
+      const a = normName(inst[i].name); const b = normName(inst[j].name);
+      if (a && b && (editDistance(a, b) <= 2 || a.startsWith(b + ' ') || b.startsWith(a + ' '))) out.push({ kind: 'institution', a: inst[i], b: inst[j] });
+    }
+  }
+  return out;
+}
+
+/** Merges contact `dropId` into `keepId` (relationships and interactions move; duplicate relationships are combined). */
+export async function mergeContacts(keepId, dropId) {
+  await requireUser('team');
+  store.find('relationships', (r) => r.contact_id === dropId).forEach((r) => {
+    const twin = store.find('relationships', (x) => x.contact_id === keepId && x.organization_id === r.organization_id)[0];
+    if (twin) {
+      store.find('interactions', (i) => i.relationship_id === r.id).forEach((i) => store.update('interactions', i.id, { relationship_id: twin.id }));
+      store.remove('relationships', r.id);
+    } else {
+      store.update('relationships', r.id, { contact_id: keepId });
+    }
+  });
+  store.find('users', (u) => u.contact_id === dropId).forEach((u) => store.update('users', u.id, { contact_id: keepId }));
+  store.remove('contacts', dropId);
+  return { ok: true };
+}
+
+/** Merges institution `dropId` into `keepId`. */
+export async function mergeInstitutions(keepId, dropId) {
+  await requireUser('team');
+  store.find('contacts', (c) => c.institution_id === dropId).forEach((c) => store.update('contacts', c.id, { institution_id: keepId }));
+  store.remove('institutions', dropId);
+  return { ok: true };
+}
+
+/**
+ * Team dashboard (spec 2, 7.3): validated Lead/NIA/NPIA per year vs. goals, follow-up indicators,
+ * validation queue and pending items per company.
+ */
+export async function getCrmDashboard(year) {
+  await requireUser('team');
+  const settings = store.get('settings', 'settings');
+  const y = String(year);
+  const rels = store.all('relationships');
+  const its = store.all('interactions');
+  const counting = (r) => r.organization_id !== undefined;
+  const leads = rels.filter((r) => counting(r) && (r.created_at || '').startsWith(y) && !['br', 'incomplete'].includes(r.classification));
+  const nias = rels.filter((r) => ['nia', 'npia'].includes(r.classification) && (r.validated_at || '').startsWith(y));
+  const npias = rels.filter((r) => r.npia && r.npia.state === 'validated' && (r.npia.validated_at || '').startsWith(y));
+  const meetings = its.filter((i) => i.date.startsWith(y) && ['in_person_meeting', 'virtual_meeting'].includes(i.type));
+  const eventOrgs = new Set(its.filter((i) => i.date.startsWith(y) && i.apex_product === 'promotion_event')
+    .map((i) => (rels.find((r) => r.id === i.relationship_id) || {}).organization_id).filter((id) => id && id !== 'program'));
+  const queue = [];
+  rels.forEach((r) => {
+    if (r.suggested && r.suggested.state === 'pending') queue.push({ kind: 'classification', relationship_id: r.id, organization_name: orgName(r.organization_id), contact_name: (store.get('contacts', r.contact_id) || {}).name, suggested: r.suggested, current: r.classification });
+    if (r.npia && r.npia.state === 'pending') queue.push({ kind: 'npia', relationship_id: r.id, organization_name: orgName(r.organization_id), contact_name: (store.get('contacts', r.contact_id) || {}).name, npia: r.npia });
+  });
+  const byCompany = {};
+  rels.forEach((r) => {
+    const contact = store.get('contacts', r.contact_id) || {};
+    const inst = store.get('institutions', contact.institution_id) || {};
+    const st = requestState(r, its.filter((i) => i.relationship_id === r.id), settings.holidays);
+    const k = r.organization_id;
+    byCompany[k] = byCompany[k] || { organization_id: k, organization_name: orgName(k), records: 0, completeness_sum: 0, overdue: 0, warning: 0 };
+    byCompany[k].records += 1;
+    byCompany[k].completeness_sum += completeness(contact, inst, r).pct;
+    if (st && st.business_days > settings.deadlines.contact_overdue_business_days) byCompany[k].overdue += 1;
+    else if (st && st.business_days >= settings.deadlines.contact_warning_business_days) byCompany[k].warning += 1;
+  });
+  return {
+    year: Number(year),
+    goals: (settings.goals || {})[y] || { lead: 0, nia: 0, npia: 0 },
+    indicators: { lead: leads.length, nia: nias.length, npia: npias.length, meetings: meetings.length, event_companies: eventOrgs.size },
+    queue: queue.sort((a, b) => ((a.suggested || a.npia).at || '').localeCompare((b.suggested || b.npia).at || '')),
+    by_company: Object.values(byCompany).map((c) => ({ ...c, avg_completeness: Math.round(c.completeness_sum / c.records) }))
+      .sort((a, b) => b.overdue - a.overdue || a.avg_completeness - b.avg_completeness),
+    years: Object.keys(settings.goals || {}),
+  };
 }
