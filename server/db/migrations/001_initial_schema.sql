@@ -135,7 +135,7 @@ CREATE TABLE IF NOT EXISTS institutions (
   hq_city VARCHAR(200) NULL,
   created_at DATETIME NULL,
   normalized_name VARCHAR(300) GENERATED ALWAYS AS (LOWER(TRIM(name))) STORED,
-  INDEX idx_institutions_normalized_name (normalized_name)
+  UNIQUE KEY uq_institutions_normalized_name (normalized_name)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS contacts (

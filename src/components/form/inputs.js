@@ -3,6 +3,7 @@
 import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
 import { UFS } from '../../lib/formSchema.js';
+import { uploadImage } from '../../services/api.js';
 
 // ---------------------------------------------------------------- USD (spec 1, 5.2)
 const USD_ALLOWED = { pt: /^[\d.]*$/, en: /^[\d,]*$/ }; // digits + the language's thousands separator
@@ -168,24 +169,19 @@ function TextMini({ value, onChange, max, disabled }) {
     ${max && html`<${Counter} n=${v.pt.length} max=${max} />`}</div>`;
 }
 
-// ---------------------------------------------------------------- images (MOCK: stored as data URLs, resized)
-function readImage(file, { minSide, maxMB, types }) {
+// ---------------------------------------------------------------- images (validated locally and saved on the API server)
+function readImage(file, { minSide, maxMB, types }, kind) {
   return new Promise((resolve, reject) => {
     if (!file) { reject(new Error('none')); return; }
     if (types && !types.includes(file.type)) { reject(new Error('image_type')); return; }
     if (maxMB && file.size > maxMB * 1024 * 1024) { reject(new Error('image_too_big')); return; }
     const reader = new FileReader();
     reader.onload = () => {
-      if (file.type === 'image/svg+xml') { resolve(reader.result); return; }
+      if (file.type === 'image/svg+xml') { uploadImage(file, kind).then(resolve, reject); return; }
       const img = new Image();
       img.onload = () => {
         if (minSide && Math.max(img.naturalWidth, img.naturalHeight) < minSide) { reject(new Error('image_too_small')); return; }
-        // keep the mock database small: re-encode at most 1600 px wide (the real upload keeps the original)
-        const scale = Math.min(1, 1600 / img.naturalWidth);
-        const c = document.createElement('canvas');
-        c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
-        c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-        resolve(c.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.82));
+        uploadImage(file, kind).then(resolve, reject);
       };
       img.onerror = () => reject(new Error('image_type'));
       img.src = reader.result;
@@ -204,7 +200,7 @@ function ImageInput({ field, value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
   const rules = IMAGE_RULES[field.kind];
   const pick = async (e) => {
-    try { onChange(await readImage(e.target.files[0], rules)); setErr(null); } catch (x) { setErr(x.message); }
+    try { onChange(await readImage(e.target.files[0], rules, field.kind)); setErr(null); } catch (x) { setErr(x.message); }
     e.target.value = '';
   };
   return html`<div class=${cx('image-input', field.kind)}>
@@ -219,7 +215,7 @@ function GalleryInput({ value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
   const list = value || [];
   const add = async (e) => {
-    try { const url = await readImage(e.target.files[0], IMAGE_RULES.gallery); onChange(list.concat([{ url, caption: { pt: '', en: '' } }])); setErr(null); } catch (x) { setErr(x.message); }
+    try { const url = await readImage(e.target.files[0], IMAGE_RULES.gallery, 'gallery'); onChange(list.concat([{ url, caption: { pt: '', en: '' } }])); setErr(null); } catch (x) { setErr(x.message); }
     e.target.value = '';
   };
   return html`<div class="rows">

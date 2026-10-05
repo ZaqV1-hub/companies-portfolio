@@ -19,7 +19,7 @@ function normalize(table, row) {
     if (!value.password_hash) value.password_hash = bcrypt.hashSync(`disabled-${value.id}`, 12);
     value.email_verified_at = value.email_verified_at || null;
     value.created_at = value.created_at || new Date().toISOString();
-    value.is_demo = Boolean(value.is_demo ?? value.demo);
+    value.is_demo = true;
     delete value.demo;
   }
   for (const key of Object.keys(value)) {
