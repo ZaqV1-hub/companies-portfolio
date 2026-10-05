@@ -109,11 +109,13 @@ def build_profile_entities():
             'invited_at': '2026-08-20',
             'last_updated_at': APPROVED.get(oid) or '2026-06-30',
             'created_at': '2026-06-30',
+            # demo = fictitious organization created only for the demo: remove before publishing
+            'demo': bool(o.get('fictitious')),
             'seed_note': 'fictitious' if o.get('fictitious') else 'from June/2026 prototype; PT texts and some fields filled for the demo',
         })
         for i, p in enumerate(o['projects']):
             validate_project(p)
-            fields = {k: v for k, v in p.items() if k not in ('id', 'type', 'summary')}
+            fields = {k: v for k, v in p.items() if k not in ('id', 'type', 'summary', 'demo')}
             # list-of-pairs → objects
             if 'pipeline' in fields:
                 fields['pipeline'] = [{'name': n, 'indication': ind} for n, ind in fields['pipeline']]
@@ -122,6 +124,8 @@ def build_profile_entities():
                     fields[key] = [{a: x, b: y} for x, y in fields[key]]
             projects.append({
                 'id': p['id'], 'organization_id': oid, 'profile_type': p['type'], 'sort_order': i,
+                # fictitious project (whole demo organization, or an extra project added to a real one)
+                'demo': bool(o.get('fictitious') or p.get('demo')),
                 'summary': p.get('summary'),
                 'fields': fields,
             })

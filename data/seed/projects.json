@@ -4,6 +4,7 @@
     "organization_id": "imunotera",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -144,6 +145,7 @@
     "organization_id": "heptech",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -233,6 +235,7 @@
     "organization_id": "krabs",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -344,6 +347,7 @@
     "organization_id": "cellertz",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -436,6 +440,7 @@
     "organization_id": "aptah",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -512,6 +517,7 @@
     "organization_id": "wecare",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -636,6 +642,7 @@
     "organization_id": "nintx",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -740,6 +747,7 @@
     "organization_id": "mirscience",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -822,6 +830,7 @@
     "organization_id": "biocase",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -906,6 +915,7 @@
     "organization_id": "celluris",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "segment": {
@@ -999,6 +1009,7 @@
     "organization_id": "qnity",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1042,6 +1053,7 @@
     "organization_id": "peptidus",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1085,6 +1097,7 @@
     "organization_id": "sante",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1126,6 +1139,7 @@
     "organization_id": "microforge",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1172,6 +1186,7 @@
     "organization_id": "techtrials",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1231,6 +1246,7 @@
     "organization_id": "vesper",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1272,6 +1288,7 @@
     "organization_id": "vyro",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1312,6 +1329,7 @@
     "organization_id": "futrbio",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1352,6 +1370,7 @@
     "organization_id": "huna",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -1421,6 +1440,7 @@
     "organization_id": "croplabs",
     "profile_type": "D",
     "sort_order": 0,
+    "demo": false,
     "summary": {
       "pt": "Controle de qualidade e testes pré-clínicos BPL para a indústria farmacêutica.",
       "en": "GLP quality control and pre-clinical testing for the pharmaceutical industry."
@@ -1489,6 +1509,7 @@
     "organization_id": "croplabs",
     "profile_type": "D",
     "sort_order": 1,
+    "demo": true,
     "summary": {
       "pt": "Ensaios microbiológicos e analíticos para saneantes e cosméticos.",
       "en": "Microbiological and analytical testing for sanitizers and cosmetics."
@@ -1530,6 +1551,7 @@
     "organization_id": "ionvet",
     "profile_type": "D",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "services": [
@@ -1584,6 +1606,7 @@
     "organization_id": "embrapa",
     "profile_type": "E",
     "sort_order": 0,
+    "demo": false,
     "summary": {
       "pt": "Genômica avançada, biologia sintética e bioprospecção com 43 unidades de pesquisa.",
       "en": "Advanced genomics, synthetic biology and bioprospecting across 43 research units."
@@ -1699,6 +1722,7 @@
     "organization_id": "embrapa",
     "profile_type": "B",
     "sort_order": 1,
+    "demo": true,
     "summary": {
       "pt": "Plataforma de bioinsumos microbianos para saúde vegetal e animal.",
       "en": "Microbial bioinputs platform for plant and animal health."
@@ -1743,6 +1767,7 @@
     "organization_id": "biomanguinhos",
     "profile_type": "E",
     "sort_order": 0,
+    "demo": false,
     "summary": null,
     "fields": {
       "institution_type": {
@@ -1850,6 +1875,7 @@
     "organization_id": "aurora",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": true,
     "summary": {
       "pt": "AU-101: anti-inflamatório oral de liberação prolongada para artrite reumatoide, em Fase II.",
       "en": "AU-101: extended-release oral anti-inflammatory for rheumatoid arthritis, in Phase II."
@@ -1964,6 +1990,7 @@
     "organization_id": "aurora",
     "profile_type": "A",
     "sort_order": 1,
+    "demo": true,
     "summary": {
       "pt": "AU-201: biossimilar de anticorpo monoclonal para oncologia, em fase pré-clínica.",
       "en": "AU-201: monoclonal antibody biosimilar for oncology, pre-clinical."
@@ -2035,6 +2062,7 @@
     "organization_id": "aurora",
     "profile_type": "C",
     "sort_order": 2,
+    "demo": true,
     "summary": {
       "pt": "Unidade de CDMO para formulação e fabricação de sólidos orais e injetáveis.",
       "en": "CDMO unit for formulation and manufacturing of oral solids and injectables."
@@ -2106,6 +2134,7 @@
     "organization_id": "aurora",
     "profile_type": "F",
     "sort_order": 3,
+    "demo": true,
     "summary": {
       "pt": "Embalagens farmacêuticas especiais e insumos para a indústria.",
       "en": "Specialty pharmaceutical packaging and inputs for the industry."
@@ -2177,6 +2206,7 @@
     "organization_id": "vitalbio",
     "profile_type": "E",
     "sort_order": 0,
+    "demo": true,
     "summary": {
       "pt": "Produção de soros e vacinas para o SUS, com interesse em transferência de tecnologia.",
       "en": "Production of sera and vaccines for the public health system, seeking technology transfer."
@@ -2243,6 +2273,7 @@
     "organization_id": "vitalbio",
     "profile_type": "A",
     "sort_order": 1,
+    "demo": true,
     "summary": {
       "pt": "Vacina de mRNA contra dengue em fase pré-clínica.",
       "en": "Pre-clinical mRNA dengue vaccine."
@@ -2314,6 +2345,7 @@
     "organization_id": "biofactor",
     "profile_type": "C",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "services": [
@@ -2381,6 +2413,7 @@
     "organization_id": "nexa",
     "profile_type": "F",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "products": [
@@ -2437,6 +2470,7 @@
     "organization_id": "amazonia",
     "profile_type": "F",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "products": [
@@ -2480,6 +2514,7 @@
     "organization_id": "veritas",
     "profile_type": "D",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "services": [
@@ -2516,6 +2551,7 @@
     "organization_id": "synthera",
     "profile_type": "A",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "segment": {
@@ -2534,6 +2570,7 @@
     "organization_id": "lumina",
     "profile_type": "B",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "platform_type": {
@@ -2608,6 +2645,7 @@
     "organization_id": "pharmaplex",
     "profile_type": "E",
     "sort_order": 0,
+    "demo": true,
     "summary": null,
     "fields": {
       "institution_type": {

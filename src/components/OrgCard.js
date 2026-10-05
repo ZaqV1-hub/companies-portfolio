@@ -26,7 +26,6 @@ export function OrgCard({ org, featured }) {
     <div class="card-cover" style=${org.cover_url ? { backgroundImage: "linear-gradient(165deg, rgba(20,27,52,.18), rgba(20,27,52,.5)), url('" + org.cover_url + "')" } : null}>
       <${LogoPlate} org=${org} className="logo-plate" />
       ${org.public_state === 'provisional' && html`<span class="cover-badge updating">${t('common.updating')}</span>`}
-      ${n > 1 && html`<span class="cover-badge">${t('common.projects_count', { n })}</span>`}
     </div>
     <div class="card-body">
       <div class="card-title-row">
@@ -37,7 +36,10 @@ export function OrgCard({ org, featured }) {
       <div class="card-desc">${tx(org.description)}</div>
       <${CardStage} project=${project} i18n=${i18n} />
       <div class="card-foot">
-        <div class="card-metric">${summary}</div>
+        <div>
+          ${summary && html`<div class="card-metric">${summary}</div>`}
+          ${n > 1 && html`<div class="card-projects">${t('common.projects_count', { n })}</div>`}
+        </div>
         <div class="card-more">${featured ? t('home.view_profile') : t('home.view_more')}</div>
       </div>
     </div>

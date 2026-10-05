@@ -87,6 +87,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-22",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -124,6 +125,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -160,6 +162,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -199,6 +202,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -235,6 +239,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -272,6 +277,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -322,6 +328,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-10",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -358,6 +365,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -395,6 +403,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -432,6 +441,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -469,6 +479,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -507,6 +518,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -545,6 +557,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -583,6 +596,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -621,6 +635,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-18",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -657,6 +672,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -694,6 +710,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -731,6 +748,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -769,6 +787,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-25",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -806,6 +825,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-12",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -844,6 +864,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -883,6 +904,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-08",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -923,6 +945,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-15",
     "created_at": "2026-06-30",
+    "demo": false,
     "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
   },
   {
@@ -1009,6 +1032,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-29",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1048,6 +1072,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-19",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1086,6 +1111,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-24",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1124,6 +1150,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-17",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1162,6 +1189,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-26",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1198,6 +1226,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1234,6 +1263,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1272,6 +1302,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-09-30",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   },
   {
@@ -1310,6 +1341,7 @@
     "invited_at": "2026-08-20",
     "last_updated_at": "2026-06-30",
     "created_at": "2026-06-30",
+    "demo": true,
     "seed_note": "fictitious"
   }
 ]
