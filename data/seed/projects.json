@@ -1,0 +1,2703 @@
+[
+  {
+    "id": "imunotera-terah7",
+    "organization_id": "imunotera",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Imunoterapia — Oncologia / cânceres induzidos por HPV",
+        "en": "Immunotherapy — Oncology / HPV-induced cancers"
+      },
+      "trl": 5,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "TERAH-7",
+      "lead_product_moa": {
+        "pt": "Vacina terapêutica capaz de tratar a doença estabelecida e induzir memória imunológica duradoura contra células tumorais.",
+        "en": "Therapeutic vaccine capable of treating established disease while inducing long-lasting immunological memory against tumor cells."
+      },
+      "pipeline": [
+        {
+          "name": "TERAVID-19",
+          "indication": {
+            "pt": "Imunoterapia para SARS-CoV-2",
+            "en": "SARS-CoV-2 immunotherapy"
+          }
+        },
+        {
+          "name": "A9Z",
+          "indication": {
+            "pt": "Imunoterapia para ZIKV/DENV",
+            "en": "ZIKV/DENV immunotherapy"
+          }
+        },
+        {
+          "name": "IMT-075",
+          "indication": {
+            "pt": "Indicação adicional em definição",
+            "en": "Additional indication being defined"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "PCT/BR2024/050376 (WO2025039059A1) em exame no BR, CA, CL, CO, MX, EC, US e EP. PCT adicional WO2025107050A1 (A9Z, BR e US), também em exame.",
+        "en": "PCT/BR2024/050376 (WO2025039059A1) filed and under examination in BR, CA, CL, CO, MX, EC, US and EP. Additional PCT WO2025107050A1 (A9Z, BR and US), also under examination."
+      },
+      "fto": "in_progress",
+      "milestones": [
+        {
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Estudos pré-clínicos toxicológicos e produção de lote clínico GMP",
+            "en": "Toxicological pre-clinical studies and GMP clinical batch production"
+          }
+        },
+        {
+          "period": {
+            "year": 2028,
+            "semester": 1
+          },
+          "description": {
+            "pt": "Estudo clínico de Fase I/II (Série A)",
+            "en": "Phase I/II clinical study (Series A)"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "seed",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 1000000,
+          "purpose": {
+            "pt": "Lote clínico GMP",
+            "en": "GMP clinical batch"
+          }
+        },
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2028,
+            "semester": 1
+          },
+          "amount_usd": 3000000,
+          "purpose": {
+            "pt": "Estudo clínico de Fase I/II",
+            "en": "Phase I/II clinical trial"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Fabricação de lote clínico GMP na fase Seed; estudo de Fase I/II na Série A.",
+        "en": "GMP clinical batch manufacturing in the Seed phase; Phase I/II trial in the Series A."
+      },
+      "raised": [
+        {
+          "source": "fapesp",
+          "amount_usd": 1110000
+        },
+        {
+          "source": "cnpq",
+          "amount_usd": 57000
+        },
+        {
+          "source": "other",
+          "amount_usd": 22000,
+          "note": "Catalisa ICT"
+        },
+        {
+          "source": "award",
+          "amount_usd": 33000
+        },
+        {
+          "source": "angel",
+          "amount_usd": 39000
+        },
+        {
+          "source": "donation",
+          "amount_usd": 19000
+        }
+      ],
+      "gtm_models": [
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento para parceiros farmacêuticos globais.",
+        "en": "Out-licensing to global pharmaceutical partners."
+      },
+      "target_markets": [
+        "brazil",
+        "north_america",
+        "europe",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "heptech-lmwh",
+    "organization_id": "heptech",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Anticoagulante — Heparina bovina de baixo peso molecular",
+        "en": "Anticoagulant — Bovine low molecular weight heparin"
+      },
+      "trl": 5,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "Bovine LMWH",
+      "lead_product_moa": {
+        "pt": "Mecanismo anticoagulante que inibe a coagulação sanguínea, voltado a mercados onde a heparina suína é restrita ou indisponível.",
+        "en": "Anticoagulant mechanism inhibiting blood coagulation, targeting markets where porcine heparin is restricted or unavailable."
+      },
+      "pipeline": [
+        {
+          "name": "UFH bovina",
+          "indication": {
+            "pt": "Heparina não fracionada com atividade equivalente ao padrão suíno",
+            "en": "Non-fractionated heparin with activity equivalent to the porcine standard"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "PCT/BR2024/050460 pendente.",
+        "en": "PCT/BR2024/050460 pending."
+      },
+      "patents_granted": {
+        "pt": "US 12,485,137B2; BR 112021015794-8.",
+        "en": "US 12,485,137B2; BR 112021015794-8."
+      },
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "month": 6
+          },
+          "description": {
+            "pt": "Conclusão da fase pré-clínica e preparação da submissão de IND",
+            "en": "Completion of the pre-clinical phase and IND submission preparation"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "amount_usd": 3000000,
+          "purpose": {
+            "pt": "Toxicologia e farmacologia pré-clínicas",
+            "en": "Pre-clinical toxicology and pharmacology"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Estudos pré-clínicos de toxicologia e farmacologia; submissões regulatórias.",
+        "en": "Pre-clinical toxicology and pharmacology studies; regulatory submissions."
+      },
+      "raised": [
+        {
+          "source": "finep",
+          "amount_usd": 1000000
+        },
+        {
+          "source": "other",
+          "amount_usd": 1000000,
+          "note": "B2B partner"
+        }
+      ],
+      "gtm_models": [
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento.",
+        "en": "Out-licensing."
+      },
+      "target_markets": [
+        "north_america",
+        "asia"
+      ]
+    }
+  },
+  {
+    "id": "krabs-klk7",
+    "organization_id": "krabs",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Dermatologia — Tratamento tópico para dermatite atópica",
+        "en": "Dermatology — Topical treatment for Atopic Dermatitis"
+      },
+      "trl": 5,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "Anti-KLK7 topical antibody",
+      "lead_product_moa": {
+        "pt": "Anticorpo tópico inibidor de KLK7 — alternativa sem corticoide para uma das doenças de pele mais prevalentes do mundo.",
+        "en": "Topical KLK7-inhibitor antibody — steroid-free alternative for one of the world’s most prevalent skin conditions."
+      },
+      "pipeline": [
+        {
+          "name": "Glyphosate rapid test",
+          "indication": {
+            "pt": "Método portátil de detecção rápida de glifosato",
+            "en": "Portable rapid glyphosate detection method"
+          }
+        },
+        {
+          "name": "CAR-T",
+          "indication": {
+            "pt": "Terapia CAR-T para câncer de próstata",
+            "en": "CAR-T therapy for prostate cancer"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "BR 102020009679-6 A2 (Brasil, pendente); EP 4 151 657 A1 (Europa, pendente); WO 2021/226695 A1 (PCT).",
+        "en": "BR 102020009679-6 A2 (Brazil, pending); EP 4 151 657 A1 (Europe, pending); WO 2021/226695 A1 (PCT)."
+      },
+      "patents_granted": {
+        "pt": "US 12,590,170 B2.",
+        "en": "US 12,590,170 B2."
+      },
+      "fto": "yes",
+      "milestones": [
+        {
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Estruturação da rodada de captação",
+            "en": "Fundraising round structuring"
+          }
+        },
+        {
+          "period": {
+            "year": 2027,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Próximo marco regulatório",
+            "en": "Next regulatory milestone"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "seed",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 1000000,
+          "purpose": {
+            "pt": "Avanço pré-clínico",
+            "en": "Pre-clinical advancement"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Avanço pré-clínico e submissões regulatórias.",
+        "en": "Pre-clinical advancement and regulatory submissions."
+      },
+      "raised": [
+        {
+          "source": "fapesp",
+          "amount_usd": 270000
+        },
+        {
+          "source": "finep",
+          "amount_usd": 269000
+        }
+      ],
+      "revenue": {
+        "amount_usd": 30000,
+        "year": 2025
+      },
+      "gtm_models": [
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento.",
+        "en": "Out-licensing."
+      },
+      "target_markets": [
+        "brazil",
+        "north_america",
+        "europe"
+      ]
+    }
+  },
+  {
+    "id": "cellertz-cellbite",
+    "organization_id": "cellertz",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Oncologia / Hematologia — Engajador biespecífico de células T por mRNA (BiKE)",
+        "en": "Oncology / Hematology — mRNA bispecific T-cell engager (BiKE)"
+      },
+      "trl": 3,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "CellBiTE (CLZ-06X)",
+      "lead_product_moa": {
+        "pt": "Engajador biespecífico anti-CD19/anti-CD3 codificado por mRNA. Conecta células T (CD3) e células tumorais (CD19), provocando lise tumoral seletiva.",
+        "en": "mRNA-encoded anti-CD19/anti-CD3 bispecific T-cell engager. Bridges T cells (CD3) and tumor cells (CD19), triggering selective tumor lysis."
+      },
+      "pipeline": [
+        {
+          "name": "CLZ-02X",
+          "indication": {
+            "pt": "CAR+BiKE in vivo para mieloma múltiplo",
+            "en": "In vivo CAR+BiKE for multiple myeloma"
+          }
+        },
+        {
+          "name": "CLZ-01X",
+          "indication": {
+            "pt": "Linfoma",
+            "en": "Lymphoma"
+          }
+        }
+      ],
+      "fto": "in_progress",
+      "milestones": [
+        {
+          "period": {
+            "year": 2026,
+            "month": 10
+          },
+          "description": {
+            "pt": "Prova de conceito in vivo (PoC)",
+            "en": "In vivo proof of concept (PoC)"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "pre_seed",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 1800000,
+          "purpose": {
+            "pt": "PoC in vivo e conclusão do pré-seed",
+            "en": "In vivo PoC and pre-seed completion"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Estudos de PoC in vivo e conclusão da rodada pré-seed (USD 600 mil já captados; USD 1,2 milhão em aberto).",
+        "en": "In vivo PoC studies and completion of the pre-seed round (USD 600K already raised; USD 1.2M outstanding)."
+      },
+      "raised": [
+        {
+          "source": "vc",
+          "amount_usd": 600000
+        },
+        {
+          "source": "other",
+          "amount_usd": 740000,
+          "note": "Partner project"
+        }
+      ],
+      "gtm_models": [
+        "out_licensing",
+        "co_development"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento e co-desenvolvimento.",
+        "en": "Out-licensing and co-development."
+      },
+      "target_markets": [
+        "north_america",
+        "europe",
+        "asia",
+        "oceania"
+      ]
+    }
+  },
+  {
+    "id": "aptah-apt20",
+    "organization_id": "aptah",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Oncologia — Aptâmero de DNA terapêutico",
+        "en": "Oncology — DNA aptamer therapeutic"
+      },
+      "trl": 4,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "APT20TTMG",
+      "lead_product_moa": {
+        "pt": "Corrige a disfunção do complexo U1 snRNP, restaurando a expressão gênica normal em células tumorais.",
+        "en": "Corrects U1 snRNP complex dysfunction, restoring normal gene expression in cancer cells."
+      },
+      "patents_filed": {
+        "pt": "PCT pendente em EP, JP, CN e US (\"Polynucleotide compositions and methods for treatment of cancer\" e \"...for gene expression regulation\").",
+        "en": "PCT pending in EP, JP, CN and US (\"Polynucleotide compositions and methods for treatment of cancer\" and \"...for gene expression regulation\")."
+      },
+      "patents_granted": {
+        "pt": "Patente concedida e ativa nos EUA.",
+        "en": "Patent granted and active in the US."
+      },
+      "milestones": [
+        {
+          "period": {
+            "year": 2028,
+            "month": 4
+          },
+          "description": {
+            "pt": "Próximo marco regulatório",
+            "en": "Next regulatory milestone"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "amount_usd": 20000000,
+          "purpose": {
+            "pt": "Pacote IND e preparação da Fase I",
+            "en": "IND package and Phase I preparation"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Pacote IND, conclusão do pré-clínico e preparação da Fase I.",
+        "en": "IND package, pre-clinical completion and Phase I preparation."
+      },
+      "raised": [
+        {
+          "source": "other",
+          "amount_usd": 8890000,
+          "note": "Grants, angels and VC"
+        }
+      ],
+      "gtm_models": [
+        "direct_sales"
+      ],
+      "gtm_text": {
+        "pt": "Entrada direta no mercado.",
+        "en": "Direct market entry."
+      },
+      "target_markets": [
+        "brazil",
+        "north_america"
+      ]
+    }
+  },
+  {
+    "id": "wecare-topical",
+    "organization_id": "wecare",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Dermatologia / Anti-inflamatório — Composto tópico semelhante a corticoide",
+        "en": "Dermatology / Anti-inflammatory — Corticoid-like topical compound"
+      },
+      "trl": 5,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "WCS-01",
+      "lead_product_moa": {
+        "pt": "Ação anti-inflamatória para dermatite e psoríase, como substituto de corticoides.",
+        "en": "Anti-inflammatory action for dermatitis and psoriasis, as a corticosteroid substitute."
+      },
+      "pipeline": [
+        {
+          "name": "WCS-02",
+          "indication": {
+            "pt": "Atrofia vaginal",
+            "en": "Vaginal atrophy"
+          }
+        },
+        {
+          "name": "WCS-03",
+          "indication": {
+            "pt": "Cicatrização pós-parto",
+            "en": "Post-partum healing"
+          }
+        },
+        {
+          "name": "WCS-04",
+          "indication": {
+            "pt": "Cicatrização pós-cirúrgica",
+            "en": "Post-surgical healing"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "7 pedidos de patente depositados no Brasil.",
+        "en": "7 patent applications filed in Brazil."
+      },
+      "fto": "yes",
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "description": {
+            "pt": "Início do estudo clínico de Fase I",
+            "en": "Phase I clinical study initiation"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 6000000,
+          "purpose": {
+            "pt": "Estudo de Fase I",
+            "en": "Phase I trial"
+          }
+        },
+        {
+          "stage": "series_b",
+          "period": {
+            "year": 2028,
+            "semester": 2
+          },
+          "amount_usd": 24000000,
+          "purpose": {
+            "pt": "Fases II e III",
+            "en": "Phases II and III"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Estudo clínico de Fase I, submissões regulatórias e escalonamento.",
+        "en": "Phase I clinical trial, regulatory submissions and scale-up."
+      },
+      "raised": [
+        {
+          "source": "finep",
+          "amount_usd": 1140000
+        },
+        {
+          "source": "fapesp",
+          "amount_usd": 347000
+        },
+        {
+          "source": "vc",
+          "amount_usd": 597000
+        },
+        {
+          "source": "angel",
+          "amount_usd": 539000
+        }
+      ],
+      "revenue": {
+        "amount_usd": 578000,
+        "year": 2025
+      },
+      "gtm_models": [
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento.",
+        "en": "Out-licensing."
+      },
+      "target_markets": [
+        "brazil",
+        "europe",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "nintx-ntx06",
+    "organization_id": "nintx",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Imunologia GI — Doença inflamatória intestinal (DII)",
+        "en": "GI Immunology — Inflammatory Bowel Disease (IBD)"
+      },
+      "trl": 5,
+      "regulatory_phase": "phase_1",
+      "lead_product_name": "NTX-06",
+      "lead_product_moa": {
+        "pt": "Reduz infiltrados imunológicos e citocinas pró-inflamatórias, com modulação positiva do microbioma intestinal. PoC clínica prevista para junho de 2027.",
+        "en": "Reduces immunological infiltrates and pro-inflammatory cytokines, with positive gut microbiome modulation. Clinical PoC expected June 2027."
+      },
+      "pipeline": [
+        {
+          "name": "NTX-03",
+          "indication": {
+            "pt": "Molécula sintética para regeneração do músculo cardíaco, com validação biofísica e celular concluída",
+            "en": "Synthetic molecule for cardiac muscle regeneration, with biophysical and cellular validation already completed"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "PBTX-01 (BR10 2026 008578-2); PBTX-02 (BR10 2025 007846-5).",
+        "en": "PBTX-01 (BR10 2026 008578-2); PBTX-02 (BR10 2025 007846-5)."
+      },
+      "patents_granted": {
+        "pt": "xGIbiomics® (BR202022013346-3); Mini xGIbiomics® (BR202023024796-5).",
+        "en": "xGIbiomics® (BR202022013346-3); Mini xGIbiomics® (BR202023024796-5)."
+      },
+      "fto": "yes",
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "month": 6
+          },
+          "description": {
+            "pt": "Conclusão da PoC clínica",
+            "en": "Completion of clinical PoC"
+          }
+        },
+        {
+          "period": {
+            "year": 2027,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Lançamento da rodada Série B",
+            "en": "Series B round launch"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "series_b",
+          "period": {
+            "year": 2027,
+            "semester": 2
+          },
+          "amount_usd": 30000000,
+          "purpose": {
+            "pt": "Fases I/II e escalonamento comercial",
+            "en": "Phase I/II and commercial scale-up"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Estudos de Fase I/II, submissões regulatórias e escalonamento comercial.",
+        "en": "Phase I/II studies, regulatory submissions and commercial scale-up."
+      },
+      "raised": [
+        {
+          "source": "vc",
+          "amount_usd": 13000000
+        },
+        {
+          "source": "other",
+          "amount_usd": 5000000,
+          "note": "Grants"
+        }
+      ],
+      "gtm_models": [
+        "partnership_distribution"
+      ],
+      "gtm_text": {
+        "pt": "Parcerias com fundos de venture capital e programas de fomento.",
+        "en": "Partnerships with venture capital funds and grant programs."
+      },
+      "target_markets": [
+        "brazil",
+        "north_america",
+        "europe",
+        "latin_america",
+        "asia",
+        "oceania"
+      ]
+    }
+  },
+  {
+    "id": "mirscience-mt01",
+    "organization_id": "mirscience",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Terapias de RNA — Sarcopenia",
+        "en": "RNA Therapeutics — Sarcopenia"
+      },
+      "trl": 4,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "MT-01",
+      "lead_product_moa": {
+        "pt": "Silenciamento de genes da atrofia muscular por interferência de RNA.",
+        "en": "Silencing of muscle atrophy genes via RNA interference."
+      },
+      "pipeline": [
+        {
+          "name": "MT-02",
+          "indication": {
+            "pt": "Sarcopenia em pacientes obesos",
+            "en": "Sarcopenia in obese patients"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "Patentes depositadas no Brasil, Europa e Estados Unidos.",
+        "en": "Patents filed in Brazil, Europe and the United States."
+      },
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "description": {
+            "pt": "Autorização da ANVISA para Fase I (submissão de IND)",
+            "en": "ANVISA Phase I authorization (IND submission)"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "seed",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 5000000,
+          "purpose": {
+            "pt": "IND e Fase I",
+            "en": "IND and Phase I"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Submissão de IND e estudo clínico de Fase I.",
+        "en": "IND submission and Phase I clinical trial."
+      },
+      "raised": [
+        {
+          "source": "other",
+          "amount_usd": 222000
+        }
+      ],
+      "gtm_models": [
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento.",
+        "en": "Out-licensing."
+      },
+      "target_markets": [
+        "brazil",
+        "north_america",
+        "europe",
+        "asia"
+      ]
+    }
+  },
+  {
+    "id": "biocase-psilo",
+    "organization_id": "biocase",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Psicodélicos / SNC — Psilocibina natural para depressão, dependência e transtornos de impulso",
+        "en": "Psychedelics / CNS — Natural psilocybin for depression, addiction and impulse disorders"
+      },
+      "trl": 5,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "Natural psilocybin",
+      "lead_product_moa": {
+        "pt": "Indicação psiquiátrica/SNC. Agonismo 5-HT2A no córtex pré-frontal, reiniciando a rede de modo padrão.",
+        "en": "CNS/psychiatric indication. 5-HT2A agonism in the prefrontal cortex, resetting the default mode network."
+      },
+      "pipeline": [
+        {
+          "name": "PsiloCINE",
+          "indication": {
+            "pt": "Formulação sublingual de psilocina",
+            "en": "Sublingual psilocin formulation"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "Pedido de patente de processo depositado no Brasil.",
+        "en": "Process patent application filed in Brazil."
+      },
+      "milestones": [
+        {
+          "period": {
+            "year": 2026,
+            "month": 8
+          },
+          "description": {
+            "pt": "Petição à ANVISA para estudo de Fase I / registro",
+            "en": "ANVISA petition for Phase I study / registration"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 6000000,
+          "purpose": {
+            "pt": "Estudo de Fase I",
+            "en": "Phase I study"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Estudo clínico de Fase I pela via regulatória da ANVISA para substâncias controladas.",
+        "en": "Phase I clinical study under ANVISA’s regulatory pathway for controlled substances."
+      },
+      "raised": [
+        {
+          "source": "other",
+          "amount_usd": 1500000,
+          "note": "Family office and grants"
+        }
+      ],
+      "revenue": {
+        "amount_usd": 400000,
+        "year": 2025
+      },
+      "gtm_models": [
+        "direct_sales"
+      ],
+      "gtm_text": {
+        "pt": "Mercado regulado de medicamentos de controle especial.",
+        "en": "Regulated market for special-control medications."
+      },
+      "target_markets": [
+        "brazil"
+      ]
+    }
+  },
+  {
+    "id": "celluris-cart",
+    "organization_id": "celluris",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Terapia celular e gênica — CAR-T para tumores sólidos",
+        "en": "Cell and gene therapy — CAR-T for solid tumors"
+      },
+      "trl": 5,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "Dual-module CAR-T",
+      "lead_product_moa": {
+        "pt": "Módulo direcionado ao tumor + modulação do microambiente pelo sequestro de uma proteína imunossupressora.",
+        "en": "Tumor-targeted module + microenvironment modulation via sequestration of an immunosuppressive protein."
+      },
+      "pipeline": [
+        {
+          "name": "CAR-T lung",
+          "indication": {
+            "pt": "Câncer de pulmão",
+            "en": "Lung cancer"
+          }
+        },
+        {
+          "name": "CAR-T ovarian",
+          "indication": {
+            "pt": "Câncer de ovário",
+            "en": "Ovarian cancer"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "EUA: 1 continuação em análise. Japão: 1 em análise. Europa: em análise.",
+        "en": "US: 1 continuation under review. Japan: 1 under review. Europe: under review."
+      },
+      "patents_granted": {
+        "pt": "EUA: US 12,491,247. Japão: 1 concedida.",
+        "en": "US: US 12,491,247. Japan: 1 granted."
+      },
+      "fto": "yes",
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Conclusão do pacote IND e submissão à FDA e à ANVISA, visando a Fase I",
+            "en": "Completion of the IND package and submission to FDA and ANVISA, targeting Phase I"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "amount_usd": 20000000,
+          "purpose": {
+            "pt": "Pacote IND e Fase I",
+            "en": "IND package and Phase I"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Preparação do pacote IND, submissões à FDA/ANVISA e estudo de Fase I.",
+        "en": "IND package preparation, FDA/ANVISA submissions and Phase I study."
+      },
+      "raised": [
+        {
+          "source": "vc",
+          "amount_usd": 3000000
+        }
+      ],
+      "gtm_models": [
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Licenciamento.",
+        "en": "Out-licensing."
+      },
+      "target_markets": [
+        "brazil",
+        "north_america",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "qnity-platform",
+    "organization_id": "qnity",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Instrumentação científica — Biossensoriamento por eletroquímica quântica",
+        "en": "Scientific instrumentation — Quantum electrochemistry biosensing"
+      },
+      "maturity": "pre_operational",
+      "platform_description": {
+        "pt": "Equipamento e interfaces moleculares próprias que medem cinética de ligação em tempo real, sem marcação.",
+        "en": "Proprietary equipment and molecular interfaces that measure binding kinetics in real time, label-free."
+      },
+      "technology_tags": [
+        "electrochemistry",
+        "biosensors"
+      ],
+      "technology_text": {
+        "pt": "Eletroquímica quântica; eletroquímica avançada; biossensores eletroquímicos; interfaces moleculares próprias; nanomateriais.",
+        "en": "Quantum electrochemistry; advanced electrochemistry; electrochemical biosensors; proprietary molecular interfaces; nanomaterials."
+      },
+      "business_models": [
+        "equipment",
+        "consumables",
+        "service"
+      ],
+      "business_model_text": {
+        "pt": "Venda de equipamentos + consumíveis + serviços especializados. Venda direta ou comodato com receita recorrente de consumíveis.",
+        "en": "Equipment sales + consumables + specialized services. Direct sale or placement model with recurring consumables revenue."
+      },
+      "traction": {
+        "pt": "Interações e parcerias em desenvolvimento com farmacêuticas, instituições de pesquisa e outros atores de ciências da vida.",
+        "en": "Interactions and partnerships in development with pharmaceutical companies, research institutions and other life sciences players."
+      },
+      "competitive_edge": {
+        "pt": "Transdução ultrassensível de sinal molecular por eletroquímica quântica — análise de cinética de ligação sem marcação nem preparo complexo de amostra.",
+        "en": "Ultra-sensitive molecular signal transduction via quantum electrochemistry — binding kinetics analysis without labeling or complex sample preparation."
+      }
+    }
+  },
+  {
+    "id": "peptidus-laika",
+    "organization_id": "peptidus",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "IA/ML — Descoberta de peptídeos terapêuticos para saúde animal",
+        "en": "AI/ML — Therapeutic peptide discovery for animal health"
+      },
+      "maturity": "partially_operational",
+      "platform_description": {
+        "pt": "LAIKA: plataforma de descoberta de peptídeos que cobre do desenho in silico à validação, para licenciamento a farmacêuticas veterinárias.",
+        "en": "LAIKA: a peptide-discovery platform covering in silico design through validation, for licensing to veterinary pharma companies."
+      },
+      "technology_tags": [
+        "ai_ml"
+      ],
+      "technology_text": {
+        "pt": "IA/ML (modelos preditivos multicamada), modelagem e dinâmica molecular, base própria de peptídeos, bioinformática estrutural.",
+        "en": "AI/ML (multi-layer predictive models), molecular modeling and dynamics, proprietary peptide database, structural bioinformatics."
+      },
+      "business_models": [
+        "licensing"
+      ],
+      "business_model_text": {
+        "pt": "Licenciamento B2B de PI: cria e valida peptídeos nas etapas de descoberta e licencia os ativos a farmacêuticas e biotechs.",
+        "en": "B2B IP licensing: creates and validates peptides through the drug-discovery stages and licenses the assets to pharma/biotech companies."
+      },
+      "traction": {
+        "pt": "Pré-receita. NDAs assinados e discussões técnicas ativas com grandes farmacêuticas de saúde animal. Primeiro licenciamento previsto para 2026, após o fechamento da rodada Seed.",
+        "en": "Pre-revenue. Signed NDAs and active technical discussions with major animal-health pharma companies. First licensing expected in 2026, after the Seed round closes."
+      },
+      "revenue": {
+        "pre_revenue": true
+      },
+      "competitive_edge": {
+        "pt": "Foco em peptídeos para saúde animal — lacuna nas plataformas globais de descoberta com IA. Base de dados própria e arquitetura preditiva multicamada.",
+        "en": "Focus on animal-health peptides — a gap in global AI drug-discovery platforms. Proprietary database and multi-layer predictive architecture."
+      }
+    }
+  },
+  {
+    "id": "sante-postbiotics",
+    "organization_id": "sante",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Biotecnologia de fermentação — Ingredientes pós-bióticos para saúde animal e humana",
+        "en": "Fermentation biotechnology — Postbiotic ingredients for animal and human health"
+      },
+      "maturity": "pre_operational",
+      "platform_description": {
+        "pt": "Processo próprio de fermentação microbiana para gerar pós-bióticos com múltiplos compostos bioativos.",
+        "en": "Proprietary microbial fermentation process generating postbiotics with multiple bioactive compounds."
+      },
+      "technology_tags": [
+        "fermentation"
+      ],
+      "technology_text": {
+        "pt": "Biotecnologia microbiana; fermentação de precisão; engenharia metabólica; desenvolvimento de pós-bióticos; metabolômica.",
+        "en": "Microbial biotechnology; precision fermentation; metabolic engineering; postbiotic development; metabolomics."
+      },
+      "business_models": [
+        "licensing",
+        "service"
+      ],
+      "business_model_text": {
+        "pt": "Vendas B2B a empresas de saúde animal, nutrição e farmacêuticas. Receita de venda de ingredientes, co-desenvolvimento e licenciamento.",
+        "en": "B2B sales to animal health, nutrition and pharmaceutical companies. Revenue from ingredient sales, co-development and licensing."
+      },
+      "traction": {
+        "pt": "4 cartas de intenção assinadas com empresas brasileiras de saúde e nutrição animal; 1 carta com empresa internacional.",
+        "en": "4 LOIs signed with Brazilian animal-health and nutrition companies; 1 LOI with an international company."
+      },
+      "competitive_edge": {
+        "pt": "Processo próprio de fermentação que gera pós-bióticos com composição bioativa complexa e atividade multimodal, diferente das abordagens de composto único.",
+        "en": "Proprietary fermentation process generating postbiotics with complex bioactive composition and multimodal activity — differentiated from single-compound approaches."
+      }
+    }
+  },
+  {
+    "id": "microforge-synbio",
+    "organization_id": "microforge",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Biologia sintética / Engenharia metabólica — Produção de moléculas de alto valor",
+        "en": "Synthetic biology / Metabolic engineering — High-value molecule production"
+      },
+      "maturity": "pre_operational",
+      "platform_description": {
+        "pt": "Plataformas de linhagens microbianas e processos de fermentação para moléculas de alto valor agregado.",
+        "en": "Microbial strain and fermentation-process platforms for high-value molecules."
+      },
+      "technology_tags": [
+        "fermentation",
+        "genomics"
+      ],
+      "technology_text": {
+        "pt": "Bioinformática; biologia sintética; engenharia metabólica; biologia molecular; microbiologia; engenharia de fermentação.",
+        "en": "Bioinformatics; synthetic biology; metabolic engineering; molecular biology; microbiology; fermentation engineering."
+      },
+      "business_models": [
+        "licensing",
+        "service"
+      ],
+      "business_model_text": {
+        "pt": "Licenciamento de plataformas + P&D sob contrato (modelo PD&I). Clientes recentes no setor sucroenergético.",
+        "en": "IP licensing of platforms + contract R&D (PD&E model). Recent clients in the sugarcane energy sector."
+      },
+      "traction": {
+        "pt": "Clientes atuais no setor sucroenergético.",
+        "en": "Current clients in the sugarcane sector."
+      },
+      "revenue": {
+        "amount_usd": 20000,
+        "year": 2025
+      },
+      "competitive_edge": {
+        "pt": "Equipe multidisciplinar que integra biologia sintética, biologia molecular, engenharia metabólica e fermentação — do desenho do gene à produção.",
+        "en": "Multidisciplinary team integrating synthetic biology, molecular biology, metabolic engineering and fermentation — from gene design to production."
+      }
+    }
+  },
+  {
+    "id": "techtrials-rwe",
+    "organization_id": "techtrials",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Real-World Evidence — Inteligência em saúde com IA",
+        "en": "Real-World Evidence — AI-powered health intelligence"
+      },
+      "maturity": "fully_operational",
+      "platform_description": {
+        "pt": "Plataforma de dados e analytics que integra fontes clínicas e epidemiológicas com estrutura de nível regulatório.",
+        "en": "Data and analytics platform integrating clinical and epidemiological sources with a regulatory-grade structure."
+      },
+      "technology_tags": [
+        "ai_ml"
+      ],
+      "technology_text": {
+        "pt": "Inteligência artificial; machine learning; ciência de dados em saúde; Real-World Evidence; epidemiologia comparada; NLP; analytics clínico.",
+        "en": "Artificial intelligence; machine learning; health data science; Real-World Evidence; comparative epidemiology; NLP; clinical analytics."
+      },
+      "business_models": [
+        "saas",
+        "service"
+      ],
+      "business_model_text": {
+        "pt": "B2B — assinatura e projetos de analytics para farmacêuticas, hospitais e sistemas de saúde.",
+        "en": "B2B — subscription and project-based analytics for pharma, hospitals and health systems."
+      },
+      "traction": {
+        "pt": "Mais de 50 clientes ativos, entre eles Sanofi, Ferring, Amgen e redes hospitalares.",
+        "en": "50+ active clients including Sanofi, Ferring, Amgen and hospital networks."
+      },
+      "revenue": {
+        "amount_usd": 400000,
+        "year": 2025
+      },
+      "competitive_edge": {
+        "pt": "Integração de dados de saúde de várias fontes com estrutura de nível regulatório; diversidade epidemiológica da população brasileira; camada combinada de analytics clínico e epidemiológico.",
+        "en": "Multi-source health data integration with regulatory-grade structure; epidemiological diversity of the Brazilian population; combined clinical and epidemiological analytics layer."
+      },
+      "rounds": [
+        {
+          "stage": "series_a",
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "amount_usd": 4000000,
+          "purpose": {
+            "pt": "Expansão internacional",
+            "en": "International expansion"
+          }
+        }
+      ]
+    }
+  },
+  {
+    "id": "vesper-builder",
+    "organization_id": "vesper",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Venture builder — RNA, engenharia genética e IA/bioinformática",
+        "en": "Venture builder — RNA, genetic engineering and AI/bioinformatics"
+      },
+      "maturity": "pre_operational",
+      "platform_description": {
+        "pt": "Infraestrutura científica compartilhada para criar e acelerar empresas de biotecnologia.",
+        "en": "Shared scientific infrastructure to build and accelerate biotech companies."
+      },
+      "technology_tags": [
+        "genomics",
+        "ai_ml"
+      ],
+      "technology_text": {
+        "pt": "Engenharia genética; IA; bioinformática; biologia de RNA.",
+        "en": "Genetic engineering; AI; bioinformatics; RNA biology."
+      },
+      "business_models": [
+        "licensing"
+      ],
+      "business_model_text": {
+        "pt": "Licenciamento (modelo de empresas investidas).",
+        "en": "Licensing (portfolio-company model)."
+      },
+      "traction": {
+        "pt": "Parcerias do portfólio incluem Boston Children’s Hospital, Fiocruz, Libbs, Croda e Corteva.",
+        "en": "Portfolio partnerships include Boston Children’s Hospital, Fiocruz, Libbs, Croda and Corteva."
+      },
+      "competitive_edge": {
+        "pt": "Modelo integrado de venture builder com infraestrutura científica compartilhada e acesso a parceiros estratégicos globais em farma, biotech e agrobiotech.",
+        "en": "Integrated venture-builder model with shared scientific infrastructure and access to global strategic partners across pharma, biotech and agri-biotech."
+      }
+    }
+  },
+  {
+    "id": "vyro-zika",
+    "organization_id": "vyro",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Vetor viral / entrega gênica — Zika modificado para tumores do SNC",
+        "en": "Viral vector / gene delivery — Modified Zika virus for CNS tumors"
+      },
+      "maturity": "pre_operational",
+      "platform_description": {
+        "pt": "Plataforma de vetor viral atenuado com tropismo pelo sistema nervoso central.",
+        "en": "Attenuated viral-vector platform with central nervous system tropism."
+      },
+      "technology_tags": [
+        "genomics"
+      ],
+      "technology_text": {
+        "pt": "Genômica; engenharia de vetores virais; vírus Zika modificado; entrega gênica direcionada ao SNC.",
+        "en": "Genomics; viral vector engineering; modified Zika virus; CNS-targeted gene delivery."
+      },
+      "business_models": [
+        "licensing"
+      ],
+      "business_model_text": {
+        "pt": "Licenciamento.",
+        "en": "Licensing."
+      },
+      "traction": {
+        "pt": "2 parcerias ativas.",
+        "en": "2 active partnerships."
+      },
+      "competitive_edge": {
+        "pt": "Atravessa naturalmente a barreira hematoencefálica; tropismo cerebral; alta especificidade em doses baixas; perfil de segurança de plataforma viral atenuada.",
+        "en": "Natural blood-brain-barrier penetration; brain tropism; high specificity at low doses; safety profile of an attenuated viral platform."
+      }
+    }
+  },
+  {
+    "id": "futrbio-mrna",
+    "organization_id": "futrbio",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Engenharia de vacinas de mRNA — Vacinas de nova geração",
+        "en": "mRNA vaccine engineering — Next-generation vaccines"
+      },
+      "maturity": "pre_operational",
+      "platform_description": {
+        "pt": "Biblioteca própria de UTRs e reforçadores moleculares aplicáveis a diferentes antígenos.",
+        "en": "Proprietary library of UTRs and molecular boosters applicable to different antigens."
+      },
+      "technology_tags": [
+        "genomics"
+      ],
+      "technology_text": {
+        "pt": "Imunologia; virologia; genômica; nanopartículas lipídicas (LNPs); engenharia própria de UTRs.",
+        "en": "Immunology; virology; genomics; lipid nanoparticles (LNPs); proprietary UTR engineering."
+      },
+      "business_models": [
+        "licensing"
+      ],
+      "business_model_text": {
+        "pt": "Licenciamento.",
+        "en": "Licensing."
+      },
+      "traction": {
+        "pt": "4 parcerias ativas.",
+        "en": "4 active partnerships."
+      },
+      "competitive_edge": {
+        "pt": "UTRs e reforçadores moleculares próprios com cinética imune superior (início mais rápido, maior duração) em doses menores que as vacinas de mRNA convencionais.",
+        "en": "Proprietary UTRs and molecular boosters with superior immune kinetics (faster onset, longer duration) at lower doses than conventional mRNA vaccines."
+      }
+    }
+  },
+  {
+    "id": "huna-ai",
+    "organization_id": "huna",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "IA / Biomarcadores clínicos — Rastreamento oncológico",
+        "en": "AI / Clinical biomarkers — Oncology screening"
+      },
+      "maturity": "partially_operational",
+      "platform_description": {
+        "pt": "Primeira aplicação em operação: rastreamento de 5 tipos de câncer a partir de hemogramas de rotina.",
+        "en": "First application in operation: screening for 5 cancer types from routine blood counts."
+      },
+      "technology_tags": [
+        "ai_ml"
+      ],
+      "technology_text": {
+        "pt": "IA/ML que processa grandes volumes de dados clínicos estruturados e não estruturados, com foco em biomarcadores laboratoriais e de patologia.",
+        "en": "AI/ML processing large volumes of structured and unstructured clinical data, focused on routine lab and pathology biomarkers."
+      },
+      "business_models": [
+        "saas",
+        "service"
+      ],
+      "business_model_text": {
+        "pt": "Modelo híbrido: receita recorrente por uso (vidas/análises processadas) com camada de resultado (AI-as-a-Service).",
+        "en": "Hybrid model: usage-based recurring revenue (lives/analyses processed) with an outcomes layer (AI-as-a-Service)."
+      },
+      "traction": {
+        "pt": "Mais de 10 clientes na saúde privada; projetos de saúde pública em Barretos e na SES/RJ. Parcerias com Fleury, Sabin, Hermes Pardini e Hospital de Amor. Base própria de mais de 5 milhões de pacientes.",
+        "en": "10+ operational clients in private healthcare; public-health projects in Barretos and SES/RJ. Partnerships with Fleury, Sabin, Hermes Pardini and Hospital de Amor. Proprietary dataset of 5M+ patients."
+      },
+      "competitive_edge": {
+        "pt": "Especialização em oncologia combinada a IA aplicada a biomarcadores; base de 20 anos de dados longitudinais; primeira aplicação 4,5 vezes mais eficiente que o rastreamento convencional em estudos prospectivos.",
+        "en": "Deep oncology specialization combined with AI applied to biomarkers; 20 years of longitudinal data; first application 4.5x more efficient than conventional screening in prospective studies."
+      },
+      "rounds": [
+        {
+          "stage": "seed",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 5000000,
+          "purpose": {
+            "pt": "Escala comercial e novos biomarcadores",
+            "en": "Commercial scale-up and new biomarkers"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Expansão comercial e ampliação para dados genômicos e proteômicos.",
+        "en": "Commercial expansion and extension to genomic and proteomic data."
+      },
+      "raised": [
+        {
+          "source": "vc",
+          "amount_usd": 1500000
+        },
+        {
+          "source": "angel",
+          "amount_usd": 500000
+        }
+      ]
+    }
+  },
+  {
+    "id": "croplabs-pharma",
+    "organization_id": "croplabs",
+    "profile_type": "D",
+    "sort_order": 0,
+    "demo": false,
+    "summary": {
+      "pt": "Controle de qualidade e testes pré-clínicos BPL para a indústria farmacêutica.",
+      "en": "GLP quality control and pre-clinical testing for the pharmaceutical industry."
+    },
+    "fields": {
+      "services": [
+        "quality_control",
+        "analytical",
+        "preclinical",
+        "bpl"
+      ],
+      "services_text": {
+        "pt": "Controle de qualidade de IFAs, matérias-primas, injetáveis e sintéticos, e microbiologia de áreas produtivas. Testes pré-clínicos sob BPL (modelos in vitro).",
+        "en": "Quality control of APIs, raw materials, injectable and synthetic products, and production-area microbiology. Pre-clinical testing under GLP (in vitro models)."
+      },
+      "therapeutic_areas": [
+        "other"
+      ],
+      "scope_text": {
+        "pt": "IFAs; injetáveis acabados; produtos sintéticos.",
+        "en": "APIs; finished injectable products; synthetic products."
+      },
+      "models": {
+        "pt": "In vitro (pré-clínico).",
+        "en": "In vitro (pre-clinical)."
+      },
+      "certifications": [
+        "reblas",
+        "anvisa",
+        "bpl"
+      ],
+      "certificate_numbers": "BPL nº 0082 (INMETRO)",
+      "client_count": 42,
+      "client_profiles": [
+        "national_pharma",
+        "multinational"
+      ],
+      "revenue": {
+        "amount_usd": 600000,
+        "year": 2025
+      },
+      "exports": {
+        "pct": 12,
+        "destinations": [
+          "north_america",
+          "europe",
+          "latin_america"
+        ]
+      },
+      "investment_types": [
+        "expansion"
+      ],
+      "investment_range": {
+        "min": 1000000,
+        "max": 3000000
+      },
+      "target_markets": [
+        "north_america",
+        "europe",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "croplabs-consumer",
+    "organization_id": "croplabs",
+    "profile_type": "D",
+    "sort_order": 1,
+    "demo": true,
+    "summary": {
+      "pt": "Ensaios microbiológicos e analíticos para saneantes e cosméticos.",
+      "en": "Microbiological and analytical testing for sanitizers and cosmetics."
+    },
+    "fields": {
+      "services": [
+        "analytical",
+        "quality_control"
+      ],
+      "services_text": {
+        "pt": "Ensaios microbiológicos e analíticos para saneantes e cosméticos.",
+        "en": "Microbiological and analytical testing for sanitizers and cosmetics."
+      },
+      "therapeutic_areas": [
+        "consumer_goods"
+      ],
+      "scope_text": {
+        "pt": "Bens de consumo (saneantes, cosméticos).",
+        "en": "Consumer goods (sanitizers, cosmetics)."
+      },
+      "certifications": [
+        "reblas",
+        "anvisa"
+      ],
+      "client_profiles": [
+        "national_pharma"
+      ],
+      "investment_types": [
+        "expansion",
+        "strategic_partner"
+      ],
+      "target_markets": [
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "ionvet-cro",
+    "organization_id": "ionvet",
+    "profile_type": "D",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "services": [
+        "analytical",
+        "preclinical"
+      ],
+      "services_text": {
+        "pt": "Metabolômica de alta resolução; identificação e validação de biomarcadores; caracterização biológica de produtos e ingredientes; desenvolvimento e validação de métodos analíticos; nutrição de precisão; apoio a P&D veterinário.",
+        "en": "High-resolution metabolomics; biomarker identification and validation; biological characterization of products and ingredients; analytical method development and validation; precision nutrition; veterinary R&D support."
+      },
+      "therapeutic_areas": [
+        "animal_health",
+        "infectious_diseases",
+        "immunology"
+      ],
+      "scope_text": {
+        "pt": "Saúde animal; medicina veterinária preventiva; reprodução e nutrição animal; saúde intestinal; bem-estar animal.",
+        "en": "Animal health; preventive veterinary medicine; animal reproduction and nutrition; gut health; animal welfare."
+      },
+      "models": {
+        "pt": "Bovinos, suínos, aves, equinos, ovinos, caprinos, cães, gatos, peixes e outras espécies.",
+        "en": "Bovine, swine, poultry, equine, ovine, caprine, canine, feline, fish and other species."
+      },
+      "partner_sites": [
+        "USP",
+        "UNESP",
+        "UNICAMP",
+        "Embrapa"
+      ],
+      "client_count": 18,
+      "client_profiles": [
+        "national_pharma",
+        "startups"
+      ],
+      "revenue": {
+        "amount_usd": 828745,
+        "year": 2025
+      },
+      "investment_types": [
+        "expansion",
+        "strategic_partner"
+      ],
+      "target_markets": [
+        "north_america",
+        "europe",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "embrapa-genomics",
+    "organization_id": "embrapa",
+    "profile_type": "E",
+    "sort_order": 0,
+    "demo": false,
+    "summary": {
+      "pt": "Genômica avançada, biologia sintética e bioprospecção com 43 unidades de pesquisa.",
+      "en": "Advanced genomics, synthetic biology and bioprospecting across 43 research units."
+    },
+    "fields": {
+      "institution_type": {
+        "pt": "Instituição pública de pesquisa agropecuária — Genômica e biodiversidade",
+        "en": "Public agricultural research — Genomics and biodiversity"
+      },
+      "product_portfolio": [
+        {
+          "category": {
+            "pt": "Genômica",
+            "en": "Genomics"
+          },
+          "description": {
+            "pt": "Genômica avançada com edição de cultivares por CRISPR.",
+            "en": "Advanced genomics with CRISPR-based crop editing."
+          }
+        },
+        {
+          "category": {
+            "pt": "Bioinsumos",
+            "en": "Bioinputs"
+          },
+          "description": {
+            "pt": "Biopesticidas e bioinsumos.",
+            "en": "Biopesticides and bioinputs."
+          }
+        },
+        {
+          "category": {
+            "pt": "Cultivares",
+            "en": "Crop varieties"
+          },
+          "description": {
+            "pt": "Cultivares resilientes ao clima.",
+            "en": "Climate-resilient crop varieties."
+          }
+        }
+      ],
+      "production_capacity": {
+        "pt": "43 unidades de pesquisa e laboratórios; plantas-piloto multiusuário de biologia sintética, metabolômica, genômica e bioprospecção.",
+        "en": "43 research and laboratory units; multi-user pilot plants for synthetic biology, metabolomics, genomics and bioprospecting."
+      },
+      "export_markets": [
+        "latin_america",
+        "north_america",
+        "africa",
+        "asia"
+      ],
+      "export_markets_text": {
+        "pt": "Ativos tecnológicos e cooperação técnica com mais de 30 países (foco na CPLP).",
+        "en": "Technology assets and technical cooperation with 30+ countries (CPLP focus)."
+      },
+      "certifications": [
+        "anvisa",
+        "other"
+      ],
+      "partnership_interests": [
+        {
+          "area": {
+            "pt": "Biotecnologia avançada",
+            "en": "Advanced biotechnology"
+          },
+          "description": {
+            "pt": "Co-desenvolvimento em edição genômica, cultivares resilientes e biologia sintética.",
+            "en": "Co-development in genomic editing, resilient cultivars and synthetic biology."
+          }
+        },
+        {
+          "area": {
+            "pt": "Interface saúde/farma",
+            "en": "Health/pharma interface"
+          },
+          "description": {
+            "pt": "Compostos naturais e bioprospecção de insumos farmacêuticos.",
+            "en": "Natural compounds and bioprospecting for pharmaceutical inputs."
+          }
+        },
+        {
+          "area": {
+            "pt": "Agricultura digital",
+            "en": "Digital agriculture"
+          },
+          "description": {
+            "pt": "IA para monitoramento de pragas e doenças.",
+            "en": "AI for pest and disease monitoring."
+          }
+        }
+      ],
+      "partnership_models": [
+        "co_development",
+        "technology_transfer",
+        "licensing"
+      ],
+      "expansion_projects": {
+        "pt": "Modernização de plantas-piloto e laboratórios multiusuário de biologia sintética, metabolômica, genômica e bioprospecção.",
+        "en": "Modernization of pilot plants and multi-user labs for synthetic biology, metabolomics, genomics and bioprospecting."
+      },
+      "investment_range": {
+        "min": 100000,
+        "max": 10000000
+      },
+      "investment_description": {
+        "pt": "Projetos de co-desenvolvimento e infraestrutura laboratorial.",
+        "en": "Co-development projects and lab infrastructure."
+      }
+    }
+  },
+  {
+    "id": "embrapa-bioinputs",
+    "organization_id": "embrapa",
+    "profile_type": "B",
+    "sort_order": 1,
+    "demo": true,
+    "summary": {
+      "pt": "Plataforma de bioinsumos microbianos para saúde vegetal e animal.",
+      "en": "Microbial bioinputs platform for plant and animal health."
+    },
+    "fields": {
+      "platform_type": {
+        "pt": "Plataforma de bioinsumos microbianos",
+        "en": "Microbial bioinputs platform"
+      },
+      "maturity": "partially_operational",
+      "platform_description": {
+        "pt": "Coleção de microrganismos e processos de formulação para bioinsumos, disponível para licenciamento e co-desenvolvimento.",
+        "en": "Microorganism collection and formulation processes for bioinputs, available for licensing and co-development."
+      },
+      "technology_tags": [
+        "fermentation",
+        "genomics"
+      ],
+      "technology_text": {
+        "pt": "Coleção de microrganismos; fermentação; formulação de bioinsumos.",
+        "en": "Microorganism collection; fermentation; bioinput formulation."
+      },
+      "business_models": [
+        "licensing"
+      ],
+      "business_model_text": {
+        "pt": "Licenciamento de tecnologia e co-desenvolvimento com empresas.",
+        "en": "Technology licensing and co-development with companies."
+      },
+      "traction": {
+        "pt": "Tecnologias licenciadas a empresas brasileiras de bioinsumos.",
+        "en": "Technologies licensed to Brazilian bioinput companies."
+      },
+      "competitive_edge": {
+        "pt": "Uma das maiores coleções de microrganismos da América Latina, com dados de campo de décadas.",
+        "en": "One of Latin America’s largest microorganism collections, with decades of field data."
+      }
+    }
+  },
+  {
+    "id": "biomanguinhos-main",
+    "organization_id": "biomanguinhos",
+    "profile_type": "E",
+    "sort_order": 0,
+    "demo": false,
+    "summary": null,
+    "fields": {
+      "institution_type": {
+        "pt": "Produtora pública — Vacinas, biofármacos e diagnósticos",
+        "en": "Public producer — Vaccines, biopharmaceuticals and diagnostics"
+      },
+      "product_portfolio": [
+        {
+          "category": {
+            "pt": "Vacinas",
+            "en": "Vaccines"
+          },
+          "description": {
+            "pt": "11 vacinas em plataformas virais e bacterianas.",
+            "en": "11 vaccines on viral and bacterial platforms."
+          }
+        },
+        {
+          "category": {
+            "pt": "Biofármacos",
+            "en": "Biopharmaceuticals"
+          },
+          "description": {
+            "pt": "10 biofármacos, entre eles adalimumabe, infliximabe, trastuzumabe e rituximabe.",
+            "en": "10 biopharmaceuticals, including adalimumab, infliximab, trastuzumab and rituximab."
+          }
+        },
+        {
+          "category": {
+            "pt": "Diagnósticos",
+            "en": "Diagnostics"
+          },
+          "description": {
+            "pt": "40 kits de diagnóstico.",
+            "en": "40 diagnostic kits."
+          }
+        }
+      ],
+      "production_capacity": {
+        "pt": "Vacinas: 150 milhões de doses/ano. Biofármacos: 9 milhões de frascos/seringas por ano.",
+        "en": "Vaccines: 150 million doses/year. Biopharmaceuticals: 9 million vials/syringes per year."
+      },
+      "export_markets": [
+        "latin_america",
+        "africa",
+        "asia"
+      ],
+      "export_markets_text": {
+        "pt": "16 milhões de doses/ano de vacina de febre amarela para 75 países via OPAS.",
+        "en": "16 million doses/year of yellow fever vaccine to 75 countries via PAHO."
+      },
+      "certifications": [
+        "anvisa",
+        "who",
+        "who_pq"
+      ],
+      "partnership_interests": [
+        {
+          "area": {
+            "pt": "Plataforma de RNA",
+            "en": "RNA platform"
+          },
+          "description": {
+            "pt": "Desenvolvimento conjunto de vacinas e terapias de RNA.",
+            "en": "Joint development of RNA vaccines and therapies."
+          }
+        },
+        {
+          "area": {
+            "pt": "Biossimilares",
+            "en": "Biosimilars"
+          },
+          "description": {
+            "pt": "Transferência de tecnologia de biossimilares.",
+            "en": "Biosimilar technology transfer."
+          }
+        },
+        {
+          "area": {
+            "pt": "CAR-T in vivo",
+            "en": "In vivo CAR-T"
+          },
+          "description": {
+            "pt": "Terapias celulares avançadas.",
+            "en": "Advanced cell therapies."
+          }
+        }
+      ],
+      "partnership_models": [
+        "co_development",
+        "technology_transfer"
+      ],
+      "expansion_projects": {
+        "pt": "Terapias avançadas — plataformas de RNA, CAR-T in vivo e terapia gênica.",
+        "en": "Advanced therapies — RNA, in vivo CAR-T and gene-therapy platforms."
+      },
+      "investment_range": {
+        "min": 10000000,
+        "max": 50000000
+      }
+    }
+  },
+  {
+    "id": "aurora-au101",
+    "organization_id": "aurora",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": true,
+    "summary": {
+      "pt": "AU-101: anti-inflamatório oral de liberação prolongada para artrite reumatoide, em Fase II.",
+      "en": "AU-101: extended-release oral anti-inflammatory for rheumatoid arthritis, in Phase II."
+    },
+    "fields": {
+      "segment": {
+        "pt": "Reumatologia — Anti-inflamatório oral de liberação prolongada",
+        "en": "Rheumatology — Extended-release oral anti-inflammatory"
+      },
+      "trl": 6,
+      "regulatory_phase": "phase_2",
+      "lead_product_name": "AU-101",
+      "lead_product_moa": {
+        "pt": "Inibidor seletivo de JAK1 em formulação de liberação prolongada, com dose única diária.",
+        "en": "Selective JAK1 inhibitor in an extended-release formulation, once daily."
+      },
+      "pipeline": [
+        {
+          "name": "AU-102",
+          "indication": {
+            "pt": "Artrite psoriásica",
+            "en": "Psoriatic arthritis"
+          }
+        }
+      ],
+      "patents_filed": {
+        "pt": "Formulação depositada no BR, US e EP.",
+        "en": "Formulation filed in BR, US and EP."
+      },
+      "fto": "yes",
+      "milestones": [
+        {
+          "period": {
+            "year": 2025,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Conclusão da Fase I",
+            "en": "Phase I completed"
+          }
+        },
+        {
+          "period": {
+            "year": 2026,
+            "month": 11
+          },
+          "description": {
+            "pt": "Primeiro paciente na Fase II",
+            "en": "First patient in Phase II"
+          }
+        },
+        {
+          "period": {
+            "year": 2028,
+            "semester": 1
+          },
+          "description": {
+            "pt": "Resultados da Fase II",
+            "en": "Phase II results"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "other",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 15000000,
+          "purpose": {
+            "pt": "Co-desenvolvimento da Fase II",
+            "en": "Phase II co-development"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Estudo de Fase II em 12 centros no Brasil e na Argentina.",
+        "en": "Phase II study in 12 sites in Brazil and Argentina."
+      },
+      "raised": [
+        {
+          "source": "own_resources",
+          "amount_usd": 8000000
+        },
+        {
+          "source": "finep",
+          "amount_usd": 2500000
+        }
+      ],
+      "revenue": {
+        "amount_usd": 310000000,
+        "year": 2025
+      },
+      "gtm_models": [
+        "co_development",
+        "out_licensing"
+      ],
+      "gtm_text": {
+        "pt": "Co-desenvolvimento para mercados fora da América Latina.",
+        "en": "Co-development for markets outside Latin America."
+      },
+      "target_markets": [
+        "brazil",
+        "latin_america",
+        "europe"
+      ]
+    }
+  },
+  {
+    "id": "aurora-au201",
+    "organization_id": "aurora",
+    "profile_type": "A",
+    "sort_order": 1,
+    "demo": true,
+    "summary": {
+      "pt": "AU-201: biossimilar de anticorpo monoclonal para oncologia, em fase pré-clínica.",
+      "en": "AU-201: monoclonal antibody biosimilar for oncology, pre-clinical."
+    },
+    "fields": {
+      "segment": {
+        "pt": "Oncologia — Biossimilar de anticorpo monoclonal",
+        "en": "Oncology — Monoclonal antibody biosimilar"
+      },
+      "trl": 4,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "AU-201",
+      "lead_product_moa": {
+        "pt": "Anticorpo anti-HER2 biossimilar.",
+        "en": "Anti-HER2 biosimilar antibody."
+      },
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "semester": 2
+          },
+          "description": {
+            "pt": "Comparabilidade analítica concluída",
+            "en": "Analytical comparability completed"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "other",
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "amount_usd": 8000000,
+          "purpose": {
+            "pt": "Desenvolvimento analítico e clínico",
+            "en": "Analytical and clinical development"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Comparabilidade analítica e estudo clínico de equivalência.",
+        "en": "Analytical comparability and clinical equivalence study."
+      },
+      "raised": [
+        {
+          "source": "own_resources",
+          "amount_usd": 3000000
+        }
+      ],
+      "gtm_models": [
+        "direct_sales",
+        "partnership_distribution"
+      ],
+      "gtm_text": {
+        "pt": "Venda direta no Brasil e parceiros na América Latina.",
+        "en": "Direct sales in Brazil and partners in Latin America."
+      },
+      "target_markets": [
+        "brazil",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "aurora-cdmo",
+    "organization_id": "aurora",
+    "profile_type": "C",
+    "sort_order": 2,
+    "demo": true,
+    "summary": {
+      "pt": "Unidade de CDMO para formulação e fabricação de sólidos orais e injetáveis.",
+      "en": "CDMO unit for formulation and manufacturing of oral solids and injectables."
+    },
+    "fields": {
+      "services": [
+        "process_development",
+        "formulation",
+        "manufacturing",
+        "analytical"
+      ],
+      "services_text": {
+        "pt": "Desenvolvimento de processo, formulação, escalonamento e fabricação comercial de sólidos orais e injetáveis.",
+        "en": "Process development, formulation, scale-up and commercial manufacturing of oral solids and injectables."
+      },
+      "molecule_types": [
+        "small_molecules",
+        "apis"
+      ],
+      "capacity_scales": [
+        "pilot",
+        "commercial"
+      ],
+      "utilization_pct": 68,
+      "capacity_text": {
+        "pt": "2 bilhões de comprimidos/ano e 30 milhões de ampolas/ano.",
+        "en": "2 billion tablets/year and 30 million ampoules/year."
+      },
+      "certifications": [
+        "gmp",
+        "anvisa",
+        "ema"
+      ],
+      "client_count": 35,
+      "client_profiles": [
+        "startups",
+        "national_pharma",
+        "multinational"
+      ],
+      "revenue": {
+        "amount_usd": 42000000,
+        "year": 2025
+      },
+      "exports": {
+        "amount_usd": 6500000,
+        "year": 2025
+      },
+      "expansion_plan": {
+        "pt": "Nova linha de injetáveis estéreis em 2027.",
+        "en": "New sterile injectables line in 2027."
+      },
+      "investment_types": [
+        "jv",
+        "infrastructure_expansion"
+      ],
+      "investment_range": {
+        "min": 10000000,
+        "max": 25000000
+      },
+      "target_markets": [
+        "brazil",
+        "latin_america",
+        "africa"
+      ]
+    }
+  },
+  {
+    "id": "aurora-packaging",
+    "organization_id": "aurora",
+    "profile_type": "F",
+    "sort_order": 3,
+    "demo": true,
+    "summary": {
+      "pt": "Embalagens farmacêuticas especiais e insumos para a indústria.",
+      "en": "Specialty pharmaceutical packaging and inputs for the industry."
+    },
+    "fields": {
+      "products": [
+        {
+          "pt": "Blísteres de alta barreira",
+          "en": "High-barrier blisters"
+        },
+        {
+          "pt": "Frascos de vidro tipo I",
+          "en": "Type I glass vials"
+        },
+        {
+          "pt": "Excipientes",
+          "en": "Excipients"
+        }
+      ],
+      "products_text": {
+        "pt": "Embalagens primárias e secundárias para medicamentos, com rastreabilidade.",
+        "en": "Primary and secondary packaging for medicines, with traceability."
+      },
+      "markets_served": [
+        "brazil",
+        "latin_america"
+      ],
+      "markets_text": {
+        "pt": "Farmacêuticas nacionais e multinacionais instaladas no Brasil.",
+        "en": "Brazilian and multinational pharma companies operating in Brazil."
+      },
+      "certifications": [
+        "iso",
+        "gmp"
+      ],
+      "market_share": {
+        "pct": 14,
+        "segment": {
+          "pt": "Blísteres farmacêuticos no Brasil",
+          "en": "Pharmaceutical blisters in Brazil"
+        }
+      },
+      "revenue": {
+        "amount_usd": 18000000,
+        "year": 2025
+      },
+      "exports": {
+        "pct": 8,
+        "destinations": [
+          "latin_america"
+        ]
+      },
+      "expansion_strategy": {
+        "pt": "Ampliar exportações para o Mercosul.",
+        "en": "Expand exports to Mercosur."
+      },
+      "partnership_models": [
+        "jv",
+        "distribution"
+      ],
+      "investment_range": {
+        "min": 2000000,
+        "max": 6000000
+      }
+    }
+  },
+  {
+    "id": "vitalbio-production",
+    "organization_id": "vitalbio",
+    "profile_type": "E",
+    "sort_order": 0,
+    "demo": true,
+    "summary": {
+      "pt": "Produção de soros e vacinas para o SUS, com interesse em transferência de tecnologia.",
+      "en": "Production of sera and vaccines for the public health system, seeking technology transfer."
+    },
+    "fields": {
+      "institution_type": {
+        "pt": "Instituto público — Soros, vacinas e biofármacos",
+        "en": "Public institute — Sera, vaccines and biopharmaceuticals"
+      },
+      "product_portfolio": [
+        {
+          "category": {
+            "pt": "Soros",
+            "en": "Sera"
+          },
+          "description": {
+            "pt": "8 soros hiperimunes.",
+            "en": "8 hyperimmune sera."
+          }
+        },
+        {
+          "category": {
+            "pt": "Vacinas",
+            "en": "Vaccines"
+          },
+          "description": {
+            "pt": "4 vacinas do calendário nacional.",
+            "en": "4 national-schedule vaccines."
+          }
+        }
+      ],
+      "production_capacity": {
+        "pt": "60 milhões de doses/ano.",
+        "en": "60 million doses/year."
+      },
+      "certifications": [
+        "anvisa",
+        "who"
+      ],
+      "partnership_interests": [
+        {
+          "area": {
+            "pt": "Vacinas combinadas",
+            "en": "Combination vaccines"
+          },
+          "description": {
+            "pt": "Transferência de tecnologia para produção local.",
+            "en": "Technology transfer for local production."
+          }
+        }
+      ],
+      "partnership_models": [
+        "technology_transfer",
+        "co_development"
+      ],
+      "investment_range": {
+        "min": 5000000,
+        "max": 20000000
+      }
+    }
+  },
+  {
+    "id": "vitalbio-mrna",
+    "organization_id": "vitalbio",
+    "profile_type": "A",
+    "sort_order": 1,
+    "demo": true,
+    "summary": {
+      "pt": "Vacina de mRNA contra dengue em fase pré-clínica.",
+      "en": "Pre-clinical mRNA dengue vaccine."
+    },
+    "fields": {
+      "segment": {
+        "pt": "Doenças infecciosas — Vacina de mRNA contra dengue",
+        "en": "Infectious diseases — mRNA dengue vaccine"
+      },
+      "trl": 4,
+      "regulatory_phase": "preclinical",
+      "lead_product_name": "VB-DEN1",
+      "lead_product_moa": {
+        "pt": "mRNA tetravalente codificando antígenos dos quatro sorotipos.",
+        "en": "Tetravalent mRNA encoding antigens of the four serotypes."
+      },
+      "milestones": [
+        {
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "description": {
+            "pt": "Estudos de toxicologia",
+            "en": "Toxicology studies"
+          }
+        }
+      ],
+      "rounds": [
+        {
+          "stage": "other",
+          "period": {
+            "year": 2027,
+            "semester": 1
+          },
+          "amount_usd": 12000000,
+          "purpose": {
+            "pt": "Pré-clínico e Fase I",
+            "en": "Pre-clinical and Phase I"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Lotes clínicos e estudo de Fase I.",
+        "en": "Clinical batches and Phase I study."
+      },
+      "raised": [
+        {
+          "source": "bndes",
+          "amount_usd": 4000000
+        }
+      ],
+      "gtm_models": [
+        "co_development"
+      ],
+      "gtm_text": {
+        "pt": "Co-desenvolvimento com parceiro internacional.",
+        "en": "Co-development with an international partner."
+      },
+      "target_markets": [
+        "brazil",
+        "latin_america",
+        "asia"
+      ]
+    }
+  },
+  {
+    "id": "biofactor-main",
+    "organization_id": "biofactor",
+    "profile_type": "C",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "services": [
+        "process_development",
+        "manufacturing",
+        "analytical"
+      ],
+      "services_text": {
+        "pt": "Desenvolvimento de linhagens, processo upstream e downstream, lotes clínicos GMP.",
+        "en": "Cell-line development, upstream and downstream processing, GMP clinical batches."
+      },
+      "molecule_types": [
+        "biologics",
+        "antibodies",
+        "vaccines"
+      ],
+      "capacity_scales": [
+        "laboratory",
+        "pilot"
+      ],
+      "utilization_pct": 74,
+      "capacity_text": {
+        "pt": "Biorreatores de 50 L a 1.000 L.",
+        "en": "Bioreactors from 50 L to 1,000 L."
+      },
+      "certifications": [
+        "gmp",
+        "anvisa",
+        "iso"
+      ],
+      "client_count": 14,
+      "client_profiles": [
+        "startups",
+        "national_pharma"
+      ],
+      "revenue": {
+        "amount_usd": 9500000,
+        "year": 2025
+      },
+      "exports": {
+        "none": true
+      },
+      "expansion_plan": {
+        "pt": "Biorreator de 2.000 L para fabricação comercial.",
+        "en": "2,000 L bioreactor for commercial manufacturing."
+      },
+      "investment_types": [
+        "pe",
+        "infrastructure_expansion",
+        "strategic_partner"
+      ],
+      "investment_range": {
+        "min": 8000000,
+        "max": 15000000
+      },
+      "target_markets": [
+        "brazil",
+        "latin_america",
+        "north_america"
+      ]
+    }
+  },
+  {
+    "id": "nexa-main",
+    "organization_id": "nexa",
+    "profile_type": "F",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "products": [
+        {
+          "pt": "Excipientes de celulose",
+          "en": "Cellulose excipients"
+        },
+        {
+          "pt": "Intermediários de síntese",
+          "en": "Synthesis intermediates"
+        }
+      ],
+      "products_text": {
+        "pt": "Excipientes e intermediários para sólidos orais, com DMF registrado.",
+        "en": "Excipients and intermediates for oral solids, with registered DMF."
+      },
+      "markets_served": [
+        "brazil",
+        "latin_america",
+        "europe"
+      ],
+      "certifications": [
+        "iso",
+        "gmp",
+        "dmf"
+      ],
+      "revenue": {
+        "amount_usd": 26000000,
+        "year": 2025
+      },
+      "exports": {
+        "pct": 22,
+        "destinations": [
+          "latin_america",
+          "europe"
+        ]
+      },
+      "expansion_strategy": {
+        "pt": "Nova planta de intermediários em 2028.",
+        "en": "New intermediates plant in 2028."
+      },
+      "partnership_models": [
+        "distribution",
+        "jv"
+      ],
+      "investment_range": {
+        "min": 5000000,
+        "max": 12000000
+      }
+    }
+  },
+  {
+    "id": "amazonia-main",
+    "organization_id": "amazonia",
+    "profile_type": "F",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "products": [
+        {
+          "pt": "Extratos padronizados",
+          "en": "Standardized extracts"
+        },
+        {
+          "pt": "Óleos vegetais",
+          "en": "Vegetable oils"
+        }
+      ],
+      "products_text": {
+        "pt": "12 extratos com marcadores químicos definidos e 5 óleos vegetais.",
+        "en": "12 extracts with defined chemical markers and 5 vegetable oils."
+      },
+      "markets_served": [
+        "brazil",
+        "europe",
+        "north_america"
+      ],
+      "certifications": [
+        "iso"
+      ],
+      "revenue": {
+        "amount_usd": 1200000,
+        "year": 2025
+      },
+      "partnership_models": [
+        "distribution",
+        "pe"
+      ],
+      "investment_range": {
+        "min": 1000000,
+        "max": 3000000
+      }
+    }
+  },
+  {
+    "id": "veritas-main",
+    "organization_id": "veritas",
+    "profile_type": "D",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "services": [
+        "clinical_phase_1_4"
+      ],
+      "services_text": {
+        "pt": "Condução de estudos de Fase I a IV, monitoria e gestão de dados.",
+        "en": "Conduct of Phase I–IV studies, monitoring and data management."
+      },
+      "therapeutic_areas": [
+        "oncology",
+        "cardiovascular",
+        "metabolic"
+      ],
+      "certifications": [
+        "bpc",
+        "anvisa"
+      ],
+      "partner_sites": [
+        "Hospital Moinhos (fictício)",
+        "Centro Clínico Sul (fictício)"
+      ],
+      "investment_types": [
+        "expansion"
+      ],
+      "target_markets": [
+        "brazil",
+        "latin_america"
+      ]
+    }
+  },
+  {
+    "id": "synthera-main",
+    "organization_id": "synthera",
+    "profile_type": "A",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "segment": {
+        "pt": "Doenças raras — Peptídeos sintéticos",
+        "en": "Rare diseases — Synthetic peptides"
+      },
+      "trl": 3,
+      "regulatory_phase": "preclinical",
+      "target_markets": [
+        "brazil"
+      ]
+    }
+  },
+  {
+    "id": "lumina-main",
+    "organization_id": "lumina",
+    "profile_type": "B",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "platform_type": {
+        "pt": "Diagnóstico molecular point-of-care",
+        "en": "Point-of-care molecular diagnostics"
+      },
+      "maturity": "partially_operational",
+      "platform_description": {
+        "pt": "Cartucho microfluídico descartável que realiza amplificação isotérmica em 20 minutos.",
+        "en": "Disposable microfluidic cartridge running isothermal amplification in 20 minutes."
+      },
+      "technology_tags": [
+        "microfluidics",
+        "biosensors"
+      ],
+      "technology_text": {
+        "pt": "Amplificação isotérmica; microfluídica; leitura óptica por smartphone.",
+        "en": "Isothermal amplification; microfluidics; smartphone optical readout."
+      },
+      "business_models": [
+        "equipment",
+        "consumables"
+      ],
+      "business_model_text": {
+        "pt": "Leitor em comodato e venda de cartuchos.",
+        "en": "Reader placement and cartridge sales."
+      },
+      "traction": {
+        "pt": "Pilotos em 6 laboratórios; registro ANVISA classe III em análise.",
+        "en": "Pilots in 6 labs; ANVISA class III registration under review."
+      },
+      "revenue": {
+        "amount_usd": 150000,
+        "year": 2025
+      },
+      "competitive_edge": {
+        "pt": "Custo por teste 70% menor que o PCR de bancada.",
+        "en": "Cost per test 70% lower than benchtop PCR."
+      },
+      "rounds": [
+        {
+          "stage": "seed",
+          "period": {
+            "year": 2026,
+            "semester": 2
+          },
+          "amount_usd": 3000000,
+          "purpose": {
+            "pt": "Registro e escala de produção",
+            "en": "Registration and production scale-up"
+          }
+        }
+      ],
+      "use_of_funds": {
+        "pt": "Registro ANVISA e linha de produção de cartuchos.",
+        "en": "ANVISA registration and cartridge production line."
+      },
+      "raised": [
+        {
+          "source": "fapesp",
+          "amount_usd": 400000
+        },
+        {
+          "source": "angel",
+          "amount_usd": 350000
+        }
+      ]
+    }
+  },
+  {
+    "id": "pharmaplex-main",
+    "organization_id": "pharmaplex",
+    "profile_type": "E",
+    "sort_order": 0,
+    "demo": true,
+    "summary": null,
+    "fields": {
+      "institution_type": {
+        "pt": "Produtora de grande porte — Genéricos e IFAs",
+        "en": "Large producer — Generics and APIs"
+      },
+      "product_portfolio": [
+        {
+          "category": {
+            "pt": "Genéricos",
+            "en": "Generics"
+          },
+          "description": {
+            "pt": "180 registros de genéricos.",
+            "en": "180 generic registrations."
+          }
+        },
+        {
+          "category": {
+            "pt": "IFAs",
+            "en": "APIs"
+          },
+          "description": {
+            "pt": "12 IFAs produzidos internamente.",
+            "en": "12 APIs produced in-house."
+          }
+        }
+      ],
+      "production_capacity": {
+        "pt": "3 plantas, 1,5 bilhão de unidades/ano.",
+        "en": "3 plants, 1.5 billion units/year."
+      },
+      "certifications": [
+        "anvisa",
+        "other"
+      ],
+      "partnership_interests": [
+        {
+          "area": {
+            "pt": "IFAs oncológicos",
+            "en": "Oncology APIs"
+          },
+          "description": {
+            "pt": "Transferência de tecnologia para produção local.",
+            "en": "Technology transfer for local production."
+          }
+        }
+      ],
+      "partnership_models": [
+        "jv",
+        "technology_transfer"
+      ]
+    }
+  }
+]

@@ -1,0 +1,1347 @@
+[
+  {
+    "id": "imunotera",
+    "name": "ImunoTera",
+    "logo_url": "assets/logos/imunotera.jpg",
+    "cover_url": "https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=1600&h=720&auto=format&fit=crop",
+    "description": {
+      "pt": "A ImunoTera desenvolve imunoterapias terapêuticas contra cânceres induzidos por HPV (colo do útero, cabeça e pescoço) e doenças virais emergentes.",
+      "en": "ImunoTera develops therapeutic immunotherapies against HPV-induced cancers (cervical, head & neck) and emerging viral diseases."
+    },
+    "website": "https://www.imunotera.example",
+    "city": "Ribeirão Preto",
+    "state": "SP",
+    "size": "startup",
+    "segments": [
+      "biotechnology",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing",
+      "vc"
+    ],
+    "leadership": [
+      {
+        "name": "Ana Ribeiro",
+        "role": {
+          "pt": "CEO e cofundadora",
+          "en": "CEO & Co-founder"
+        },
+        "experience": {
+          "pt": "15 anos em imunologia de tumores; PhD pela USP.",
+          "en": "15 years in tumor immunology; PhD from USP."
+        }
+      },
+      {
+        "name": "Carlos Menezes",
+        "role": {
+          "pt": "Diretor científico",
+          "en": "Chief Scientific Officer"
+        },
+        "experience": {
+          "pt": "Ex-pesquisador do Instituto Butantan, 40 artigos publicados.",
+          "en": "Former researcher at Instituto Butantan, 40 published papers."
+        }
+      }
+    ],
+    "gallery": [
+      {
+        "url": "https://images.unsplash.com/photo-1579154204601-01588f351e67?q=80&w=700&h=700&auto=format&fit=crop",
+        "caption": {
+          "pt": "Laboratório",
+          "en": "Laboratory"
+        }
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1587854692152-cbe660dbde88?q=80&w=700&h=700&auto=format&fit=crop",
+        "caption": {
+          "pt": "Produto",
+          "en": "Product"
+        }
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1579165466741-7f35e4755660?q=80&w=700&h=700&auto=format&fit=crop",
+        "caption": {
+          "pt": "Equipe",
+          "en": "Team"
+        }
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1532187863486-abf9dbad1b69?q=80&w=700&h=700&auto=format&fit=crop&crop=faces",
+        "caption": {
+          "pt": "Estudos",
+          "en": "Trials"
+        }
+      }
+    ],
+    "focal_point": {
+      "name": "Ponto focal ImunoTera",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@imunotera.example",
+      "phone": "+55 11 91233-8199"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-22",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-22",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "heptech",
+    "name": "Heptech Biotech",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/heptech-hero/1600/720",
+    "description": {
+      "pt": "A Heptech desenvolve heparina de baixo peso molecular (HBPM) de origem bovina como alternativa à suína, reduzindo a vulnerabilidade da cadeia global de heparina.",
+      "en": "Heptech develops bovine-derived low molecular weight heparin (LMWH) as a non-porcine alternative, addressing the vulnerability of the global heparin supply chain."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "pharmaceutical"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Heptech Biotech",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@heptech.example",
+      "phone": "+55 11 90959-3665"
+    },
+    "status": "returned",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "krabs",
+    "name": "KRABS",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/krabs-hero/1600/720",
+    "description": {
+      "pt": "A KRABS desenvolve um tratamento tópico inovador para dermatite atópica com um anticorpo próprio que inibe a KLK7, enzima associada à descamação da pele.",
+      "en": "KRABS develops a novel topical treatment for Atopic Dermatitis using a proprietary antibody that inhibits KLK7, an enzyme associated with skin desquamation."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal KRABS",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@krabs.example",
+      "phone": "+55 11 90685-4555"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "cellertz",
+    "name": "Cellertz Bio",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/cellertz-hero/1600/720",
+    "description": {
+      "pt": "A Cellertz Bio desenvolve o CellBiTE (CLZ-06X), um mRNA que codifica um engajador biespecífico de células T anti-CD19/CD3 para leucemia linfoide aguda. A abordagem in vivo evita a complexidade e o custo de fabricação dos BiTEs proteicos tradicionais.",
+      "en": "Cellertz Bio develops CellBiTE (CLZ-06X), an mRNA encoding a bispecific T-cell engager targeting CD19/CD3 for acute lymphoid leukemia. The in vivo approach avoids the complexity and manufacturing cost of traditional protein-based BiTE production."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing",
+      "co_development",
+      "vc"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Cellertz Bio",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@cellertz.example",
+      "phone": "+55 11 91096-0932"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "aptah",
+    "name": "Aptah Bio",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/aptah-hero/1600/720",
+    "description": {
+      "pt": "A Aptah Bio desenvolve o APT20TTMG, molécula sintética de DNA de fita simples que corrige a disfunção do complexo U1 snRNP, essencial para o splicing do pré-mRNA, com ampla aplicação potencial em oncologia.",
+      "en": "Aptah Bio develops APT20TTMG, a synthetic single-stranded DNA molecule that corrects the dysfunction of the U1 snRNP complex, essential for pre-mRNA splicing, with broad potential application in oncology."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology"
+    ],
+    "partnership_types": [
+      "vc"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Aptah Bio",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@aptah.example",
+      "phone": "+55 11 90685-8199"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "wecare",
+    "name": "Wecare Skin",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/wecare-hero/1600/720",
+    "description": {
+      "pt": "A Wecare Skin desenvolve um composto tópico próprio semelhante a corticoide, com atividade anti-inflamatória para dermatite e psoríase, sem os efeitos adversos dos corticoides convencionais.",
+      "en": "Wecare Skin develops a proprietary corticoid-like topical compound with anti-inflammatory activity for dermatitis and psoriasis, without the adverse effects of conventional corticosteroids."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "pharmaceutical",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Wecare Skin",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@wecare.example",
+      "phone": "+55 11 90822-0021"
+    },
+    "status": "filling",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "nintx",
+    "name": "Nintx",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/nintx-hero/1600/720",
+    "description": {
+      "pt": "A Nintx desenvolve um ingrediente de origem natural para o tratamento da doença inflamatória intestinal (DII), com abordagem multimecanística, apoiada pelas plataformas próprias xGIbiomics® e GAIApath™ de simulação do microbioma e descoberta de biomarcadores com IA.",
+      "en": "Nintx develops a nature-derived ingredient for IBD treatment with a multi-mechanistic approach, supported by its proprietary xGIbiomics® and GAIApath™ platforms for microbiome simulation and AI-driven biomarker discovery."
+    },
+    "website": "https://www.nintx.example",
+    "city": "São Paulo",
+    "state": "SP",
+    "size": "startup",
+    "segments": [
+      "biotechnology",
+      "human_health"
+    ],
+    "partnership_types": [
+      "vc",
+      "co_development"
+    ],
+    "leadership": [
+      {
+        "name": "Rafael Duarte",
+        "role": {
+          "pt": "CEO",
+          "en": "CEO"
+        },
+        "experience": {
+          "pt": "Fundador de duas biotechs; ex-diretor de P&D em farmacêutica nacional.",
+          "en": "Founder of two biotechs; former R&D director at a Brazilian pharma."
+        }
+      }
+    ],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Nintx",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@nintx.example",
+      "phone": "+55 11 90685-4555"
+    },
+    "status": "in_review",
+    "public_state": "published",
+    "is_featured": true,
+    "last_approved_at": "2026-09-10",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-10",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "mirscience",
+    "name": "Mirscience Therapeutics",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/mirscience-hero/1600/720",
+    "description": {
+      "pt": "Terapia de RNA para sarcopenia (atrofia muscular). O produto principal silencia genes responsáveis pela atrofia muscular por interferência de RNA.",
+      "en": "RNA therapy targeting sarcopenia (muscle atrophy). The lead product silences genes responsible for muscle atrophy via RNA interference."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Mirscience Therapeutics",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@mirscience.example",
+      "phone": "+55 11 91370-0953"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "biocase",
+    "name": "Biocase Group",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/biocase-hero/1600/720",
+    "description": {
+      "pt": "Formulação de psilocibina natural para transtorno depressivo maior, alcoolismo, tabagismo e transtornos de impulso, com ação nos receptores 5-HT2A do córtex pré-frontal e efeito de 3 a 6 meses por dose.",
+      "en": "Natural psilocybin formulation targeting major depressive disorder, alcoholism, tobacco addiction and impulse disorders, acting on 5-HT2A receptors in the prefrontal cortex, with effects lasting 3 to 6 months per dose."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "pharmaceutical",
+      "human_health"
+    ],
+    "partnership_types": [
+      "vc"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Biocase Group",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@biocase.example",
+      "phone": "+55 11 90959-1843"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "celluris",
+    "name": "Celluris",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/celluris-hero/1600/720",
+    "description": {
+      "pt": "Plataforma própria de CAR-T para tumores sólidos, com arquitetura de dois módulos que mira o antígeno tumoral e sequestra uma proteína do microambiente tumoral, superando um mecanismo-chave de resistência.",
+      "en": "Proprietary CAR-T platform for solid tumors, with a dual-module architecture that targets the tumor antigen and sequesters a tumor microenvironment protein, overcoming a key resistance mechanism."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Celluris",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@celluris.example",
+      "phone": "+55 11 91096-7288"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "qnity",
+    "name": "Qnity",
+    "logo_url": "assets/logos/qnity.png",
+    "cover_url": "https://picsum.photos/seed/qnity-hero/1600/720",
+    "description": {
+      "pt": "A Qnity desenvolve uma plataforma de instrumentação científica baseada em eletroquímica quântica para análise em tempo real de interações moleculares, convertidas em sinais eletroquímicos ultrassensíveis.",
+      "en": "Qnity is developing a scientific instrumentation platform based on quantum electrochemistry for real-time analysis of molecular interactions, translating them into ultrasensitive electrochemical signals."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "devices_diagnostics"
+    ],
+    "partnership_types": [
+      "vc",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Qnity",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@qnity.example",
+      "phone": "+55 11 90685-4555"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "peptidus",
+    "name": "Peptidus Biotech",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/peptidus-hero/1600/720",
+    "description": {
+      "pt": "A plataforma LAIKA, da Peptidus Biotech, usa IA/ML para projetar e validar novos peptídeos terapêuticos para saúde animal, segmento historicamente pouco atendido pelas plataformas de descoberta de fármacos.",
+      "en": "Peptidus Biotech’s LAIKA platform uses AI/ML to design and validate new therapeutic peptides for animal health, a segment historically underserved by drug-discovery platforms."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "animal_health"
+    ],
+    "partnership_types": [
+      "vc",
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Peptidus Biotech",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@peptidus.example",
+      "phone": "+55 11 91096-4576"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "sante",
+    "name": "Sante Science",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/sante-hero/1600/720",
+    "description": {
+      "pt": "Plataforma de biotecnologia que usa fermentação microbiana própria para produzir ingredientes pós-bióticos com composição bioativa complexa e atividade multimodal, para saúde animal e nutrição humana.",
+      "en": "Biotechnology platform using proprietary microbial fermentation to produce postbiotic ingredients with complex bioactive composition and multimodal activity, for animal health and human nutrition."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "animal_health"
+    ],
+    "partnership_types": [
+      "co_development",
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Sante Science",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@sante.example",
+      "phone": "+55 11 90685-1843"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "microforge",
+    "name": "Micro Forge Biotech",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/microforge-hero/1600/720",
+    "description": {
+      "pt": "A Micro Forge desenvolve plataformas biotecnológicas para produzir moléculas de alto valor por microrganismos, com foco em desenvolvimento de linhagens, otimização de fermentação e purificação.",
+      "en": "Micro Forge develops biotechnology platforms for producing high-value molecules via microorganisms, focused on strain development, fermentation optimization and downstream purification."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "biodiversity_bioeconomy"
+    ],
+    "partnership_types": [
+      "out_licensing",
+      "co_development"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Micro Forge Biotech",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@microforge.example",
+      "phone": "+55 11 91370-7309"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "techtrials",
+    "name": "Techtrials",
+    "logo_url": "assets/logos/techtrials.png",
+    "cover_url": "https://picsum.photos/seed/techtrials-hero/1600/720",
+    "description": {
+      "pt": "A Techtrials é uma plataforma de inteligência em saúde baseada em Real-World Evidence, dados clínicos e epidemiológicos, analytics avançado e IA. Integra dados de várias fontes e gera insights estratégicos para farmacêuticas, operadoras, hospitais e reguladores.",
+      "en": "Techtrials is a health intelligence platform built on Real-World Evidence, clinical and epidemiological data, advanced analytics and AI. It integrates data from multiple sources and generates strategic insights for pharma, payers, hospitals and regulators."
+    },
+    "website": "https://www.techtrials.example",
+    "city": "São Paulo",
+    "state": "SP",
+    "size": "startup",
+    "segments": [
+      "human_health",
+      "other"
+    ],
+    "partnership_types": [
+      "vc",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Techtrials",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@techtrials.example",
+      "phone": "+55 11 91370-9110"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-18",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-18",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "vesper",
+    "name": "Vesper Biotechnologies",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/vesper-hero/1600/720",
+    "description": {
+      "pt": "Venture builder focada em criar empresas de biotecnologia em RNA, engenharia genética e IA/bioinformática. O portfólio inclui a VYRO Biotherapeutics e a FUTR Bio (também neste diretório).",
+      "en": "Venture builder focused on building biotech companies in RNA technology, genetic engineering and AI/bioinformatics. The portfolio includes VYRO Biotherapeutics and FUTR Bio (also in this directory)."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Vesper Biotechnologies",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@vesper.example",
+      "phone": "+55 11 90822-0042"
+    },
+    "status": "offline",
+    "public_state": "hidden",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "vyro",
+    "name": "Vyro Biotherapeutics",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/vyro-hero/1600/720",
+    "description": {
+      "pt": "Usa um vírus Zika geneticamente modificado como vetor terapêutico para tumores do sistema nervoso central e como plataforma de entrega gênica, aproveitando o tropismo natural do Zika pelo cérebro.",
+      "en": "Uses a genetically modified Zika virus as a therapeutic vector for central nervous system tumors and as a gene-delivery platform, leveraging Zika’s natural tropism for the brain."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Vyro Biotherapeutics",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@vyro.example",
+      "phone": "+55 11 90548-8220"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "futrbio",
+    "name": "Futr Bio",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/futrbio-hero/1600/720",
+    "description": {
+      "pt": "Desenvolve vacinas de mRNA de nova geração com sequências UTR próprias e reforçadores moleculares que geram respostas imunes mais rápidas e duradouras, potencialmente em dose única e baixa.",
+      "en": "Develops next-generation mRNA vaccines using proprietary UTR sequences and molecular boosters that generate faster, more durable immune responses, potentially in a single low dose."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "biotechnology",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Futr Bio",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@futrbio.example",
+      "phone": "+55 11 90959-7288"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "huna",
+    "name": "Huna",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/huna-hero/1600/720",
+    "description": {
+      "pt": "Plataforma de IA que identifica padrões em dados clínicos — biomarcadores laboratoriais, genômicos e proteômicos — para oncologia. A primeira aplicação, já operando em escala, usa dados de hemograma para rastrear 5 tipos de câncer.",
+      "en": "AI platform identifying patterns in clinical data — lab, genomic and proteomic biomarkers — for oncology. Its first application, already operational at scale, uses CBC/blood-count data to screen for 5 cancer types."
+    },
+    "website": "https://www.huna.example",
+    "city": "São Paulo",
+    "state": "SP",
+    "size": "startup",
+    "segments": [
+      "human_health",
+      "devices_diagnostics"
+    ],
+    "partnership_types": [
+      "vc",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Huna",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@huna.example",
+      "phone": "+55 11 90548-3644"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-25",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-25",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "croplabs",
+    "name": "Crop Labs",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/croplabs-hero/1600/720",
+    "description": {
+      "pt": "A Crop Labs é uma CRO estabelecida que oferece controle de qualidade com certificação BPL e testes pré-clínicos para clientes farmacêuticos e de bens de consumo.",
+      "en": "Crop Labs is an established CRO offering GLP-certified quality control and pre-clinical testing services for pharmaceutical and consumer-goods clients."
+    },
+    "website": "https://www.croplabs.example",
+    "city": "Campinas",
+    "state": "SP",
+    "size": "medium",
+    "segments": [
+      "cro"
+    ],
+    "partnership_types": [
+      "infrastructure_investment",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Crop Labs",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@croplabs.example",
+      "phone": "+55 11 91096-8199"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-12",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-12",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "ionvet",
+    "name": "IonVet",
+    "logo_url": "assets/logos/ionvet.jpg",
+    "cover_url": "https://picsum.photos/seed/ionvet-hero/1600/720",
+    "description": {
+      "pt": "A IonVet é uma CRO estabelecida que presta serviços analíticos e de pesquisa — metabolômica, validação de biomarcadores e apoio a P&D — para saúde animal e agronegócio.",
+      "en": "IonVet is an established CRO providing analytical and research services — metabolomics, biomarker validation and R&D support — for animal health and agribusiness clients."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": null,
+    "segments": [
+      "cro",
+      "animal_health"
+    ],
+    "partnership_types": [
+      "infrastructure_investment",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal IonVet",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@ionvet.example",
+      "phone": "+55 11 90822-5466"
+    },
+    "status": "in_review",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "embrapa",
+    "name": "Embrapa",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/embrapa-hero/1600/720",
+    "description": {
+      "pt": "Maior instituição pública de pesquisa agropecuária do Brasil, com 43 unidades de pesquisa e laboratórios no país, que desenvolve e licencia tecnologias em genômica avançada, biologia sintética e edição de cultivares por CRISPR.",
+      "en": "Brazil’s largest public agricultural research institution, with 43 research and laboratory units nationwide, developing and licensing technologies in advanced genomics, synthetic biology and CRISPR-based crop editing."
+    },
+    "website": "https://www.embrapa.br",
+    "city": "Brasília",
+    "state": "DF",
+    "size": "large",
+    "segments": [
+      "biodiversity_bioeconomy",
+      "biotechnology",
+      "animal_health"
+    ],
+    "partnership_types": [
+      "co_development",
+      "infrastructure_investment"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Embrapa",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@embrapa.example",
+      "phone": "+55 11 90959-6377"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": true,
+    "last_approved_at": "2026-09-08",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-08",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "biomanguinhos",
+    "name": "Bio-Manguinhos / Fiocruz",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/biomanguinhos-hero/1600/720",
+    "description": {
+      "pt": "Instituição pública vinculada ao Ministério da Saúde e uma das maiores produtoras de imunobiológicos da América Latina, construindo plataformas de terapias avançadas em RNA, CAR-T e terapia gênica.",
+      "en": "Public institution under Brazil’s Ministry of Health and one of Latin America’s largest immunobiological producers, building advanced-therapy platforms in RNA, CAR-T and gene therapy."
+    },
+    "website": "https://www.bio.fiocruz.br",
+    "city": "Rio de Janeiro",
+    "state": "RJ",
+    "size": "large",
+    "segments": [
+      "pharmaceutical",
+      "biotechnology",
+      "human_health",
+      "devices_diagnostics"
+    ],
+    "partnership_types": [
+      "co_development",
+      "joint_venture"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Bio-Manguinhos / Fiocruz",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@biomanguinhos.example",
+      "phone": "+55 11 91781-1864"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": true,
+    "last_approved_at": "2026-09-15",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-15",
+    "created_at": "2026-06-30",
+    "demo": false,
+    "seed_note": "from June/2026 prototype; PT texts and some fields filled for the demo"
+  },
+  {
+    "id": "aurora",
+    "name": "Aurora Farma",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/aurora-hero/1600/720",
+    "description": {
+      "pt": "Farmacêutica brasileira de capital nacional com 40 anos de mercado, portfólio de genéricos e inovação incremental, e unidades de P&D, produção de IFAs e embalagens especiais.",
+      "en": "Brazilian-owned pharmaceutical company with 40 years in the market, a portfolio of generics and incremental innovation, and R&D, API and specialty-packaging units."
+    },
+    "website": "https://www.aurorafarma.example",
+    "city": "Guarulhos",
+    "state": "SP",
+    "size": "large",
+    "segments": [
+      "pharmaceutical",
+      "apis",
+      "human_health"
+    ],
+    "partnership_types": [
+      "out_licensing",
+      "co_development",
+      "joint_venture",
+      "market_distribution"
+    ],
+    "leadership": [
+      {
+        "name": "Helena Prado",
+        "role": {
+          "pt": "Presidente",
+          "en": "CEO"
+        },
+        "experience": {
+          "pt": "25 anos na indústria farmacêutica, ex-diretora comercial para a América Latina.",
+          "en": "25 years in pharma; former Latin America commercial director."
+        }
+      },
+      {
+        "name": "Marcos Tavares",
+        "role": {
+          "pt": "Vice-presidente de inovação",
+          "en": "VP Innovation"
+        },
+        "experience": {
+          "pt": "Liderou 12 lançamentos de novos produtos no Brasil.",
+          "en": "Led 12 new product launches in Brazil."
+        }
+      },
+      {
+        "name": "Luiza Fontes",
+        "role": {
+          "pt": "Diretora industrial",
+          "en": "Industrial Director"
+        },
+        "experience": {
+          "pt": "Responsável por três plantas certificadas pela ANVISA e pela EMA.",
+          "en": "Runs three plants certified by ANVISA and EMA."
+        }
+      },
+      {
+        "name": "Pedro Albuquerque",
+        "role": {
+          "pt": "Diretor financeiro",
+          "en": "CFO"
+        },
+        "experience": {
+          "pt": "Ex-banco de investimento, especialista em M&A no setor de saúde.",
+          "en": "Former investment banker, healthcare M&A specialist."
+        }
+      }
+    ],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Aurora Farma",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@aurora.example",
+      "phone": "+55 11 90822-0932"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": true,
+    "last_approved_at": "2026-09-29",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-29",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "vitalbio",
+    "name": "Instituto Vital Bio",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/vitalbio-hero/1600/720",
+    "description": {
+      "pt": "Instituto público estadual de pesquisa e produção de soros, vacinas e biofármacos, com centro de desenvolvimento de vacinas de mRNA.",
+      "en": "State-owned institute for research and production of sera, vaccines and biopharmaceuticals, with an mRNA vaccine development center."
+    },
+    "website": "https://www.vitalbio.example",
+    "city": "Belo Horizonte",
+    "state": "MG",
+    "size": "large",
+    "segments": [
+      "biotechnology",
+      "human_health",
+      "pharmaceutical"
+    ],
+    "partnership_types": [
+      "co_development",
+      "joint_venture"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Instituto Vital Bio",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@vitalbio.example",
+      "phone": "+55 11 91096-7309"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-19",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-19",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "biofactor",
+    "name": "BioFactor CDMO",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/biofactor-hero/1600/720",
+    "description": {
+      "pt": "CDMO de biológicos com plantas de cultivo celular e fermentação microbiana, do desenvolvimento de processo ao lote clínico.",
+      "en": "Biologics CDMO with cell-culture and microbial fermentation plants, from process development to clinical batches."
+    },
+    "website": "https://www.biofactor.example",
+    "city": "Curitiba",
+    "state": "PR",
+    "size": "medium",
+    "segments": [
+      "biotechnology",
+      "pharmaceutical"
+    ],
+    "partnership_types": [
+      "joint_venture",
+      "infrastructure_investment"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal BioFactor CDMO",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@biofactor.example",
+      "phone": "+55 11 91233-2754"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-24",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-24",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "nexa",
+    "name": "Nexa Insumos",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/nexa-hero/1600/720",
+    "description": {
+      "pt": "Fabricante de excipientes e intermediários farmacêuticos de alta pureza, com laboratório próprio de controle de qualidade.",
+      "en": "Manufacturer of high-purity pharmaceutical excipients and intermediates, with an in-house quality-control lab."
+    },
+    "website": "https://www.nexainsumos.example",
+    "city": "Jundiaí",
+    "state": "SP",
+    "size": "medium",
+    "segments": [
+      "apis",
+      "pharmaceutical"
+    ],
+    "partnership_types": [
+      "market_distribution",
+      "joint_venture"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Nexa Insumos",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@nexa.example",
+      "phone": "+55 11 90548-0932"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-17",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-17",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "amazonia",
+    "name": "Amazônia Bioativos",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/amazonia-hero/1600/720",
+    "description": {
+      "pt": "Produz extratos padronizados e ativos de origem amazônica para as indústrias farmacêutica e cosmética, com cadeia rastreável e repartição de benefícios.",
+      "en": "Produces standardized Amazonian extracts and actives for the pharmaceutical and cosmetics industries, with a traceable supply chain and benefit sharing."
+    },
+    "website": "https://www.amazoniabioativos.example",
+    "city": "Manaus",
+    "state": "AM",
+    "size": "startup",
+    "segments": [
+      "biodiversity_bioeconomy",
+      "apis"
+    ],
+    "partnership_types": [
+      "market_distribution",
+      "vc"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Amazônia Bioativos",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@amazonia.example",
+      "phone": "+55 11 91096-6398"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-26",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-26",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "veritas",
+    "name": "Veritas Clinical CRO",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/veritas-hero/1600/720",
+    "description": {
+      "pt": "CRO clínica com rede de centros de pesquisa no Sul do Brasil, especializada em estudos de Fase I a IV.",
+      "en": "Clinical CRO with a network of research sites in southern Brazil, specialized in Phase I–IV studies."
+    },
+    "website": "https://www.veritascro.example",
+    "city": "Porto Alegre",
+    "state": "RS",
+    "size": "medium",
+    "segments": [
+      "cro"
+    ],
+    "partnership_types": [
+      "infrastructure_investment"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Veritas Clinical CRO",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@veritas.example",
+      "phone": "+55 11 90959-8220"
+    },
+    "status": "in_review",
+    "public_state": "hidden",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "synthera",
+    "name": "Synthera Bio",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/synthera-hero/1600/720",
+    "description": {
+      "pt": "Startup de peptídeos sintéticos para doenças raras.",
+      "en": "Synthetic-peptide startup for rare diseases."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": "startup",
+    "segments": [
+      "biotechnology"
+    ],
+    "partnership_types": [
+      "vc"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Synthera Bio",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@synthera.example",
+      "phone": "+55 11 91096-0932"
+    },
+    "status": "awaiting_validation",
+    "public_state": "hidden",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "lumina",
+    "name": "Lumina Diagnostics",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/lumina-hero/1600/720",
+    "description": {
+      "pt": "Plataforma de diagnóstico molecular point-of-care com chip microfluídico e leitura por smartphone.",
+      "en": "Point-of-care molecular diagnostics platform with a microfluidic chip and smartphone readout."
+    },
+    "website": "https://www.luminadx.example",
+    "city": "Florianópolis",
+    "state": "SC",
+    "size": "startup",
+    "segments": [
+      "devices_diagnostics",
+      "human_health"
+    ],
+    "partnership_types": [
+      "vc",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Lumina Diagnostics",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@lumina.example",
+      "phone": "+55 11 90822-6398"
+    },
+    "status": "published",
+    "public_state": "published",
+    "is_featured": false,
+    "last_approved_at": "2026-09-30",
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-09-30",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  },
+  {
+    "id": "pharmaplex",
+    "name": "Pharmaplex Industrial",
+    "logo_url": null,
+    "cover_url": "https://picsum.photos/seed/pharmaplex-hero/1600/720",
+    "description": {
+      "pt": "Produtora de medicamentos genéricos e IFAs com três plantas industriais e exportação para a América Latina.",
+      "en": "Producer of generic medicines and APIs with three industrial plants and exports to Latin America."
+    },
+    "website": null,
+    "city": null,
+    "state": null,
+    "size": "large",
+    "segments": [
+      "pharmaceutical",
+      "apis"
+    ],
+    "partnership_types": [
+      "joint_venture",
+      "market_distribution"
+    ],
+    "leadership": [],
+    "gallery": [],
+    "focal_point": {
+      "name": "Ponto focal Pharmaplex Industrial",
+      "role": "Diretor(a) de negócios",
+      "email": "contato@pharmaplex.example",
+      "phone": "+55 11 91370-9131"
+    },
+    "status": "provisional",
+    "public_state": "provisional",
+    "is_featured": false,
+    "last_approved_at": null,
+    "invited_at": "2026-08-20",
+    "last_updated_at": "2026-06-30",
+    "created_at": "2026-06-30",
+    "demo": true,
+    "seed_note": "fictitious"
+  }
+]

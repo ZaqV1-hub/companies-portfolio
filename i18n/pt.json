@@ -1,0 +1,1148 @@
+{
+  "common": {
+    "lang_en": "EN",
+    "lang_pt": "PT",
+    "language": "Idioma",
+    "back_to_directory": "← Voltar ao portfólio",
+    "see_more": "ver mais",
+    "see_less": "ver menos",
+    "loading": "Carregando…",
+    "not_found": "Página não encontrada",
+    "log_in": "Entrar",
+    "log_out": "Sair",
+    "email": "E-mail",
+    "password": "Senha",
+    "back_public": "← Voltar ao diretório público",
+    "updating": "Em atualização",
+    "updated_on": "Atualizado em {date}",
+    "none": "—",
+    "projects_count": "{n} projetos",
+    "reset_demo": "Restaurar dados de demonstração"
+  },
+  "topbar": {
+    "tagline": "Diretório de investimentos — Abiquifi & Bio2Health",
+    "company_access": "Acesso da empresa",
+    "investor_access": "Acesso do investidor",
+    "team_access": "Equipe do programa"
+  },
+  "home": {
+    "kicker": "Portfólio de empresas · Saúde · Biotech · Farma · 2026–2028",
+    "title": "As startups brasileiras que estão redefinindo a saúde e a biotecnologia",
+    "intro": "O Brazilian Pharma & Health é o programa da Abiquifi e da ApexBrasil que conecta investidores internacionais a empresas brasileiras de saúde, biotecnologia e farma. Um diretório vivo com curadoria da Abiquifi & Bio2Health, pronto para parcerias, licenciamento e investimento.",
+    "stat_orgs": "Organizações no portfólio",
+    "stat_projects": "Projetos",
+    "stat_profiles": "Perfis",
+    "search_placeholder": "Busque por empresa, segmento ou produto…",
+    "all": "Todos",
+    "featured": "Destaques",
+    "featured_note": "Escolhidos pela equipe do programa",
+    "full_portfolio": "Portfólio completo",
+    "view_profile": "Ver perfil →",
+    "view_more": "Ver mais →",
+    "no_results_title": "Nenhuma empresa encontrada",
+    "no_results_text": "Ajuste a busca ou remova os filtros.",
+    "results": "{n} organizações"
+  },
+  "profile": {
+    "about": "Descrição",
+    "looking_for_card": "O que buscamos",
+    "looking_for": "Buscamos",
+    "request_contact": "Solicitar contato",
+    "request_sent": "✓ Pedido enviado — a empresa entrará em contato em breve.",
+    "stage": "Estágio",
+    "trl": "TRL {n}",
+    "leadership": "Liderança",
+    "gallery": "Galeria",
+    "projects": "Projetos",
+    "footer": "Perfil do programa Brazilian Pharma & Health · Abiquifi e ApexBrasil",
+    "last_approval": "Última aprovação em {date}",
+    "provisional_footer": "Perfil provisório montado pela equipe do programa a partir do portfólio de junho/2026, aguardando a validação da empresa.",
+    "total_raised": "Total captado",
+    "no_funds_raised": "Nenhum valor captado até hoje",
+    "pre_revenue": "Pré-receita",
+    "annual_revenue": "Faturamento anual ({year})",
+    "no_exports": "Não exporta",
+    "exports_pct": "{pct}% do faturamento",
+    "exports_year": "{amount} ({year})",
+    "utilization": "{pct}% de utilização",
+    "active_clients": "{n} clientes ativos",
+    "certificate_numbers": "Números dos certificados",
+    "market_share_value": "{pct}% — {segment}",
+    "range_label": "Valor buscado",
+    "patents_filed": "Patentes depositadas",
+    "patents_granted": "Patentes concedidas",
+    "fto": "Análise de liberdade de operação (FTO)",
+    "milestone_completed": "Concluído",
+    "milestone_in_progress": "Em andamento",
+    "milestone_upcoming": "Previsto",
+    "website": "Site"
+  },
+  "block": {
+    "description": "Descrição",
+    "lead_product": "Produto principal",
+    "pipeline": "Pipeline",
+    "ip_status": "Propriedade intelectual",
+    "key_milestones": "Marcos",
+    "go_to_market": "Go-to-market",
+    "investment_sought": "Investimento buscado",
+    "use_of_funds": "Uso dos recursos",
+    "raised_to_date": "Captado até hoje",
+    "target_markets": "Mercados-alvo",
+    "platform_type": "Tipo de plataforma",
+    "maturity": "Maturidade",
+    "technology": "Tecnologia",
+    "business_model": "Modelo de negócio",
+    "traction": "Tração",
+    "competitive_edge": "Diferencial competitivo",
+    "services": "Serviços",
+    "molecule_types": "Tipos de moléculas e produtos",
+    "capacity": "Capacidade instalada",
+    "certifications": "Certificações",
+    "client_profile": "Perfil de clientes",
+    "revenue": "Faturamento",
+    "exports": "Exportações",
+    "expansion_plan": "Plano de expansão",
+    "therapeutic_areas": "Áreas terapêuticas / escopo",
+    "models": "Modelos",
+    "partner_sites": "Centros parceiros",
+    "institution_type": "Tipo de instituição",
+    "product_portfolio": "Portfólio de produtos",
+    "production_capacity": "Capacidade de produção",
+    "export_markets": "Mercados de exportação",
+    "partnership_interests": "Interesses de parceria",
+    "partnership_model": "Modelo de parceria",
+    "expansion_projects": "Projetos de expansão",
+    "products": "Produtos e serviços",
+    "markets": "Mercados atendidos",
+    "market_share": "Market share",
+    "expansion_strategy": "Estratégia de expansão",
+    "segment": "Segmento"
+  },
+  "login": {
+    "brand_title": "Portfólio de Oportunidades de Investimento",
+    "brand_text": "Programa de curadoria 2026–2028 de empresas brasileiras de saúde, biotecnologia e farma.",
+    "brand_fine": "Abiquifi & Bio2Health · Brazilian Pharma & Health",
+    "company_kicker": "Acesso da empresa",
+    "company_title": "Portal da empresa",
+    "company_subtitle": "Atualize o perfil e os contatos da sua empresa no diretório de investimentos.",
+    "team_kicker": "Equipe do programa — Abiquifi & B2H",
+    "team_title": "Painel da equipe",
+    "team_subtitle": "Revise perfis, valide contatos e administre o programa.",
+    "demo_as": "Entrar como (demonstração)",
+    "invalid": "E-mail ou senha inválidos.",
+    "demo_hint": "Senha de demonstração: demo"
+  },
+  "app": {
+    "company_role": "Empresa",
+    "team_role": "Equipe do programa",
+    "nav_profile": "Meu perfil",
+    "nav_contacts": "Contatos",
+    "nav_view_public": "Ver como público",
+    "nav_review": "Fila de revisão",
+    "nav_orgs": "Organizações",
+    "nav_crm": "Registro de contatos",
+    "nav_settings": "Configurações"
+  },
+  "profile_type": {
+    "A": "Desenvolvimento de produto",
+    "B": "Plataforma tecnológica",
+    "C": "CDMO / CMO",
+    "D": "CRO / Serviços laboratoriais",
+    "E": "Instituição / Produtora de grande porte",
+    "F": "Insumos, embalagens e serviços"
+  },
+  "profile_type_short": {
+    "A": "Desenv. de produto",
+    "B": "Plataforma",
+    "C": "CDMO / CMO",
+    "D": "CRO / Laboratório",
+    "E": "Instituição",
+    "F": "Insumos e serviços"
+  },
+  "enum": {
+    "size": {
+      "startup": "Startup",
+      "medium": "Média",
+      "large": "Grande"
+    },
+    "segments": {
+      "pharmaceutical": "Farmacêutico",
+      "biotechnology": "Biotecnologia",
+      "human_health": "Saúde humana",
+      "animal_health": "Saúde animal",
+      "devices_diagnostics": "Dispositivos e diagnósticos",
+      "apis": "IFAs",
+      "biodiversity_bioeconomy": "Biodiversidade / Bioeconomia",
+      "cro": "CRO",
+      "other": "Outro"
+    },
+    "partnership_types": {
+      "vc": "VC",
+      "joint_venture": "Joint venture",
+      "co_development": "Co-desenvolvimento",
+      "market_distribution": "Parceria de mercado / distribuição internacional",
+      "out_licensing": "Licenciamento (out-licensing)",
+      "infrastructure_investment": "Investimento em infraestrutura"
+    },
+    "markets": {
+      "brazil": "Brasil",
+      "north_america": "América do Norte",
+      "latin_america": "América Latina",
+      "europe": "Europa",
+      "asia": "Ásia",
+      "oceania": "Oceania",
+      "africa": "África"
+    },
+    "regulatory_phase": {
+      "preclinical": "Pré-clínico",
+      "phase_1": "Fase I",
+      "phase_2": "Fase II",
+      "phase_3": "Fase III",
+      "registered": "Registrado"
+    },
+    "fto": {
+      "yes": "Sim",
+      "no": "Não",
+      "in_progress": "Em andamento"
+    },
+    "round_stage": {
+      "pre_seed": "Pré-seed",
+      "seed": "Seed",
+      "series_a": "Série A",
+      "series_b": "Série B",
+      "series_c_plus": "Série C+",
+      "other": "Outro"
+    },
+    "raised_source": {
+      "fapesp": "FAPESP",
+      "finep": "FINEP",
+      "bndes": "BNDES",
+      "cnpq": "CNPq",
+      "embrapii": "Embrapii",
+      "angel": "Anjo",
+      "vc": "VC",
+      "cvc": "CVC",
+      "award": "Prêmio",
+      "donation": "Doação",
+      "own_resources": "Recursos próprios",
+      "other": "Outro"
+    },
+    "gtm_models": {
+      "out_licensing": "Out-licensing",
+      "co_development": "Co-desenvolvimento",
+      "direct_sales": "Venda direta",
+      "partnership_distribution": "Parceria / distribuição"
+    },
+    "maturity": {
+      "pre_operational": "Pré-operação",
+      "partially_operational": "Operacional parcial",
+      "fully_operational": "Operacional completo"
+    },
+    "technology_tags": {
+      "ai_ml": "IA/ML",
+      "genomics": "Genômica",
+      "electrochemistry": "Eletroquímica",
+      "biosensors": "Biossensores",
+      "microfluidics": "Microfluídica",
+      "fermentation": "Fermentação",
+      "other": "Outra"
+    },
+    "business_models": {
+      "equipment": "Equipamento",
+      "consumables": "Consumíveis",
+      "saas": "SaaS",
+      "licensing": "Licenciamento",
+      "service": "Serviço"
+    },
+    "c_services": {
+      "process_development": "Desenvolvimento de processo",
+      "formulation": "Formulação",
+      "manufacturing": "Manufatura",
+      "analytical": "Analítico"
+    },
+    "molecule_types": {
+      "small_molecules": "Pequenas moléculas",
+      "biologics": "Biológicos",
+      "antibodies": "Anticorpos",
+      "vaccines": "Vacinas",
+      "apis": "IFAs",
+      "other": "Outro"
+    },
+    "capacity_scale": {
+      "laboratory": "Escala laboratorial",
+      "pilot": "Escala piloto",
+      "commercial": "Escala comercial"
+    },
+    "certifications": {
+      "gmp": "GMP",
+      "iso": "ISO",
+      "bpl": "BPL",
+      "bpc": "BPC",
+      "anvisa": "Anvisa",
+      "reblas": "REBLAS",
+      "fda": "FDA",
+      "ema": "EMA",
+      "dmf": "DMF",
+      "who": "OMS",
+      "who_pq": "OMS PQ",
+      "other": "Outra"
+    },
+    "client_profiles": {
+      "startups": "Startups",
+      "national_pharma": "Farma nacional",
+      "multinational": "Multinacionais"
+    },
+    "c_investment_types": {
+      "jv": "JV",
+      "pe": "PE",
+      "infrastructure_expansion": "Expansão de infraestrutura",
+      "strategic_partner": "Parceiro estratégico"
+    },
+    "d_services": {
+      "preclinical": "Pré-clínico",
+      "clinical_phase_1_4": "Clínico Fase I–IV",
+      "analytical": "Analítico",
+      "quality_control": "Controle de qualidade",
+      "bpl": "BPL"
+    },
+    "therapeutic_areas": {
+      "oncology": "Oncologia",
+      "infectious_diseases": "Doenças infecciosas",
+      "immunology": "Imunologia",
+      "cns": "Sistema nervoso central",
+      "cardiovascular": "Cardiovascular",
+      "dermatology": "Dermatologia",
+      "metabolic": "Metabólico",
+      "animal_health": "Saúde animal",
+      "consumer_goods": "Bens de consumo",
+      "other": "Outro"
+    },
+    "d_investment_types": {
+      "expansion": "Expansão",
+      "strategic_partner": "Parceiro estratégico",
+      "jv": "JV"
+    },
+    "e_partnership_models": {
+      "co_development": "Co-desenvolvimento",
+      "technology_transfer": "Transferência de tecnologia",
+      "jv": "JV",
+      "licensing": "Licenciamento"
+    },
+    "f_partnership_models": {
+      "jv": "JV",
+      "pe": "PE",
+      "expansion": "Expansão",
+      "distribution": "Distribuição"
+    },
+    "org_status": {
+      "awaiting_validation": "Aguardando validação",
+      "filling": "Em preenchimento",
+      "in_review": "Em revisão",
+      "returned": "Devolvido",
+      "published": "Publicado",
+      "provisional": "Provisório",
+      "offline": "Fora do ar"
+    },
+    "investor_types": {
+      "accelerator": "Accelerator",
+      "angel": "Angel",
+      "angel_network": "Angel Network",
+      "asset_wealth_management": "Asset/Wealth Management",
+      "cvc": "CVC",
+      "dfi": "DFI",
+      "endowment": "Endowment",
+      "family_office": "Family Office",
+      "foundation": "Foundation",
+      "fund_of_funds": "Fund of Funds",
+      "hnwi": "HNWI",
+      "non_profit": "Non-Profit Organization",
+      "organization": "Organization",
+      "pe_firm": "PE Firm",
+      "pension_fund": "Pension Fund",
+      "service_provider": "Service Provider",
+      "vc": "VC"
+    },
+    "niche": {
+      "pe": "PE",
+      "vc": "VC",
+      "pevc": "PEVC",
+      "impact": "Impacto",
+      "pevc_impact": "PEVC/Impacto",
+      "vc_impact": "VC/Impacto"
+    },
+    "interest_types": {
+      "direct": "Aporte direto",
+      "direct_and_coinvestment": "Aporte direto e coinvestimento",
+      "fund_indirect": "Aporte em fundo (indireto)",
+      "coinvestment": "Co-investimento",
+      "new_fund_expansion": "Expansão de novo fundo",
+      "licensing": "Licensing",
+      "tech_transfer": "Tech transfer",
+      "rd_agreement": "Acordo de P&D"
+    },
+    "sectors": {
+      "health": "Saúde",
+      "biotechnology": "Biotecnologia",
+      "pharmaceutical": "Farmacêutico",
+      "animal_health": "Saúde animal",
+      "multisector": "Multissetorial"
+    },
+    "rel_status": {
+      "in_progress": "Em andamento",
+      "closed": "Encerrado",
+      "deal": "Deal"
+    },
+    "classification": {
+      "lead": "Lead",
+      "nia": "NIA",
+      "npia": "NPIA",
+      "br": "BR (investidor brasileiro)",
+      "incomplete": "Contato incompleto"
+    },
+    "deal_types": {
+      "investment": "Investimento",
+      "licensing": "Licenciamento",
+      "co_development": "Co-desenvolvimento",
+      "other": "Outro"
+    },
+    "npia_types": {
+      "a": "a) Investimento estrangeiro em nova planta produtiva ou ampliação de planta existente",
+      "b": "b) Investimento de empresa estrangeira em projeto ou centro de P&D",
+      "c": "c) Joint venture ou parceria, produtiva ou tecnológica, entre empresa brasileira e estrangeira",
+      "d": "d) Investimento estrangeiro em gestora de fundos brasileira",
+      "e": "e) Investimento de fundo estrangeiro em empresa ou startup brasileira",
+      "f": "f) Co-investimento entre fundo gestor nacional e estrangeiro",
+      "g": "g) Abertura de operação de empresa estrangeira no Brasil",
+      "h": "h) Expansão de fundo estrangeiro no Brasil"
+    },
+    "interaction_types": {
+      "in_person_meeting": "Reunião presencial",
+      "virtual_meeting": "Reunião virtual",
+      "email": "E-mail",
+      "material_sent": "Envio de material",
+      "nda": "NDA",
+      "proposal_term_sheet": "Proposta ou term sheet",
+      "other": "Outro"
+    },
+    "apex_products": {
+      "promotion_event": "Evento/seminário de promoção",
+      "promotion_webinar": "Webinar de promoção",
+      "facilitation_webinar": "Webinar de facilitação",
+      "basic_investor_info": "Informações básicas para o investidor",
+      "custom_intelligence": "Inteligência customizada",
+      "custom_business_agenda": "Agenda customizada de negócios",
+      "investment_portfolio": "Portfólio de oportunidades de investimentos",
+      "investment_matchmaking": "Matchmaking de investimentos",
+      "pitch_training": "Pitch training"
+    },
+    "continuity": {
+      "yes": "Sim",
+      "left": "Saiu",
+      "unknown": "Desconhecido"
+    }
+  },
+  "filters": {
+    "size": "Porte",
+    "segment": "Segmento",
+    "partnership": "Tipo de parceria",
+    "market": "Mercado-alvo",
+    "phase": "Fase regulatória",
+    "trl": "TRL",
+    "maturity": "Maturidade",
+    "any": "Todos",
+    "trl_min": "TRL {n} ou mais",
+    "clear": "Limpar filtros"
+  },
+  "fields": {
+    "name": {
+      "label": "Nome da organização",
+      "help": "Como a organização deve aparecer no diretório."
+    },
+    "logo_url": {
+      "label": "Logo",
+      "help": "PNG ou SVG com fundo transparente, mínimo 512 px."
+    },
+    "description": {
+      "label": "Descrição",
+      "help": "O que a organização faz, em poucas frases. Aparece no topo do perfil e no card."
+    },
+    "website": {
+      "label": "Site",
+      "help": "Endereço completo, começando com https://"
+    },
+    "place": {
+      "label": "Cidade e UF",
+      "help": "Cidade da sede e estado."
+    },
+    "size": {
+      "label": "Porte",
+      "help": "Média: faturamento até R$ 300 mi. Grande: acima de R$ 300 mi."
+    },
+    "segments": {
+      "label": "Segmentos de atuação",
+      "help": "Marque todos que se aplicam. Usado nos filtros do diretório."
+    },
+    "partnership_types": {
+      "label": "Tipo de parceria buscada",
+      "help": "Aparece no topo do card \"O que buscamos\"."
+    },
+    "focal_point": {
+      "label": "Ponto focal",
+      "help": "Interno: nunca aparece para o investidor. Recebe os avisos de pedido de contato."
+    },
+    "summary": {
+      "label": "Resumo do projeto",
+      "help": "Aparece no seletor de projetos do perfil."
+    },
+    "segment": {
+      "label": "Segmento",
+      "help": "Área terapêutica + modalidade. Ex.: Oncologia — anticorpo monoclonal."
+    },
+    "trl": {
+      "label": "Estágio: TRL",
+      "help": "Nível de maturidade tecnológica, de 1 a 9."
+    },
+    "regulatory_phase": {
+      "label": "Estágio: fase regulatória",
+      "help": "Fase atual do produto principal."
+    },
+    "lead_product_name": {
+      "label": "Produto principal: nome",
+      "help": "Nome ou código do produto."
+    },
+    "lead_product_moa": {
+      "label": "Produto principal: mecanismo de ação",
+      "help": "Como o produto funciona e para que serve."
+    },
+    "pipeline": {
+      "label": "Pipeline",
+      "help": "Outros produtos em desenvolvimento: nome e indicação."
+    },
+    "patents_filed": {
+      "label": "Patentes depositadas",
+      "help": "Números dos pedidos e países."
+    },
+    "patents_granted": {
+      "label": "Patentes concedidas",
+      "help": "Números das patentes e países."
+    },
+    "fto": {
+      "label": "Análise de FTO",
+      "help": "Liberdade de operação (freedom to operate)."
+    },
+    "milestones": {
+      "label": "Marcos",
+      "help": "Pelo menos um: período (mês/ano ou semestre) e descrição."
+    },
+    "rounds": {
+      "label": "Investimento buscado",
+      "help": "Uma linha por rodada: estágio, período previsto, valor em USD e finalidade."
+    },
+    "use_of_funds": {
+      "label": "Uso dos recursos",
+      "help": "Como o investimento será usado."
+    },
+    "raised": {
+      "label": "Captado até hoje",
+      "help": "Uma linha por fonte, em USD. A plataforma soma o total."
+    },
+    "revenue": {
+      "label": "Faturamento anual",
+      "help": "Valor inteiro em USD e o ano."
+    },
+    "gtm_models": {
+      "label": "Go-to-market",
+      "help": "Como o produto chegará ao mercado."
+    },
+    "gtm_text": {
+      "label": "Go-to-market: detalhes",
+      "help": "Complemento opcional."
+    },
+    "target_markets": {
+      "label": "Mercados-alvo",
+      "help": "Usado nos filtros do diretório."
+    },
+    "platform_type": {
+      "label": "Tipo de plataforma",
+      "help": "Aparece abaixo do nome. Ex.: Diagnóstico molecular point-of-care."
+    },
+    "maturity": {
+      "label": "Maturidade",
+      "help": "Situação de operação da plataforma."
+    },
+    "platform_description": {
+      "label": "Descrição da plataforma",
+      "help": "Complementa a descrição da organização."
+    },
+    "technology_tags": {
+      "label": "Tecnologia",
+      "help": "Marque as tecnologias da plataforma. Usado nos filtros."
+    },
+    "technology_text": {
+      "label": "Tecnologia: detalhes",
+      "help": "Complemento opcional."
+    },
+    "business_models": {
+      "label": "Modelo de negócio",
+      "help": "Como a plataforma gera receita."
+    },
+    "business_model_text": {
+      "label": "Modelo de negócio: detalhes",
+      "help": "Complemento opcional."
+    },
+    "traction": {
+      "label": "Tração",
+      "help": "Clientes, parcerias e métricas."
+    },
+    "competitive_edge": {
+      "label": "Diferencial competitivo",
+      "help": "O que diferencia a plataforma das alternativas."
+    },
+    "services": {
+      "label": "Serviços",
+      "help": "Marque os serviços oferecidos."
+    },
+    "services_text": {
+      "label": "Serviços: detalhes",
+      "help": "Complemento opcional."
+    },
+    "molecule_types": {
+      "label": "Tipos de moléculas e produtos",
+      "help": "Com o que a organização trabalha."
+    },
+    "capacity_scales": {
+      "label": "Capacidade instalada: escala",
+      "help": "Escalas de produção disponíveis."
+    },
+    "utilization_pct": {
+      "label": "Taxa de utilização (%)",
+      "help": "Percentual da capacidade em uso, de 0 a 100."
+    },
+    "capacity_text": {
+      "label": "Capacidade: detalhes",
+      "help": "Complemento opcional."
+    },
+    "certifications": {
+      "label": "Certificações",
+      "help": "Aparecem como selos no perfil."
+    },
+    "certificate_numbers": {
+      "label": "Número dos certificados",
+      "help": "Opcional."
+    },
+    "clients": {
+      "label": "Perfil de clientes",
+      "help": "Número de clientes ativos e perfil."
+    },
+    "exports": {
+      "label": "Exportações",
+      "help": "Informe os valores exportados."
+    },
+    "expansion_plan": {
+      "label": "Plano de expansão",
+      "help": "Próximos passos de crescimento."
+    },
+    "investment_types": {
+      "label": "Tipo de investimento desejado",
+      "help": "Aparece no card \"O que buscamos\"."
+    },
+    "investment_range": {
+      "label": "Valor buscado",
+      "help": "Mínimo e máximo, em USD."
+    },
+    "therapeutic_areas": {
+      "label": "Áreas terapêuticas / escopo",
+      "help": "Áreas atendidas."
+    },
+    "scope_text": {
+      "label": "Escopo: detalhes",
+      "help": "Complemento opcional."
+    },
+    "models": {
+      "label": "Modelos",
+      "help": "Espécies, in vitro, in vivo."
+    },
+    "partner_sites": {
+      "label": "Centros parceiros",
+      "help": "Um centro por linha."
+    },
+    "institution_type": {
+      "label": "Tipo de instituição",
+      "help": "Aparece abaixo do nome."
+    },
+    "product_portfolio": {
+      "label": "Portfólio de produtos",
+      "help": "Pelo menos um item: categoria e descrição."
+    },
+    "production_capacity": {
+      "label": "Capacidade de produção",
+      "help": "Volumes e plantas."
+    },
+    "export_markets": {
+      "label": "Mercados de exportação",
+      "help": "Para onde a organização exporta."
+    },
+    "export_markets_text": {
+      "label": "Mercados de exportação: detalhes",
+      "help": "Complemento opcional."
+    },
+    "partnership_interests": {
+      "label": "Interesses de parceria",
+      "help": "Pelo menos uma área: área e descrição. Aparece em destaque."
+    },
+    "partnership_models": {
+      "label": "Modelo de parceria",
+      "help": "Aparece no card \"O que buscamos\"."
+    },
+    "expansion_projects": {
+      "label": "Projetos de expansão",
+      "help": "Projetos de crescimento em andamento ou planejados."
+    },
+    "investment_description": {
+      "label": "Investimento buscado: descrição",
+      "help": "Complemento opcional."
+    },
+    "products": {
+      "label": "Produtos e serviços",
+      "help": "Um item por linha."
+    },
+    "products_text": {
+      "label": "Produtos: detalhes",
+      "help": "Complemento opcional."
+    },
+    "markets_served": {
+      "label": "Mercados atendidos",
+      "help": "Onde a organização vende."
+    },
+    "markets_text": {
+      "label": "Mercados: detalhes",
+      "help": "Complemento opcional."
+    },
+    "market_share": {
+      "label": "Market share",
+      "help": "Percentual (0–100) e o segmento."
+    },
+    "expansion_strategy": {
+      "label": "Estratégia de expansão",
+      "help": "Próximos passos de crescimento."
+    },
+    "leadership": {
+      "label": "Liderança",
+      "help": "Até 4 pessoas: nome, cargo e uma linha de experiência."
+    },
+    "cover_url": {
+      "label": "Imagem de capa",
+      "help": "JPG ou PNG, 1920 × 720 px, até 8 MB. Fica no fundo do cabeçalho."
+    },
+    "gallery": {
+      "label": "Galeria de fotos",
+      "help": "Até 6 imagens próprias, mínimo 1600 px no lado maior, com legenda."
+    }
+  },
+  "form": {
+    "title": "Meu perfil",
+    "progress": "Etapa {n} de {total}",
+    "save_draft": "Salvar rascunho",
+    "saved": "Rascunho salvo",
+    "next": "Próxima etapa →",
+    "prev": "← Etapa anterior",
+    "required_hint": "* obrigatório",
+    "step_organization": "Organização",
+    "step_project": "Projeto",
+    "step_leadership": "Liderança",
+    "step_images": "Imagens",
+    "step_preview": "Prévia e envio",
+    "reviewed_step": "Revisei esta etapa",
+    "imported": "Importado do formulário · confirme",
+    "previous_answer": "Resposta anterior: {answer}",
+    "usd_error": "Informe o valor em dólares americanos, apenas números",
+    "chars": "{n}/{max}",
+    "submit": "Enviar para revisão",
+    "submit_blocked": "Para enviar, resolva os itens abaixo:",
+    "submitted": "Perfil enviado para revisão. A equipe Abiquifi/B2H vai analisar e você receberá um e-mail.",
+    "unreviewed_step": "Marque \"Revisei esta etapa\" em: {step}",
+    "go_to": "ir para o campo",
+    "preview_intro": "É assim que o investidor verá a página. Confira nos dois idiomas antes de enviar.",
+    "preview_lang": "Idioma da prévia",
+    "preview_en_note": "A versão em inglês dos textos é revisada pela equipe. Textos novos aparecem em português até a revisão.",
+    "add": "+ Adicionar",
+    "remove": "Remover",
+    "none_raised": "Nenhum valor captado",
+    "pre_revenue": "Pré-receita",
+    "no_exports": "Não exporta",
+    "year": "Ano",
+    "month": "Mês",
+    "semester": "Semestre",
+    "period": "Período",
+    "semester_1": "1º semestre",
+    "semester_2": "2º semestre",
+    "amount_usd": "Valor (USD)",
+    "min_usd": "Mínimo (USD)",
+    "max_usd": "Máximo (USD)",
+    "stage": "Estágio",
+    "purpose": "Finalidade",
+    "source": "Fonte",
+    "total": "Total",
+    "name": "Nome",
+    "indication": "Indicação",
+    "description": "Descrição",
+    "category": "Categoria",
+    "area": "Área",
+    "role": "Cargo",
+    "experience": "Experiência (uma linha)",
+    "email": "E-mail",
+    "phone": "Telefone com DDI",
+    "city": "Cidade",
+    "state": "UF",
+    "client_count": "Clientes ativos",
+    "pct_revenue": "% do faturamento",
+    "destinations": "Destinos",
+    "pct": "Percentual (%)",
+    "segment": "Segmento",
+    "caption": "Legenda",
+    "upload": "Enviar imagem",
+    "replace": "Trocar imagem",
+    "choose": "Selecione…",
+    "select_period": "Selecione",
+    "image_too_small": "Imagem pequena demais: mínimo {min} px.",
+    "image_type": "Formato não aceito.",
+    "image_too_big": "Arquivo acima do limite.",
+    "locked_review": "Seu perfil está em revisão pela equipe. A versão publicada continua no ar até a aprovação; o formulário fica bloqueado durante a revisão.",
+    "returned": "A equipe devolveu o perfil para ajustes:",
+    "status": "Status",
+    "view_public": "Ver página pública",
+    "updating_public": "No ar: perfil provisório (selo \"Em atualização\")",
+    "en_reviewed_by_team": "Preencha em português. A versão em inglês é revisada pela equipe.",
+    "errors": {
+      "required": "Campo obrigatório.",
+      "too_long": "Máximo de {max} caracteres.",
+      "url": "Informe uma URL válida (https://…).",
+      "email": "E-mail inválido.",
+      "phone": "Informe o telefone com DDI, ex.: +55 11 91234-5678.",
+      "percent": "Número inteiro de 0 a 100.",
+      "usd": "Informe o valor em dólares americanos, apenas números",
+      "range": "O mínimo é maior que o máximo.",
+      "min_items": "Inclua pelo menos {min} item.",
+      "item_incomplete": "Complete o item {item}.",
+      "raised_required": "Inclua uma fonte ou marque \"Nenhum valor captado\".",
+      "year_required": "Informe o ano.",
+      "max_items": "Máximo de {max} itens.",
+      "caption_required": "A imagem {item} precisa de legenda."
+    }
+  },
+  "review": {
+    "queue_title": "Fila de revisão",
+    "queue_subtitle": "Perfis enviados pelas empresas, do envio mais antigo para o mais recente.",
+    "queue_empty": "Nenhum perfil aguardando revisão.",
+    "col_org": "Organização",
+    "col_type": "Tipo",
+    "col_submitted": "Enviado em",
+    "col_online": "No ar",
+    "open": "Revisar",
+    "first_validation": "Primeira validação",
+    "update": "Atualização de perfil",
+    "online_published": "Versão publicada no ar",
+    "online_provisional": "Perfil provisório no ar",
+    "online_hidden": "Fora do ar",
+    "english_version": "Versão em inglês (editável pela equipe)",
+    "en_placeholder": "Tradução para o inglês…",
+    "changed": "Alterado",
+    "forms_answer": "Resposta no Google Forms",
+    "save": "Salvar edições",
+    "return": "Devolver",
+    "approve": "Aprovar e publicar",
+    "return_comment": "Comentário para a empresa (obrigatório)",
+    "cancel": "Cancelar",
+    "confirm_return": "Devolver para edição",
+    "comment_required": "Escreva um comentário para devolver.",
+    "saved": "Edições salvas.",
+    "online_note": "Enquanto a revisão não termina, a versão publicada (ou a provisória) continua no ar. Aprovar publica esta versão e registra a data em \"Atualizado em\".",
+    "tab_compare": "Antes e depois",
+    "tab_preview": "Prévia da página",
+    "only_changes": "Só alterações",
+    "previous": "Versão anterior (publicada)",
+    "previous_provisional": "Versão anterior (perfil provisório)",
+    "previous_forms": "Resposta anterior (Google Forms)",
+    "new": "Nova versão (enviada pela empresa)"
+  },
+  "orgs": {
+    "title": "Organizações",
+    "subtitle": "Status de cada organização no programa. Clique num status para filtrar.",
+    "search": "Buscar organização…",
+    "col_profiles": "Perfis",
+    "col_status": "Status",
+    "col_approved": "Última aprovação",
+    "col_updated": "Última atualização",
+    "outdated": "{n} dias sem atualização",
+    "reactivate": "Reativar",
+    "take_offline": "Tirar do ar"
+  },
+  "investor": {
+    "kicker": "Investidores",
+    "title": "Conta de investidor",
+    "signup_title": "Crie sua conta de investidor",
+    "login_title": "Entre na sua conta",
+    "subtitle": "A conta permite solicitar contato com as empresas do portfólio.",
+    "login_to_request": "Para solicitar contato com {org}, entre ou crie sua conta de investidor.",
+    "name": "Nome e sobrenome",
+    "institution": "Instituição",
+    "email": "E-mail",
+    "country": "País",
+    "city": "Cidade",
+    "role": "Cargo",
+    "investor_type": "Tipo de investidor",
+    "phone": "Telefone",
+    "recommended": "recomendado",
+    "optional": "opcional",
+    "accept_terms_pre": "Li e aceito os",
+    "terms": "Termos de uso",
+    "accept_privacy_pre": "Li e aceito a",
+    "privacy": "Política de privacidade",
+    "fix_errors": "Preencha os campos obrigatórios marcados.",
+    "create_account": "Criar conta",
+    "log_in": "Entrar",
+    "have_account": "Já tem conta?",
+    "no_account": "Ainda não tem conta?",
+    "email_taken": "Já existe uma conta com este e-mail.",
+    "demo_hint": "Demonstração: sarah.chen@meridiancapital.example / demo",
+    "verify_title": "Verifique seu e-mail",
+    "verify_text": "Enviamos um link de confirmação para {email}. Abra o link para ativar a conta.",
+    "simulated_inbox": "Caixa de entrada simulada (protótipo)",
+    "verify_mail_body": "Confirme seu e-mail para ativar sua conta no Brazilian Pharma & Health.",
+    "confirm_link": "Abrir link de confirmação",
+    "no_token": "Clique em \"Reenviar link\" para receber um novo link de confirmação.",
+    "resend": "Reenviar link",
+    "resent": "Novo link enviado."
+  },
+  "legal": {
+    "terms_title": "Termos de uso",
+    "privacy_title": "Política de privacidade",
+    "placeholder": "Texto a ser fornecido pela Abiquifi. O aceite é registrado com data e versão no cadastro do investidor."
+  },
+  "help": {
+    "title": "O que são Lead, NIA e NPIA",
+    "intro": "São os indicadores de resultado do convênio com a ApexBrasil. A empresa precisa entender o que cada um significa, porque é o registro dela que comprova o avanço.",
+    "lead_title": "1 · Lead",
+    "lead": "Investidor identificado com quem houve um primeiro contato: fundo, corporate, aceleradora ou outro tipo de investidor.",
+    "lead_do": "registra o primeiro contato, com data, mesmo que ainda não tenha havido reunião.",
+    "nia_title": "2 · NIA · Investidor em Atendimento",
+    "nia": "Investidor estrangeiro com atendimento ativo e recorrente: reuniões, envio de material, matchmaking, NDA. Vale para quem quer investir em empresas ou fundos brasileiros, fazer P&D no Brasil ou abrir ou expandir operação no país.",
+    "nia_do": "registra cada interação com data e descrição e sugere a classificação NIA quando o atendimento se torna recorrente. Sem registro, o atendimento não conta.",
+    "npia_title": "3 · NPIA · Projeto de Investimento Anunciado",
+    "npia": "Projeto de investimento que o programa apoiou e que foi anunciado, publicamente ou de forma sigilosa à ApexBrasil. Conta como anúncio:",
+    "npia_do": "informa pela plataforma quando houver acordo ou anúncio, com tipo, data e valor. A informação pode ser sigilosa: vai só para a equipe e para a ApexBrasil.",
+    "what_company_does": "O que a empresa faz:",
+    "br": "BR.",
+    "br_text": "Investidores brasileiros também são registrados, mas não contam para as metas do convênio.",
+    "lead_short": "Investidor com quem houve um primeiro contato.",
+    "nia_short": "Investidor estrangeiro com atendimento ativo e recorrente.",
+    "npia_short": "Projeto de investimento anunciado (público ou sigiloso à ApexBrasil).",
+    "br_short": "Investidor brasileiro: registrado, mas não conta para as metas.",
+    "incomplete_short": "Registro com dados insuficientes."
+  },
+  "crm": {
+    "title": "Contatos",
+    "subtitle": "Registro confidencial dos contatos com investidores. Só a sua empresa e a equipe do programa veem estes dados.",
+    "new_contact": "+ Novo contato",
+    "pending_title": "Pendências",
+    "pending_requests": "Pedidos de contato sem interação registrada",
+    "pending_incomplete": "Registros incompletos",
+    "no_pending": "Nenhuma pendência.",
+    "business_days": "{n} de {max} dias úteis",
+    "overdue": "vencido",
+    "warning": "atenção",
+    "summary_title": "Resumo",
+    "summary_lead": "Leads",
+    "summary_nia": "NIAs validados",
+    "summary_npia": "NPIAs validados",
+    "summary_pending": "Sugestões aguardando validação",
+    "search": "Buscar por nome, instituição ou e-mail…",
+    "f_classification": "Classificação",
+    "f_status": "Status",
+    "f_origin": "Origem",
+    "f_country": "País",
+    "f_from": "De",
+    "f_to": "Até",
+    "f_company": "Empresa",
+    "f_event": "Evento",
+    "all": "Todos",
+    "col_name": "Nome",
+    "col_institution": "Instituição",
+    "col_country": "País",
+    "col_classification": "Classificação",
+    "col_last": "Última interação",
+    "col_status": "Status",
+    "col_completeness": "Completude",
+    "col_company": "Empresa",
+    "empty": "Nenhum contato encontrado.",
+    "validated": "validada",
+    "awaiting": "aguardando validação",
+    "complete_pct": "{pct}%",
+    "apex_mark": "usado no relatório Apex",
+    "required_note": "* obrigatório. Nenhum campo opcional impede salvar.",
+    "block_contact": "Contato",
+    "block_institution": "Instituição",
+    "block_relationship": "Relacionamento",
+    "block_interaction": "Primeira interação",
+    "f_name": "Nome e sobrenome",
+    "f_email": "E-mail",
+    "f_city": "Cidade",
+    "f_role": "Cargo",
+    "f_linkedin": "LinkedIn",
+    "f_phone": "Telefone (com DDI)",
+    "f_inst_name": "Nome da instituição",
+    "f_investor_type": "Tipo de investidor",
+    "f_niche": "Nicho",
+    "f_ticket": "Tíquete estimado para o Brasil (USD milhões)",
+    "f_ticket_min": "Mínimo",
+    "f_ticket_max": "Máximo",
+    "f_interest_type": "Tipo de interesse",
+    "f_sectors": "Setores",
+    "f_description_original": "Descrição da instituição (original, em inglês)",
+    "f_description_pt": "Resumo em português",
+    "f_website": "Site",
+    "f_owner_company": "Empresa do portfólio",
+    "f_responsible": "Responsável",
+    "f_origin_full": "Origem do contato",
+    "f_rel_status": "Status",
+    "f_deal": "Expectativa de deal",
+    "f_deal_type": "Tipo",
+    "f_classification_note": "Todo relacionamento novo começa como Lead.",
+    "f_date": "Data",
+    "f_description": "Descrição",
+    "f_type": "Tipo de interação",
+    "f_apex_product": "Produto Apex",
+    "apex_suggested": "sugerido pelo tipo de interação",
+    "email_found": "E-mail já cadastrado: contato e instituição foram preenchidos.",
+    "email_has_rel": "Sua empresa já tem um registro com este contato.",
+    "open_record": "Abrir registro",
+    "institution_found": "Instituição existente: os dados dela serão reaproveitados.",
+    "save": "Salvar contato",
+    "cancel": "Cancelar",
+    "saved": "Contato salvo.",
+    "errors": {
+      "required": "Campo obrigatório.",
+      "email_invalid": "E-mail inválido.",
+      "date_future": "A data não pode ser futura.",
+      "description_long": "Máximo de 500 caracteres.",
+      "organization": "Escolha a empresa."
+    },
+    "back": "← Contatos",
+    "actions_new_interaction": "Nova interação",
+    "actions_suggest": "Sugerir classificação",
+    "actions_announce": "Informar anúncio",
+    "completeness": "Completude: {filled} de {total} campos recomendados",
+    "missing": "Faltam:",
+    "timeline": "Linha do tempo de interações",
+    "relationship": "Relacionamento",
+    "data": "Dados do contato e da instituição",
+    "edit_save": "Salvar alterações",
+    "auto_interaction": "registro automático",
+    "suggest_value": "Classificação sugerida",
+    "justification": "Justificativa (opcional, até 300 caracteres)",
+    "send_suggestion": "Enviar sugestão",
+    "announce_type": "Tipo de anúncio",
+    "announce_date": "Data do anúncio",
+    "announce_amount": "Valor (USD)",
+    "announce_description": "Descrição (até 500 caracteres)",
+    "announce_confidential": "Sigiloso (vai só para a equipe e para a ApexBrasil)",
+    "send_announcement": "Enviar anúncio",
+    "announcement": "Anúncio NPIA",
+    "add_interaction": "Registrar interação",
+    "pending_suggestion": "Sugestão {value} aguardando validação",
+    "pending_npia": "Anúncio NPIA aguardando validação",
+    "confidential": "sigiloso",
+    "request_line": "Pedido de contato pela plataforma em {date}",
+    "next_interaction_due": "Registre a próxima interação: {n} de {max} dias úteis.",
+    "team_comment": "Comentário da equipe",
+    "rec": {
+      "role": "Cargo",
+      "linkedin": "LinkedIn",
+      "investor_type": "Tipo de investidor",
+      "niche": "Nicho",
+      "ticket": "Tíquete",
+      "interest_type": "Tipo de interesse",
+      "sectors": "Setores",
+      "description": "Descrição da instituição",
+      "website": "Site",
+      "origin": "Origem",
+      "status": "Status"
+    }
+  },
+  "crmteam": {
+    "title": "Registro de contatos",
+    "subtitle": "Base completa de contatos de todas as empresas. Visível só para a equipe Abiquifi/B2H.",
+    "indicators": "Indicadores do convênio",
+    "year": "Ano",
+    "ind_lead": "Leads validados",
+    "ind_nia": "NIAs validados",
+    "ind_npia": "NPIAs validados",
+    "ind_meetings": "Reuniões investidor–empresa",
+    "ind_events": "Empresas em eventos de promoção",
+    "queue": "Fila de validação",
+    "q_classification": "Classificação",
+    "q_npia": "Anúncio NPIA",
+    "q_duplicate": "Possível duplicado",
+    "merge": "Unir",
+    "merge_hint": "Mantém {keep} e junta o outro registro a ele.",
+    "by_company": "Pendências por empresa",
+    "records": "Registros",
+    "overdue": "Pedidos vencidos (15 dias úteis)",
+    "warning": "Em aviso (10 dias úteis)",
+    "avg_completeness": "Completude média",
+    "base": "Base completa",
+    "export_button": "Exportar para ApexBrasil",
+    "export_title": "Exportar para ApexBrasil",
+    "export_text": "Planilha XLSX com as abas e colunas do modelo da Apex. O filtro de período usa a data da interação.",
+    "export_unavailable": "Disponível na versão com banco de dados.",
+    "validation": "Validação da equipe",
+    "validate": "Validar",
+    "validate_npia": "Validar NPIA",
+    "reject": "Recusar",
+    "apex_title": "Controle Apex",
+    "team_only": "só equipe",
+    "apex_dynamics_account": "Conta no Dynamics",
+    "apex_contact_registered": "Contato cadastrado",
+    "apex_opportunity_inserted": "Oportunidade inserida",
+    "apex_opportunity_word": "Descritivo da oportunidade (Word)",
+    "apex_strategic_category": "Categoria estratégica",
+    "apex_notes": "Observações do atendimento",
+    "apex_continuity": "Continuidade por ano (calculado)"
+  },
+  "settings": {
+    "title": "Configurações",
+    "subtitle": "Prazos e metas do programa. Só os valores são salvos aqui; as rotinas automáticas usarão estes valores no servidor.",
+    "save": "Salvar configurações",
+    "saved": "Configurações salvas",
+    "invalid": "Revise os campos destacados: use números inteiros maiores que zero.",
+    "profiles": "Perfis das empresas",
+    "contacts": "Registro de contatos",
+    "goals": "Metas do convênio por ano",
+    "goals_help": "Leads, NIAs e NPIAs validados que o convênio com a ApexBrasil prevê para cada ano.",
+    "add_year": "+ Adicionar ano",
+    "lists": "Listas mantidas pela equipe",
+    "origins": "Origens / eventos (lista de ações)",
+    "apex_categories": "Categorias estratégicas Apex",
+    "one_per_line": "Um item por linha.",
+    "launch_date": "Data de lançamento da plataforma",
+    "provisional_profile_days": "Dias do perfil provisório no ar",
+    "provisional_profile_days_help": "Após o lançamento, o perfil provisório sai do ar no fim deste prazo.",
+    "provisional_warning_days": "Avisos antes da saída do provisório",
+    "provisional_warning_days_help": "Dias antes do fim do prazo, separados por vírgula (ex.: 15, 7).",
+    "validation_reminder_days": "Lembretes de validação após o convite",
+    "validation_reminder_days_help": "Dias após o convite, separados por vírgula (ex.: 7, 14).",
+    "validation_reminder_repeat_days": "Repetir o lembrete de validação a cada",
+    "validation_reminder_repeat_days_help": "Depois dos lembretes acima.",
+    "quarterly_update_reminder_days": "Lembrete de atualização trimestral",
+    "quarterly_update_reminder_days_help": "E-mail à empresa após este número de dias sem atualização.",
+    "outdated_profile_alert_days": "Alerta de perfil desatualizado",
+    "outdated_profile_alert_days_help": "Alerta no painel da equipe após este número de dias sem atualização.",
+    "contact_warning_business_days": "Aviso de pedido sem interação",
+    "contact_warning_business_days_help": "Aviso à empresa após este número de dias úteis.",
+    "contact_overdue_business_days": "Pedido vencido",
+    "contact_overdue_business_days_help": "Pedido vencido (empresa e equipe) após este número de dias úteis.",
+    "unit_days": "dias",
+    "unit_days_list": "dias",
+    "unit_business": "dias úteis"
+  }
+}

@@ -1,0 +1,685 @@
+[
+  {
+    "id": "pv-nintx-1",
+    "organization_id": "nintx",
+    "kind": "draft",
+    "status": "in_review",
+    "content": {
+      "organization": {
+        "name": "Nintx",
+        "logo_url": null,
+        "cover_url": "https://picsum.photos/seed/nintx-hero/1600/720",
+        "description": {
+          "pt": "A Nintx desenvolve o NTX-06, ingrediente de origem natural para doença inflamatória intestinal (DII) com abordagem multimecanística, apoiado pelas plataformas próprias xGIbiomics® e GAIApath™. Em 2026 iniciou o estudo clínico de Fase I.",
+          "en": "Nintx develops NTX-06, a nature-derived ingredient for IBD with a multi-mechanistic approach, supported by its proprietary xGIbiomics® and GAIApath™ platforms. In 2026 it started its Phase I clinical study."
+        },
+        "website": "https://www.nintx.example",
+        "city": "São Paulo",
+        "state": "SP",
+        "size": "startup",
+        "segments": [
+          "biotechnology",
+          "human_health"
+        ],
+        "partnership_types": [
+          "vc",
+          "co_development"
+        ],
+        "leadership": [
+          {
+            "name": "Rafael Duarte",
+            "role": {
+              "pt": "CEO",
+              "en": "CEO"
+            },
+            "experience": {
+              "pt": "Fundador de duas biotechs; ex-diretor de P&D em farmacêutica nacional.",
+              "en": "Founder of two biotechs; former R&D director at a Brazilian pharma."
+            }
+          },
+          {
+            "name": "Beatriz Lemos",
+            "role": {
+              "pt": "Diretora médica",
+              "en": "Chief Medical Officer"
+            },
+            "experience": {
+              "pt": "Ex-gerente médica de imunologia em multinacional.",
+              "en": "Former immunology medical manager at a multinational."
+            }
+          }
+        ],
+        "gallery": [],
+        "focal_point": {
+          "name": "Ponto focal Nintx",
+          "role": "Diretor(a) de negócios",
+          "email": "contato@nintx.example",
+          "phone": "+55 11 90685-4555"
+        }
+      },
+      "projects": [
+        {
+          "id": "nintx-ntx06",
+          "profile_type": "A",
+          "summary": null,
+          "fields": {
+            "segment": {
+              "pt": "Imunologia GI — Doença inflamatória intestinal (DII)",
+              "en": "GI Immunology — Inflammatory Bowel Disease (IBD)"
+            },
+            "trl": 6,
+            "regulatory_phase": "phase_1",
+            "lead_product_name": "NTX-06",
+            "lead_product_moa": {
+              "pt": "Reduz infiltrados imunológicos e citocinas pró-inflamatórias, com modulação positiva do microbioma intestinal. PoC clínica prevista para junho de 2027.",
+              "en": "Reduces immunological infiltrates and pro-inflammatory cytokines, with positive gut microbiome modulation. Clinical PoC expected June 2027."
+            },
+            "pipeline": [
+              {
+                "name": "NTX-03",
+                "indication": {
+                  "pt": "Molécula sintética para regeneração do músculo cardíaco, com validação biofísica e celular concluída",
+                  "en": "Synthetic molecule for cardiac muscle regeneration, with biophysical and cellular validation already completed"
+                }
+              }
+            ],
+            "patents_filed": {
+              "pt": "PBTX-01 (BR10 2026 008578-2); PBTX-02 (BR10 2025 007846-5).",
+              "en": "PBTX-01 (BR10 2026 008578-2); PBTX-02 (BR10 2025 007846-5)."
+            },
+            "patents_granted": {
+              "pt": "xGIbiomics® (BR202022013346-3); Mini xGIbiomics® (BR202023024796-5).",
+              "en": "xGIbiomics® (BR202022013346-3); Mini xGIbiomics® (BR202023024796-5)."
+            },
+            "fto": "yes",
+            "milestones": [
+              {
+                "period": {
+                  "year": 2026,
+                  "month": 9
+                },
+                "description": {
+                  "pt": "Primeiro paciente incluído na Fase I",
+                  "en": "First patient enrolled in Phase I"
+                }
+              },
+              {
+                "period": {
+                  "year": 2027,
+                  "month": 6
+                },
+                "description": {
+                  "pt": "Conclusão da PoC clínica",
+                  "en": "Completion of clinical PoC"
+                }
+              },
+              {
+                "period": {
+                  "year": 2027,
+                  "semester": 2
+                },
+                "description": {
+                  "pt": "Lançamento da rodada Série B",
+                  "en": "Series B round launch"
+                }
+              }
+            ],
+            "rounds": [
+              {
+                "stage": "series_b",
+                "period": {
+                  "year": 2027,
+                  "semester": 2
+                },
+                "amount_usd": 25000000,
+                "purpose": {
+                  "pt": "Fases I/II e escalonamento comercial",
+                  "en": "Phase I/II and commercial scale-up"
+                }
+              }
+            ],
+            "use_of_funds": {
+              "pt": "Estudos de Fase I/II, submissões regulatórias e escalonamento comercial.",
+              "en": "Phase I/II studies, regulatory submissions and commercial scale-up."
+            },
+            "raised": [
+              {
+                "source": "vc",
+                "amount_usd": 13000000
+              },
+              {
+                "source": "other",
+                "amount_usd": 5000000,
+                "note": "Grants"
+              }
+            ],
+            "gtm_models": [
+              "partnership_distribution"
+            ],
+            "gtm_text": {
+              "pt": "Parcerias com fundos de venture capital e programas de fomento.",
+              "en": "Partnerships with venture capital funds and grant programs."
+            },
+            "target_markets": [
+              "brazil",
+              "north_america",
+              "europe",
+              "latin_america",
+              "asia",
+              "oceania"
+            ]
+          }
+        }
+      ]
+    },
+    "reviewed_steps": {
+      "organization": true,
+      "project:nintx-ntx06": true,
+      "leadership": true,
+      "images": true
+    },
+    "created_at": "2026-09-28",
+    "updated_at": "2026-10-01",
+    "submitted_at": "2026-10-01",
+    "submitted_by": "u-nintx",
+    "review_comment": null,
+    "reviewed_at": null,
+    "reviewed_by": null
+  },
+  {
+    "id": "pv-ionvet-1",
+    "organization_id": "ionvet",
+    "kind": "draft",
+    "status": "in_review",
+    "content": {
+      "organization": {
+        "name": "IonVet",
+        "logo_url": "assets/logos/ionvet.jpg",
+        "cover_url": "https://picsum.photos/seed/ionvet-hero/1600/720",
+        "description": {
+          "pt": "A IonVet é uma CRO estabelecida que presta serviços analíticos e de pesquisa — metabolômica, validação de biomarcadores e apoio a P&D — para saúde animal e agronegócio.",
+          "en": "IonVet is an established CRO providing analytical and research services — metabolomics, biomarker validation and R&D support — for animal health and agribusiness clients."
+        },
+        "website": "https://www.ionvet.example",
+        "city": "Pirassununga",
+        "state": "SP",
+        "size": "startup",
+        "segments": [
+          "cro",
+          "animal_health"
+        ],
+        "partnership_types": [
+          "infrastructure_investment",
+          "market_distribution"
+        ],
+        "leadership": [],
+        "gallery": [],
+        "focal_point": {
+          "name": "Ponto focal IonVet",
+          "role": "Diretor(a) de negócios",
+          "email": "contato@ionvet.example",
+          "phone": "+55 11 90822-5466"
+        }
+      },
+      "projects": [
+        {
+          "id": "ionvet-cro",
+          "profile_type": "D",
+          "summary": null,
+          "fields": {
+            "services": [
+              "analytical",
+              "preclinical"
+            ],
+            "services_text": {
+              "pt": "Metabolômica de alta resolução; identificação e validação de biomarcadores; caracterização biológica de produtos e ingredientes; desenvolvimento e validação de métodos analíticos; nutrição de precisão; apoio a P&D veterinário.",
+              "en": "High-resolution metabolomics; biomarker identification and validation; biological characterization of products and ingredients; analytical method development and validation; precision nutrition; veterinary R&D support."
+            },
+            "therapeutic_areas": [
+              "animal_health",
+              "infectious_diseases",
+              "immunology"
+            ],
+            "scope_text": {
+              "pt": "Saúde animal; medicina veterinária preventiva; reprodução e nutrição animal; saúde intestinal; bem-estar animal.",
+              "en": "Animal health; preventive veterinary medicine; animal reproduction and nutrition; gut health; animal welfare."
+            },
+            "models": {
+              "pt": "Bovinos, suínos, aves, equinos, ovinos, caprinos, cães, gatos, peixes e outras espécies.",
+              "en": "Bovine, swine, poultry, equine, ovine, caprine, canine, feline, fish and other species."
+            },
+            "partner_sites": [
+              "USP",
+              "UNESP",
+              "UNICAMP",
+              "Embrapa"
+            ],
+            "client_count": 18,
+            "client_profiles": [
+              "national_pharma",
+              "startups"
+            ],
+            "revenue": {
+              "amount_usd": 828745,
+              "year": 2025
+            },
+            "investment_types": [
+              "expansion",
+              "strategic_partner"
+            ],
+            "target_markets": [
+              "north_america",
+              "europe",
+              "latin_america"
+            ],
+            "certifications": [],
+            "investment_range": {
+              "min": 500000,
+              "max": 2000000
+            }
+          }
+        }
+      ]
+    },
+    "reviewed_steps": {
+      "organization": true,
+      "project:ionvet-cro": true,
+      "leadership": true,
+      "images": true
+    },
+    "created_at": "2026-09-20",
+    "updated_at": "2026-09-27",
+    "submitted_at": "2026-09-27",
+    "submitted_by": "u-ionvet",
+    "review_comment": null,
+    "reviewed_at": null,
+    "reviewed_by": null
+  },
+  {
+    "id": "pv-veritas-1",
+    "organization_id": "veritas",
+    "kind": "draft",
+    "status": "in_review",
+    "content": {
+      "organization": {
+        "name": "Veritas Clinical CRO",
+        "logo_url": null,
+        "cover_url": "https://picsum.photos/seed/veritas-hero/1600/720",
+        "description": {
+          "pt": "CRO clínica com rede de centros de pesquisa no Sul do Brasil, especializada em estudos de Fase I a IV.",
+          "en": "Clinical CRO with a network of research sites in southern Brazil, specialized in Phase I–IV studies."
+        },
+        "website": "https://www.veritascro.example",
+        "city": "Porto Alegre",
+        "state": "RS",
+        "size": "medium",
+        "segments": [
+          "cro"
+        ],
+        "partnership_types": [
+          "infrastructure_investment"
+        ],
+        "leadership": [],
+        "gallery": [],
+        "focal_point": {
+          "name": "Ponto focal Veritas Clinical CRO",
+          "role": "Diretor(a) de negócios",
+          "email": "contato@veritas.example",
+          "phone": "+55 11 90959-8220"
+        }
+      },
+      "projects": [
+        {
+          "id": "veritas-main",
+          "profile_type": "D",
+          "summary": null,
+          "fields": {
+            "services": [
+              "clinical_phase_1_4"
+            ],
+            "services_text": {
+              "pt": "Condução de estudos de Fase I a IV, monitoria e gestão de dados.",
+              "en": "Conduct of Phase I–IV studies, monitoring and data management."
+            },
+            "therapeutic_areas": [
+              "oncology",
+              "cardiovascular",
+              "metabolic"
+            ],
+            "certifications": [
+              "bpc",
+              "anvisa"
+            ],
+            "partner_sites": [
+              "Hospital Moinhos (fictício)",
+              "Centro Clínico Sul (fictício)"
+            ],
+            "investment_types": [
+              "expansion"
+            ],
+            "target_markets": [
+              "brazil",
+              "latin_america"
+            ]
+          }
+        }
+      ]
+    },
+    "reviewed_steps": {
+      "organization": true,
+      "project:veritas-main": true,
+      "leadership": true,
+      "images": true
+    },
+    "created_at": "2026-09-25",
+    "updated_at": "2026-10-03",
+    "submitted_at": "2026-10-03",
+    "submitted_by": "u-veritas",
+    "review_comment": null,
+    "reviewed_at": null,
+    "reviewed_by": null
+  },
+  {
+    "id": "pv-wecare-1",
+    "organization_id": "wecare",
+    "kind": "draft",
+    "status": "filling",
+    "content": {
+      "organization": {
+        "name": "Wecare Skin",
+        "logo_url": null,
+        "cover_url": "https://picsum.photos/seed/wecare-hero/1600/720",
+        "description": {
+          "pt": "A Wecare Skin desenvolve um composto tópico próprio semelhante a corticoide, com atividade anti-inflamatória para dermatite e psoríase, sem os efeitos adversos dos corticoides convencionais.",
+          "en": "Wecare Skin develops a proprietary corticoid-like topical compound with anti-inflammatory activity for dermatitis and psoriasis, without the adverse effects of conventional corticosteroids."
+        },
+        "website": null,
+        "city": null,
+        "state": null,
+        "size": null,
+        "segments": [
+          "pharmaceutical",
+          "human_health"
+        ],
+        "partnership_types": [
+          "out_licensing"
+        ],
+        "leadership": [],
+        "gallery": [],
+        "focal_point": {
+          "name": "Ponto focal Wecare Skin",
+          "role": "Diretor(a) de negócios",
+          "email": "contato@wecare.example",
+          "phone": "+55 11 90822-0021"
+        }
+      },
+      "projects": [
+        {
+          "id": "wecare-topical",
+          "profile_type": "A",
+          "summary": null,
+          "fields": {
+            "segment": {
+              "pt": "Dermatologia / Anti-inflamatório — Composto tópico semelhante a corticoide",
+              "en": "Dermatology / Anti-inflammatory — Corticoid-like topical compound"
+            },
+            "trl": 5,
+            "regulatory_phase": "preclinical",
+            "lead_product_name": "WCS-01",
+            "lead_product_moa": {
+              "pt": "Ação anti-inflamatória para dermatite e psoríase, como substituto de corticoides.",
+              "en": "Anti-inflammatory action for dermatitis and psoriasis, as a corticosteroid substitute."
+            },
+            "pipeline": [
+              {
+                "name": "WCS-02",
+                "indication": {
+                  "pt": "Atrofia vaginal",
+                  "en": "Vaginal atrophy"
+                }
+              },
+              {
+                "name": "WCS-03",
+                "indication": {
+                  "pt": "Cicatrização pós-parto",
+                  "en": "Post-partum healing"
+                }
+              },
+              {
+                "name": "WCS-04",
+                "indication": {
+                  "pt": "Cicatrização pós-cirúrgica",
+                  "en": "Post-surgical healing"
+                }
+              }
+            ],
+            "patents_filed": {
+              "pt": "7 pedidos de patente depositados no Brasil.",
+              "en": "7 patent applications filed in Brazil."
+            },
+            "fto": "yes",
+            "milestones": [
+              {
+                "period": {
+                  "year": 2027,
+                  "semester": 1
+                },
+                "description": {
+                  "pt": "Início do estudo clínico de Fase I",
+                  "en": "Phase I clinical study initiation"
+                }
+              }
+            ],
+            "rounds": [
+              {
+                "stage": "series_a",
+                "period": {
+                  "year": 2026,
+                  "semester": 2
+                },
+                "amount_usd": 6000000,
+                "purpose": {
+                  "pt": "Estudo de Fase I",
+                  "en": "Phase I trial"
+                }
+              },
+              {
+                "stage": "series_b",
+                "period": {
+                  "year": 2028,
+                  "semester": 2
+                },
+                "amount_usd": 24000000,
+                "purpose": {
+                  "pt": "Fases II e III",
+                  "en": "Phases II and III"
+                }
+              }
+            ],
+            "use_of_funds": {
+              "pt": "Estudo clínico de Fase I, submissões regulatórias e escalonamento.",
+              "en": "Phase I clinical trial, regulatory submissions and scale-up."
+            },
+            "raised": [
+              {
+                "source": "finep",
+                "amount_usd": 1140000
+              },
+              {
+                "source": "fapesp",
+                "amount_usd": 347000
+              },
+              {
+                "source": "vc",
+                "amount_usd": 597000
+              },
+              {
+                "source": "angel",
+                "amount_usd": 539000
+              }
+            ],
+            "revenue": {
+              "amount_usd": 578000,
+              "year": 2025
+            },
+            "gtm_models": [
+              "out_licensing"
+            ],
+            "gtm_text": {
+              "pt": "Licenciamento.",
+              "en": "Out-licensing."
+            },
+            "target_markets": [
+              "brazil",
+              "europe",
+              "latin_america"
+            ]
+          }
+        }
+      ]
+    },
+    "reviewed_steps": {
+      "organization": true
+    },
+    "created_at": "2026-09-30",
+    "updated_at": "2026-10-02",
+    "submitted_at": null,
+    "submitted_by": null,
+    "review_comment": null,
+    "reviewed_at": null,
+    "reviewed_by": null
+  },
+  {
+    "id": "pv-heptech-1",
+    "organization_id": "heptech",
+    "kind": "draft",
+    "status": "returned",
+    "content": {
+      "organization": {
+        "name": "Heptech Biotech",
+        "logo_url": null,
+        "cover_url": "https://picsum.photos/seed/heptech-hero/1600/720",
+        "description": {
+          "pt": "A Heptech desenvolve heparina de baixo peso molecular (HBPM) de origem bovina como alternativa à suína, reduzindo a vulnerabilidade da cadeia global de heparina.",
+          "en": "Heptech develops bovine-derived low molecular weight heparin (LMWH) as a non-porcine alternative, addressing the vulnerability of the global heparin supply chain."
+        },
+        "website": null,
+        "city": null,
+        "state": null,
+        "size": null,
+        "segments": [
+          "biotechnology",
+          "pharmaceutical"
+        ],
+        "partnership_types": [
+          "out_licensing"
+        ],
+        "leadership": [],
+        "gallery": [],
+        "focal_point": {
+          "name": "Ponto focal Heptech Biotech",
+          "role": "Diretor(a) de negócios",
+          "email": "contato@heptech.example",
+          "phone": "+55 11 90959-3665"
+        }
+      },
+      "projects": [
+        {
+          "id": "heptech-lmwh",
+          "profile_type": "A",
+          "summary": null,
+          "fields": {
+            "segment": {
+              "pt": "Anticoagulante — Heparina bovina de baixo peso molecular",
+              "en": "Anticoagulant — Bovine low molecular weight heparin"
+            },
+            "trl": 5,
+            "regulatory_phase": "preclinical",
+            "lead_product_name": "Bovine LMWH",
+            "lead_product_moa": {
+              "pt": "Mecanismo anticoagulante que inibe a coagulação sanguínea, voltado a mercados onde a heparina suína é restrita ou indisponível.",
+              "en": "Anticoagulant mechanism inhibiting blood coagulation, targeting markets where porcine heparin is restricted or unavailable."
+            },
+            "pipeline": [
+              {
+                "name": "UFH bovina",
+                "indication": {
+                  "pt": "Heparina não fracionada com atividade equivalente ao padrão suíno",
+                  "en": "Non-fractionated heparin with activity equivalent to the porcine standard"
+                }
+              }
+            ],
+            "patents_filed": {
+              "pt": "PCT/BR2024/050460 pendente.",
+              "en": "PCT/BR2024/050460 pending."
+            },
+            "patents_granted": {
+              "pt": "US 12,485,137B2; BR 112021015794-8.",
+              "en": "US 12,485,137B2; BR 112021015794-8."
+            },
+            "milestones": [
+              {
+                "period": {
+                  "year": 2027,
+                  "month": 6
+                },
+                "description": {
+                  "pt": "Conclusão da fase pré-clínica e preparação da submissão de IND",
+                  "en": "Completion of the pre-clinical phase and IND submission preparation"
+                }
+              }
+            ],
+            "rounds": [
+              {
+                "stage": "series_a",
+                "period": {
+                  "year": 2027,
+                  "semester": 1
+                },
+                "amount_usd": 3000000,
+                "purpose": {
+                  "pt": "Toxicologia e farmacologia pré-clínicas",
+                  "en": "Pre-clinical toxicology and pharmacology"
+                }
+              }
+            ],
+            "use_of_funds": {
+              "pt": "Estudos pré-clínicos de toxicologia e farmacologia; submissões regulatórias.",
+              "en": "Pre-clinical toxicology and pharmacology studies; regulatory submissions."
+            },
+            "raised": [
+              {
+                "source": "finep",
+                "amount_usd": 1000000
+              },
+              {
+                "source": "other",
+                "amount_usd": 1000000,
+                "note": "B2B partner"
+              }
+            ],
+            "gtm_models": [
+              "out_licensing"
+            ],
+            "gtm_text": {
+              "pt": "Licenciamento.",
+              "en": "Out-licensing."
+            },
+            "target_markets": [
+              "north_america",
+              "asia"
+            ]
+          }
+        }
+      ]
+    },
+    "reviewed_steps": {},
+    "created_at": "2026-09-12",
+    "updated_at": "2026-09-26",
+    "submitted_at": "2026-09-18",
+    "submitted_by": "u-heptech",
+    "review_comment": "Informe os valores de \"Captado até hoje\" separados por fonte, em USD, e inclua o site e a cidade da empresa.",
+    "reviewed_at": "2026-09-26",
+    "reviewed_by": "u-team-1"
+  }
+]
