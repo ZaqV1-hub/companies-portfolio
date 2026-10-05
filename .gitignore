@@ -2,3 +2,8 @@
 node_modules/
 __pycache__/
 *.zip
+server/.env
+server/.env.*
+!server/.env.example
+server/uploads/
+server/logs/
