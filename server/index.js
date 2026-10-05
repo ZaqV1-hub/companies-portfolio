@@ -29,6 +29,15 @@ if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
 
 app.disable('x-powered-by');
 app.set('trust proxy', 1);
+// IIS terminates public TLS and proxies to this API over loopback. ARR does not
+// reliably forward X-Forwarded-Proto, so mark trusted local proxy requests as
+// HTTPS before express-session decides whether to emit its Secure cookie.
+app.use((req, _res, next) => {
+  if (process.env.NODE_ENV === 'production' && ['127.0.0.1', '::1', '::ffff:127.0.0.1'].includes(req.socket.remoteAddress)) {
+    req.headers['x-forwarded-proto'] = 'https';
+  }
+  next();
+});
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '2mb' }));
 app.use(session({
