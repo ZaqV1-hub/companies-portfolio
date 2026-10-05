@@ -9,7 +9,7 @@ export const TABLES = [
 ];
 
 const STORAGE_KEY = 'cp.v2.db';
-const SEED_VERSION = 3; // bump to discard old local data after a seed change
+const SEED_VERSION = 4; // bump to discard old local data after a seed change
 
 let db = null;
 

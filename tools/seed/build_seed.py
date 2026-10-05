@@ -262,6 +262,8 @@ def build_users(organizations):
          'organization_id': None, 'email_verified_at': '2026-06-01', 'lang': 'pt'},
         {'id': 'u-inv-1', 'role': 'investor', 'name': 'Sarah Chen', 'email': 'sarah.chen@meridiancapital.example', 'password': 'demo',
          'organization_id': None, 'contact_id': 'ct-01', 'email_verified_at': '2026-09-02', 'lang': 'en',
+         'investor_profile': {'institution': 'Meridian Capital', 'country': 'US', 'city': 'Boston', 'role': 'Partner',
+                              'investor_type': 'vc', 'phone': '+1 617 555 0101', 'linkedin': None},
          'terms_accepted_at': '2026-09-02', 'privacy_accepted_at': '2026-09-02'},
     ]
     for o in organizations:
@@ -427,7 +429,7 @@ def main():
         'relationships': relationships,
         'interactions': interactions,
         'settings': [SETTINGS],
-        'consents': [],       # investor terms / privacy acceptance records (spec 2, 6.1)
+        'consents': [{'id': 'cons-001', 'user_id': 'u-inv-1', 'terms_version': '2026-09', 'privacy_version': '2026-09', 'accepted_at': '2026-09-02'}],  # spec 2, 6.1
         'email_outbox': [],   # e-mails the platform would send (mock; see HANDOFF_CODEX.md)
     }
     os.makedirs(OUT, exist_ok=True)

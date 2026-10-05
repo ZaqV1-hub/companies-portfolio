@@ -56,3 +56,12 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 33. **"Versão anterior" de empresa nova.** Sem versão publicada, a coluna da esquerda mostra a resposta do Google Forms dos campos "só referência" e "—" nos demais.
 34. **Reativar / tirar do ar.** A lista de organizações tem um botão para tirar o perfil do ar ou reativá-lo manualmente (spec 1, 4.4). A saída automática no 60º dia fica para o servidor (rotina por data, fora deste escopo).
 35. **Alerta de perfil desatualizado.** A lista de organizações já mostra "N dias sem atualização" quando um perfil publicado passa do prazo configurado (120 dias por padrão). O e-mail correspondente fica para o servidor.
+
+## Investidor
+
+36. **Senha no cadastro.** A tabela 6.1 da spec 2 não lista senha, mas o login precisa de uma. Foi incluído o campo "Senha" (obrigatório). No protótipo a senha fica em texto puro no navegador; o servidor deve guardar só o hash.
+37. **Textos dos termos de uso e da política de privacidade.** Não foram fornecidos. As páginas `#/legal/terms` e `#/legal/privacy` têm um texto provisório. O aceite é gravado com data e versão (tabela `consents`).
+38. **Tipo de investidor.** A lista Apex aparece com os nomes originais em inglês nos dois idiomas, como nos modelos da Apex.
+39. **Login exige e-mail confirmado.** Uma conta não confirmada volta à tela "Verifique seu e-mail", com "Reenviar link". No protótipo, o link de confirmação aparece numa "caixa de entrada simulada".
+40. **Pedido de contato repetido.** Se o investidor pede contato de novo com a mesma empresa, o relacionamento existente é reaproveitado (não se cria um segundo) e uma nova interação "Pedido de contato pela plataforma" é registrada, reiniciando a contagem dos 15 dias úteis.
+41. **Projeto do pedido.** O relacionamento é com a organização (spec 2, seção 4); o projeto de onde veio o pedido fica registrado na interação (`project_id`).

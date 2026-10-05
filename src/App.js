@@ -4,6 +4,7 @@ import * as api from './services/api.js';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js';
+import { InvestorAuthModal } from './components/InvestorAuth.js';
 import { AppShell } from './components/AppShell.js';
 import { DirectoryPage } from './pages/public/DirectoryPage.js';
 import { ProfilePage } from './pages/public/ProfilePage.js';
@@ -79,15 +80,45 @@ function Routes() {
       : html`<${TeamArea} user=${user} route=${route} onLogout=${logout} />`;
   }
 
-  // Public site. "Request contact" and investor access are completed in blocks 7 and 8.
-  const requestContact = async () => 'sent';
+  return html`<${PublicSite} route=${route} user=${user} setUser=${setUser} />`;
+}
+
+function LegalPage({ kind }) {
+  const { t } = useI18n();
+  return html`<div class="section" style=${{ maxWidth: '760px' }}><h1 class="h2">${t('legal.' + kind + '_title')}</h1><p class="prose">${t('legal.placeholder')}</p></div>`;
+}
+
+/** Public site: directory, profiles and the investor account (spec 2, 6.1). */
+function PublicSite({ route, user, setUser }) {
+  const { t } = useI18n();
+  const [first, second] = route.parts;
+  const [auth, setAuth] = useState(null); // {mode, reason, pending: {org, projectId, resolve}}
+  const investor = user && user.role === 'investor' ? user : null;
+
+  // "Solicitar contato" only works for a logged-in investor; otherwise opens sign-up / login first.
+  const requestContact = (org, projectId) => new Promise((resolve) => {
+    const run = async () => resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null);
+    if (investor && investor.email_verified) run();
+    else setAuth({ mode: 'signup', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
+  });
+  const done = (u) => {
+    setUser(u);
+    const pending = auth && auth.pending;
+    setAuth(null);
+    if (pending) pending();
+  };
+  const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); };
+  const logout = async () => { await api.logout(); setUser(null); };
+
   let page;
   if (first === 'org' && second) page = html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`;
+  else if (first === 'legal') page = html`<${LegalPage} kind=${second === 'privacy' ? 'privacy' : 'terms'} />`;
   else page = html`<${DirectoryPage} />`;
   return html`<div class="page">
-    <${TopBar} onInvestorAccess=${() => {}} />
+    <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'login' })} onLogout=${logout} />
     ${page}
     <${PublicFooter} />
+    ${auth && html`<${InvestorAuthModal} initialMode=${auth.mode} reason=${auth.reason} onDone=${done} onClose=${close} />`}
   </div>`;
 }
 

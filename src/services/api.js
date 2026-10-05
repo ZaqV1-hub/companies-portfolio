@@ -310,3 +310,129 @@ export async function setOrganizationPublicState(orgId, publicState) {
   if (publicState === 'provisional') patch.status = 'provisional';
   return store.update('organizations', orgId, patch);
 }
+
+// ------------------------------------------------------------------ investor sign-up and login (spec 2, 6.1) — MOCK auth
+
+const TERMS_VERSION = '2026-10';
+
+function normEmail(e) {
+  return String(e || '').trim().toLowerCase();
+}
+
+/**
+ * Investor sign-up. Required: name, institution, email, country, city, password, accept_terms, accept_privacy.
+ * Recommended: role, investor_type. Optional: phone, linkedin.
+ * The account stays unverified until the e-mail link is opened (simulated: the token comes back here and
+ * a message is written to email_outbox).
+ * @returns {Promise<{ok: boolean, error?: string, fields?: string[], user_id?: string, verification_token?: string}>}
+ */
+export async function registerInvestor(data) {
+  const required = ['name', 'institution', 'email', 'country', 'city', 'password'];
+  const missing = required.filter((k) => !String(data[k] || '').trim());
+  if (!data.accept_terms) missing.push('accept_terms');
+  if (!data.accept_privacy) missing.push('accept_privacy');
+  if (missing.length) return { ok: false, error: 'missing', fields: missing };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)) return { ok: false, error: 'email', fields: ['email'] };
+  const email = normEmail(data.email);
+  if (store.find('users', (u) => normEmail(u.email) === email).length) return { ok: false, error: 'email_taken', fields: ['email'] };
+  const token = store.newId('verify');
+  const user = store.insert('users', {
+    id: store.newId('u'), role: 'investor', name: data.name.trim(), email, password: data.password,
+    organization_id: null, contact_id: null, email_verified_at: null, verification_token: token, lang: data.lang || 'en',
+    investor_profile: {
+      institution: data.institution.trim(), country: data.country, city: data.city.trim(), role: (data.role || '').trim() || null,
+      investor_type: data.investor_type || null, phone: (data.phone || '').trim() || null, linkedin: (data.linkedin || '').trim() || null,
+    },
+    terms_accepted_at: now(), privacy_accepted_at: now(), created_at: now(),
+  });
+  store.insert('consents', { id: store.newId('cons'), user_id: user.id, terms_version: TERMS_VERSION, privacy_version: TERMS_VERSION, accepted_at: now() });
+  queueEmail('investor_verify_email', user.email, { user_id: user.id, token });
+  return { ok: true, user_id: user.id, verification_token: token };
+}
+
+/** Opens the (simulated) confirmation link: marks the e-mail as verified and logs the investor in. */
+export async function verifyInvestorEmail(token) {
+  const u = store.find('users', (x) => x.verification_token === token)[0];
+  if (!u) return { ok: false, error: 'invalid_token' };
+  store.update('users', u.id, { email_verified_at: now(), verification_token: null });
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: u.id }));
+  return { ok: true, user: publicUser(store.get('users', u.id)) };
+}
+
+/** Sends a new confirmation link (simulated). */
+export async function resendVerification(userId) {
+  const u = store.get('users', userId);
+  if (!u || u.email_verified_at) return { ok: false };
+  const token = store.newId('verify');
+  store.update('users', u.id, { verification_token: token });
+  queueEmail('investor_verify_email', u.email, { user_id: u.id, token });
+  return { ok: true, verification_token: token };
+}
+
+/** Investor login; refuses accounts whose e-mail was not confirmed yet. */
+export async function loginInvestor(email, password) {
+  const u = store.find('users', (x) => x.role === 'investor' && normEmail(x.email) === normEmail(email))[0];
+  if (!u || u.password !== password) return { ok: false, error: 'invalid_credentials' };
+  if (!u.email_verified_at) return { ok: false, error: 'not_verified', user_id: u.id };
+  localStorage.setItem(SESSION_KEY, JSON.stringify({ userId: u.id }));
+  return { ok: true, user: publicUser(u) };
+}
+
+// ------------------------------------------------------------------ "Solicitar contato" (spec 2, 5.1)
+
+/** Finds an institution by name (case/accent-insensitive) or creates it. */
+function findOrCreateInstitution(name, extra) {
+  const key = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+  const found = store.find('institutions', (i) => key(i.name) === key(name))[0];
+  if (found) return found;
+  return store.insert('institutions', {
+    id: store.newId('in'), name: name.trim(), investor_type: extra.investor_type || null, niche: null, ticket_min_musd: null, ticket_max_musd: null,
+    interest_type: null, sectors: [], description_original: null, description_pt: null, website: null,
+    hq_country: extra.country || null, hq_city: extra.city || null, created_at: now(),
+  });
+}
+
+/**
+ * Investor clicks "Request contact" on a profile. Creates or reuses institution and contact (from the
+ * sign-up data), creates the relationship (origin "Portfólio", classification Lead) and records the
+ * first interaction "Pedido de contato pela plataforma". Notifies company and team; the 15 business-day
+ * count starts (contact_request_at).
+ * @returns {Promise<{ok: boolean, error?: string, relationship_id?: string, reused?: boolean}>}
+ */
+export async function requestContact(organizationId, projectId) {
+  const user = await getCurrentUser();
+  if (!user || user.role !== 'investor') return { ok: false, error: 'login_required' };
+  if (!user.email_verified) return { ok: false, error: 'not_verified' };
+  const full = store.get('users', user.id);
+  const prof = full.investor_profile || {};
+  const institution = findOrCreateInstitution(prof.institution || full.name, prof);
+  let contact = store.find('contacts', (c) => normEmail(c.email) === normEmail(full.email))[0];
+  if (!contact) {
+    contact = store.insert('contacts', {
+      id: store.newId('ct'), institution_id: institution.id, name: full.name, email: normEmail(full.email), country: prof.country || null,
+      city: prof.city || null, role: prof.role || null, linkedin: prof.linkedin || null, phone: prof.phone || null, created_at: now(),
+    });
+  }
+  if (full.contact_id !== contact.id) store.update('users', full.id, { contact_id: contact.id });
+  const day = todayDate();
+  let rel = store.find('relationships', (r) => r.contact_id === contact.id && r.organization_id === organizationId)[0];
+  const reused = !!rel;
+  if (!rel) {
+    rel = store.insert('relationships', {
+      id: store.newId('rel'), contact_id: contact.id, organization_id: organizationId, owner_user_id: null, origin: 'Portfólio',
+      status: 'in_progress', classification: 'lead', classification_state: 'validated', suggested: null, npia: null,
+      deal_expectation: null, contact_request_at: day, validated_at: null, validated_by: null, created_at: now(),
+      apex_control: { dynamics_account: false, contact_registered: false, opportunity_inserted: false, opportunity_word: false,
+        strategic_category: 'Indústria da saúde (CNDI Missão 2)', notes: '' },
+    });
+  } else {
+    store.update('relationships', rel.id, { contact_request_at: day });
+  }
+  store.insert('interactions', {
+    id: store.newId('it'), relationship_id: rel.id, date: day, description: 'Pedido de contato pela plataforma', type: 'other',
+    apex_product: 'investment_portfolio', event: null, project_id: projectId || null, auto: true, created_by: user.id, created_at: now(),
+  });
+  queueEmail('contact_request_company', 'company', { organization_id: organizationId, relationship_id: rel.id });
+  queueEmail('contact_request_team', 'team', { organization_id: organizationId, relationship_id: rel.id });
+  return { ok: true, relationship_id: rel.id, reused };
+}

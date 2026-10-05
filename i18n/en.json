@@ -343,6 +343,25 @@
       "published": "Published",
       "provisional": "Provisional",
       "offline": "Offline"
+    },
+    "investor_types": {
+      "accelerator": "Accelerator",
+      "angel": "Angel",
+      "angel_network": "Angel Network",
+      "asset_wealth_management": "Asset/Wealth Management",
+      "cvc": "CVC",
+      "dfi": "DFI",
+      "endowment": "Endowment",
+      "family_office": "Family Office",
+      "foundation": "Foundation",
+      "fund_of_funds": "Fund of Funds",
+      "hnwi": "HNWI",
+      "non_profit": "Non-Profit Organization",
+      "organization": "Organization",
+      "pe_firm": "PE Firm",
+      "pension_fund": "Pension Fund",
+      "service_provider": "Service Provider",
+      "vc": "VC"
     }
   },
   "filters": {
@@ -780,5 +799,47 @@
     "outdated": "{n} days without update",
     "reactivate": "Reactivate",
     "take_offline": "Take offline"
+  },
+  "investor": {
+    "kicker": "Investors",
+    "title": "Investor account",
+    "signup_title": "Create your investor account",
+    "login_title": "Log in to your account",
+    "subtitle": "An account lets you request contact with portfolio companies.",
+    "login_to_request": "To request contact with {org}, log in or create your investor account.",
+    "name": "First and last name",
+    "institution": "Institution",
+    "email": "E-mail",
+    "country": "Country",
+    "city": "City",
+    "role": "Role",
+    "investor_type": "Investor type",
+    "phone": "Phone",
+    "recommended": "recommended",
+    "optional": "optional",
+    "accept_terms_pre": "I have read and accept the",
+    "terms": "Terms of use",
+    "accept_privacy_pre": "I have read and accept the",
+    "privacy": "Privacy policy",
+    "fix_errors": "Fill in the required fields marked.",
+    "create_account": "Create account",
+    "log_in": "Log in",
+    "have_account": "Already have an account?",
+    "no_account": "No account yet?",
+    "email_taken": "An account with this e-mail already exists.",
+    "demo_hint": "Demo: sarah.chen@meridiancapital.example / demo",
+    "verify_title": "Check your e-mail",
+    "verify_text": "We sent a confirmation link to {email}. Open it to activate your account.",
+    "simulated_inbox": "Simulated inbox (prototype)",
+    "verify_mail_body": "Confirm your e-mail to activate your Brazilian Pharma & Health account.",
+    "confirm_link": "Open confirmation link",
+    "no_token": "Click \"Resend link\" to get a new confirmation link.",
+    "resend": "Resend link",
+    "resent": "New link sent."
+  },
+  "legal": {
+    "terms_title": "Terms of use",
+    "privacy_title": "Privacy policy",
+    "placeholder": "Text to be provided by Abiquifi. Acceptance is recorded with date and version in the investor sign-up."
   }
 }

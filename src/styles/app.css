@@ -456,3 +456,25 @@ button { font-family: var(--font-body); }
 .en-row textarea { font-family: var(--font-body); resize: vertical; }
 .en-row textarea.missing { border-color: #e2b93b; }
 @media (max-width: 900px) { .cmp-row { grid-template-columns: 1fr; } .trow { grid-template-columns: 1fr !important; } }
+
+/* ---------- modal / investor auth ---------- */
+.modal-backdrop { position: fixed; inset: 0; background: rgba(20, 27, 52, 0.55); z-index: 100; display: flex; align-items: flex-start; justify-content: center; padding: 40px 16px; overflow-y: auto; }
+.modal { position: relative; background: #fff; border-radius: 18px; padding: 30px; width: 100%; max-width: 640px; box-shadow: 0 24px 60px rgba(20, 27, 52, 0.3); animation: fadeUp .2s ease; }
+.modal-close { position: absolute; top: 14px; right: 16px; border: none; background: none; font-size: 26px; line-height: 1; cursor: pointer; color: var(--muted); }
+.auth-form { display: flex; flex-direction: column; gap: 14px; }
+.auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
+.auth-field { display: flex; flex-direction: column; }
+.auth-field.has-error .input { border-color: #b42318; }
+.level-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent); }
+.level-tag.muted { color: var(--muted); }
+.check-line.has-error { color: #b42318; }
+.check-line a { color: var(--accent); font-weight: 700; }
+.auth-switch { font-size: 13px; color: var(--muted); margin: 0; }
+.link-accent { color: var(--accent); font-weight: 800; }
+.verify { align-items: flex-start; }
+.verify-icon { font-size: 34px; }
+.simulated-mail { border: 1.5px dashed var(--line); border-radius: 14px; padding: 16px; width: 100%; background: var(--bg); }
+.simulated-mail p { font-size: 14px; color: var(--text-2); }
+.sim-label { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); }
+.investor-chip { font-size: 13px; font-weight: 700; color: var(--navy); background: var(--line-soft); padding: 8px 12px; border-radius: 20px; }
+@media (max-width: 600px) { .auth-grid { grid-template-columns: 1fr; } .modal { padding: 22px 18px; } }

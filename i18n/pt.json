@@ -343,6 +343,25 @@
       "published": "Publicado",
       "provisional": "Provisório",
       "offline": "Fora do ar"
+    },
+    "investor_types": {
+      "accelerator": "Accelerator",
+      "angel": "Angel",
+      "angel_network": "Angel Network",
+      "asset_wealth_management": "Asset/Wealth Management",
+      "cvc": "CVC",
+      "dfi": "DFI",
+      "endowment": "Endowment",
+      "family_office": "Family Office",
+      "foundation": "Foundation",
+      "fund_of_funds": "Fund of Funds",
+      "hnwi": "HNWI",
+      "non_profit": "Non-Profit Organization",
+      "organization": "Organization",
+      "pe_firm": "PE Firm",
+      "pension_fund": "Pension Fund",
+      "service_provider": "Service Provider",
+      "vc": "VC"
     }
   },
   "filters": {
@@ -780,5 +799,47 @@
     "outdated": "{n} dias sem atualização",
     "reactivate": "Reativar",
     "take_offline": "Tirar do ar"
+  },
+  "investor": {
+    "kicker": "Investidores",
+    "title": "Conta de investidor",
+    "signup_title": "Crie sua conta de investidor",
+    "login_title": "Entre na sua conta",
+    "subtitle": "A conta permite solicitar contato com as empresas do portfólio.",
+    "login_to_request": "Para solicitar contato com {org}, entre ou crie sua conta de investidor.",
+    "name": "Nome e sobrenome",
+    "institution": "Instituição",
+    "email": "E-mail",
+    "country": "País",
+    "city": "Cidade",
+    "role": "Cargo",
+    "investor_type": "Tipo de investidor",
+    "phone": "Telefone",
+    "recommended": "recomendado",
+    "optional": "opcional",
+    "accept_terms_pre": "Li e aceito os",
+    "terms": "Termos de uso",
+    "accept_privacy_pre": "Li e aceito a",
+    "privacy": "Política de privacidade",
+    "fix_errors": "Preencha os campos obrigatórios marcados.",
+    "create_account": "Criar conta",
+    "log_in": "Entrar",
+    "have_account": "Já tem conta?",
+    "no_account": "Ainda não tem conta?",
+    "email_taken": "Já existe uma conta com este e-mail.",
+    "demo_hint": "Demonstração: sarah.chen@meridiancapital.example / demo",
+    "verify_title": "Verifique seu e-mail",
+    "verify_text": "Enviamos um link de confirmação para {email}. Abra o link para ativar a conta.",
+    "simulated_inbox": "Caixa de entrada simulada (protótipo)",
+    "verify_mail_body": "Confirme seu e-mail para ativar sua conta no Brazilian Pharma & Health.",
+    "confirm_link": "Abrir link de confirmação",
+    "no_token": "Clique em \"Reenviar link\" para receber um novo link de confirmação.",
+    "resend": "Reenviar link",
+    "resent": "Novo link enviado."
+  },
+  "legal": {
+    "terms_title": "Termos de uso",
+    "privacy_title": "Política de privacidade",
+    "placeholder": "Texto a ser fornecido pela Abiquifi. O aceite é registrado com data e versão no cadastro do investidor."
   }
 }

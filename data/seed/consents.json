@@ -1,1 +1,9 @@
-[]
+[
+  {
+    "id": "cons-001",
+    "user_id": "u-inv-1",
+    "terms_version": "2026-09",
+    "privacy_version": "2026-09",
+    "accepted_at": "2026-09-02"
+  }
+]

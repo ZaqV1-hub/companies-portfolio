@@ -29,6 +29,15 @@
     "contact_id": "ct-01",
     "email_verified_at": "2026-09-02",
     "lang": "en",
+    "investor_profile": {
+      "institution": "Meridian Capital",
+      "country": "US",
+      "city": "Boston",
+      "role": "Partner",
+      "investor_type": "vc",
+      "phone": "+1 617 555 0101",
+      "linkedin": null
+    },
     "terms_accepted_at": "2026-09-02",
     "privacy_accepted_at": "2026-09-02"
   },

@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { href } from '../lib/router.js';
 import { LangSwitch } from './LangSwitch.js';
 
-export function TopBar({ onInvestorAccess }) {
+export function TopBar({ investor, onInvestorAccess, onLogout }) {
   const { t } = useI18n();
   return html`
     <header class="topbar">
@@ -16,7 +16,9 @@ export function TopBar({ onInvestorAccess }) {
       <nav class="topbar-actions">
         <${LangSwitch} />
         <a class="btn btn-outline" href=${href('/company/login')}>${t('topbar.company_access')}</a>
-        <button class="btn btn-lime" onClick=${onInvestorAccess}>${t('topbar.investor_access')}</button>
+        ${investor
+          ? html`<span class="investor-chip">${investor.name}</span><button class="btn btn-outline" onClick=${onLogout}>${t('common.log_out')}</button>`
+          : html`<button class="btn btn-lime" onClick=${onInvestorAccess}>${t('topbar.investor_access')}</button>`}
       </nav>
     </header>`;
 }
