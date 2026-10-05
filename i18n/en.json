@@ -334,6 +334,15 @@
       "pe": "Private equity",
       "expansion": "Expansion",
       "distribution": "Distribution"
+    },
+    "org_status": {
+      "awaiting_validation": "Awaiting validation",
+      "filling": "Filling in",
+      "in_review": "In review",
+      "returned": "Returned",
+      "published": "Published",
+      "provisional": "Provisional",
+      "offline": "Offline"
     }
   },
   "filters": {
@@ -347,5 +356,382 @@
     "any": "Any",
     "trl_min": "TRL {n} or higher",
     "clear": "Clear filters"
+  },
+  "fields": {
+    "name": {
+      "label": "Organization name",
+      "help": "How the organization should appear in the directory."
+    },
+    "logo_url": {
+      "label": "Logo",
+      "help": "PNG or SVG with transparent background, at least 512 px."
+    },
+    "description": {
+      "label": "Description",
+      "help": "What the organization does, in a few sentences. Shown at the top of the profile and on the card."
+    },
+    "website": {
+      "label": "Website",
+      "help": "Full address, starting with https://"
+    },
+    "place": {
+      "label": "City and state",
+      "help": "Headquarters city and state."
+    },
+    "size": {
+      "label": "Size",
+      "help": "Mid-size: revenue up to BRL 300M. Large: above BRL 300M."
+    },
+    "segments": {
+      "label": "Segments",
+      "help": "Select all that apply. Used in the directory filters."
+    },
+    "partnership_types": {
+      "label": "Partnership type sought",
+      "help": "Shown at the top of the \"What we're looking for\" card."
+    },
+    "focal_point": {
+      "label": "Focal point",
+      "help": "Internal: never shown to investors. Receives contact request notices."
+    },
+    "summary": {
+      "label": "Project summary",
+      "help": "Shown in the profile's project selector."
+    },
+    "segment": {
+      "label": "Segment",
+      "help": "Therapeutic area + modality. E.g. Oncology — monoclonal antibody."
+    },
+    "trl": {
+      "label": "Stage: TRL",
+      "help": "Technology readiness level, 1 to 9."
+    },
+    "regulatory_phase": {
+      "label": "Stage: regulatory phase",
+      "help": "Current phase of the lead product."
+    },
+    "lead_product_name": {
+      "label": "Lead product: name",
+      "help": "Product name or code."
+    },
+    "lead_product_moa": {
+      "label": "Lead product: mechanism of action",
+      "help": "How the product works and what it is for."
+    },
+    "pipeline": {
+      "label": "Pipeline",
+      "help": "Other products in development: name and indication."
+    },
+    "patents_filed": {
+      "label": "Patents filed",
+      "help": "Application numbers and countries."
+    },
+    "patents_granted": {
+      "label": "Patents granted",
+      "help": "Patent numbers and countries."
+    },
+    "fto": {
+      "label": "FTO analysis",
+      "help": "Freedom-to-operate analysis."
+    },
+    "milestones": {
+      "label": "Key milestones",
+      "help": "At least one: period (month/year or semester) and description."
+    },
+    "rounds": {
+      "label": "Investment sought",
+      "help": "One line per round: stage, expected period, amount in USD and purpose."
+    },
+    "use_of_funds": {
+      "label": "Use of funds",
+      "help": "How the investment will be used."
+    },
+    "raised": {
+      "label": "Raised to date",
+      "help": "One line per source, in USD. The platform adds up the total."
+    },
+    "revenue": {
+      "label": "Annual revenue",
+      "help": "Whole amount in USD and the year."
+    },
+    "gtm_models": {
+      "label": "Go-to-market",
+      "help": "How the product will reach the market."
+    },
+    "gtm_text": {
+      "label": "Go-to-market: details",
+      "help": "Optional details."
+    },
+    "target_markets": {
+      "label": "Target markets",
+      "help": "Used in the directory filters."
+    },
+    "platform_type": {
+      "label": "Platform type",
+      "help": "Shown under the name. E.g. Point-of-care molecular diagnostics."
+    },
+    "maturity": {
+      "label": "Maturity",
+      "help": "Operating status of the platform."
+    },
+    "platform_description": {
+      "label": "Platform description",
+      "help": "Complements the organization description."
+    },
+    "technology_tags": {
+      "label": "Technology",
+      "help": "Select the platform's technologies. Used in filters."
+    },
+    "technology_text": {
+      "label": "Technology: details",
+      "help": "Optional details."
+    },
+    "business_models": {
+      "label": "Business model",
+      "help": "How the platform makes money."
+    },
+    "business_model_text": {
+      "label": "Business model: details",
+      "help": "Optional details."
+    },
+    "traction": {
+      "label": "Traction",
+      "help": "Clients, partnerships and metrics."
+    },
+    "competitive_edge": {
+      "label": "Competitive edge",
+      "help": "What sets the platform apart."
+    },
+    "services": {
+      "label": "Services",
+      "help": "Select the services offered."
+    },
+    "services_text": {
+      "label": "Services: details",
+      "help": "Optional details."
+    },
+    "molecule_types": {
+      "label": "Molecule types",
+      "help": "What the organization works with."
+    },
+    "capacity_scales": {
+      "label": "Installed capacity: scale",
+      "help": "Available production scales."
+    },
+    "utilization_pct": {
+      "label": "Utilization rate (%)",
+      "help": "Share of capacity in use, 0 to 100."
+    },
+    "capacity_text": {
+      "label": "Capacity: details",
+      "help": "Optional details."
+    },
+    "certifications": {
+      "label": "Certifications",
+      "help": "Shown as badges on the profile."
+    },
+    "certificate_numbers": {
+      "label": "Certificate numbers",
+      "help": "Optional."
+    },
+    "clients": {
+      "label": "Client profile",
+      "help": "Number of active clients and profile."
+    },
+    "exports": {
+      "label": "Exports",
+      "help": "Report exported amounts."
+    },
+    "expansion_plan": {
+      "label": "Expansion plan",
+      "help": "Next growth steps."
+    },
+    "investment_types": {
+      "label": "Type of investment sought",
+      "help": "Shown in the \"What we're looking for\" card."
+    },
+    "investment_range": {
+      "label": "Amount sought",
+      "help": "Minimum and maximum, in USD."
+    },
+    "therapeutic_areas": {
+      "label": "Therapeutic areas / scope",
+      "help": "Areas served."
+    },
+    "scope_text": {
+      "label": "Scope: details",
+      "help": "Optional details."
+    },
+    "models": {
+      "label": "Models",
+      "help": "Species, in vitro, in vivo."
+    },
+    "partner_sites": {
+      "label": "Partner sites",
+      "help": "One site per line."
+    },
+    "institution_type": {
+      "label": "Institution type",
+      "help": "Shown under the name."
+    },
+    "product_portfolio": {
+      "label": "Product portfolio",
+      "help": "At least one item: category and description."
+    },
+    "production_capacity": {
+      "label": "Production capacity",
+      "help": "Volumes and plants."
+    },
+    "export_markets": {
+      "label": "Export markets",
+      "help": "Where the organization exports to."
+    },
+    "export_markets_text": {
+      "label": "Export markets: details",
+      "help": "Optional details."
+    },
+    "partnership_interests": {
+      "label": "Partnership interests",
+      "help": "At least one area: area and description. Highlighted on the profile."
+    },
+    "partnership_models": {
+      "label": "Partnership model",
+      "help": "Shown in the \"What we're looking for\" card."
+    },
+    "expansion_projects": {
+      "label": "Expansion projects",
+      "help": "Ongoing or planned growth projects."
+    },
+    "investment_description": {
+      "label": "Investment sought: description",
+      "help": "Optional details."
+    },
+    "products": {
+      "label": "Products and services",
+      "help": "One item per line."
+    },
+    "products_text": {
+      "label": "Products: details",
+      "help": "Optional details."
+    },
+    "markets_served": {
+      "label": "Markets served",
+      "help": "Where the organization sells."
+    },
+    "markets_text": {
+      "label": "Markets: details",
+      "help": "Optional details."
+    },
+    "market_share": {
+      "label": "Market share",
+      "help": "Percentage (0–100) and segment."
+    },
+    "expansion_strategy": {
+      "label": "Expansion strategy",
+      "help": "Next growth steps."
+    },
+    "leadership": {
+      "label": "Leadership",
+      "help": "Up to 4 people: name, role and one line of experience."
+    },
+    "cover_url": {
+      "label": "Cover image",
+      "help": "JPG or PNG, 1920 × 720 px, up to 8 MB. Used as the header background."
+    },
+    "gallery": {
+      "label": "Photo gallery",
+      "help": "Up to 6 own images, at least 1600 px on the longer side, with caption."
+    }
+  },
+  "form": {
+    "title": "My profile",
+    "progress": "Step {n} of {total}",
+    "save_draft": "Save draft",
+    "saved": "Draft saved",
+    "next": "Next step →",
+    "prev": "← Previous step",
+    "required_hint": "* required",
+    "step_organization": "Organization",
+    "step_project": "Project",
+    "step_leadership": "Leadership",
+    "step_images": "Images",
+    "step_preview": "Preview & submit",
+    "reviewed_step": "I have reviewed this step",
+    "imported": "Imported from the form · please confirm",
+    "previous_answer": "Previous answer: {answer}",
+    "usd_error": "Enter the amount in US dollars, numbers only",
+    "chars": "{n}/{max}",
+    "submit": "Submit for review",
+    "submit_blocked": "To submit, fix the items below:",
+    "submitted": "Profile submitted for review. The Abiquifi/B2H team will review it and you will get an e-mail.",
+    "unreviewed_step": "Tick \"I have reviewed this step\" in: {step}",
+    "go_to": "go to field",
+    "preview_intro": "This is how investors will see the page. Check both languages before submitting.",
+    "preview_lang": "Preview language",
+    "preview_en_note": "The English version of the texts is reviewed by the team. New texts show in Portuguese until then.",
+    "add": "+ Add",
+    "remove": "Remove",
+    "none_raised": "No funds raised",
+    "pre_revenue": "Pre-revenue",
+    "no_exports": "Does not export",
+    "year": "Year",
+    "month": "Month",
+    "semester": "Semester",
+    "period": "Period",
+    "semester_1": "1st half",
+    "semester_2": "2nd half",
+    "amount_usd": "Amount (USD)",
+    "min_usd": "Minimum (USD)",
+    "max_usd": "Maximum (USD)",
+    "stage": "Stage",
+    "purpose": "Purpose",
+    "source": "Source",
+    "total": "Total",
+    "name": "Name",
+    "indication": "Indication",
+    "description": "Description",
+    "category": "Category",
+    "area": "Area",
+    "role": "Role",
+    "experience": "Experience (one line)",
+    "email": "E-mail",
+    "phone": "Phone with country code",
+    "city": "City",
+    "state": "State",
+    "client_count": "Active clients",
+    "pct_revenue": "% of revenue",
+    "destinations": "Destinations",
+    "pct": "Percentage (%)",
+    "segment": "Segment",
+    "caption": "Caption",
+    "upload": "Upload image",
+    "replace": "Replace image",
+    "choose": "Select…",
+    "select_period": "Select",
+    "image_too_small": "Image too small: at least {min} px.",
+    "image_type": "File type not accepted.",
+    "image_too_big": "File above the size limit.",
+    "locked_review": "Your profile is being reviewed by the team. The published version stays online until approval; the form is locked during the review.",
+    "returned": "The team returned the profile for changes:",
+    "status": "Status",
+    "view_public": "View public page",
+    "updating_public": "Online: provisional profile (\"Updating\" badge)",
+    "en_reviewed_by_team": "Fill in Portuguese. The English version is reviewed by the team.",
+    "errors": {
+      "required": "Required field.",
+      "too_long": "At most {max} characters.",
+      "url": "Enter a valid URL (https://…).",
+      "email": "Invalid e-mail.",
+      "phone": "Enter the phone with country code, e.g. +55 11 91234-5678.",
+      "percent": "Whole number from 0 to 100.",
+      "usd": "Enter the amount in US dollars, numbers only",
+      "range": "Minimum is greater than maximum.",
+      "min_items": "Add at least {min} item.",
+      "item_incomplete": "Complete item {item}.",
+      "raised_required": "Add a source or tick \"No funds raised\".",
+      "year_required": "Enter the year.",
+      "max_items": "At most {max} items.",
+      "caption_required": "Image {item} needs a caption."
+    }
   }
 }

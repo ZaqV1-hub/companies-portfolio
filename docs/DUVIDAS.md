@@ -35,3 +35,16 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 18. **Filtro de TRL.** A spec lista "TRL" entre os filtros sem dizer o formato. Foi usado "TRL n ou mais" (mínimo), que é o uso mais comum para investidores.
 19. **Filtros de mercado em E e F.** O filtro "Mercados-alvo" também considera "Mercados de exportação" (Perfil E) e "Mercados atendidos" (Perfil F), que usam a mesma lista de mercados.
 20. **Filtros combinados.** Porte, segmento e tipo de parceria são da organização; perfil, mercado, fase, TRL e maturidade precisam valer para o **mesmo** projeto.
+
+## Formulário da empresa
+
+21. **Idioma do preenchimento.** A empresa preenche só a versão em português de cada texto (spec 1, seção 2). A versão em inglês não aparece no formulário da empresa; a equipe a edita na revisão. Na prévia em inglês, texto ainda sem tradução aparece em português.
+22. **Campos "lista + texto".** Onde a spec diz "Múltipla + texto até N caracteres" e o campo é obrigatório, a lista é obrigatória e o texto complementar é opcional.
+23. **Formulário bloqueado durante a revisão.** Enquanto o perfil está "Em revisão", o formulário fica só para leitura (a spec não diz se a empresa pode editar nesse período). Após "Devolver", volta a ser editável.
+24. **Projetos fixos para a empresa.** A empresa não cria, apaga nem muda o perfil dos projetos; isso é feito pela equipe (spec 1, 4.6). O `api.js` recusa rascunhos com projetos diferentes.
+25. **Marcas de pré-carga só na primeira validação.** "Importado do formulário · confirme" e "Resposta anterior: …" aparecem só para organizações que ainda não tiveram nenhuma aprovação. Depois da primeira aprovação, o formulário abre com a versão publicada.
+26. **Campos "só referência" vazios.** Para essas organizações, o rascunho abre com os campos "só referência" vazios (mesmo que o perfil provisório no ar mostre valores montados pela equipe), como pede a spec 1, 5.2.
+27. **Limites não definidos na spec.** Linha de experiência da liderança: 150 caracteres. Legenda da galeria: 120 caracteres. Nomes de itens (pipeline, centros parceiros, produtos): sem limite.
+28. **Separador de milhar no campo de valor.** O separador segue o idioma da área da empresa: ponto em português ("1.000.000") e vírgula em inglês ("1,000,000"). A vírgula é recusada em português, por ser decimal; o ponto é recusado em inglês, pelo mesmo motivo.
+29. **Imagens no protótipo.** Sem servidor, as imagens enviadas ficam no navegador, reduzidas para no máximo 1600 px de largura. As regras de formato e tamanho mínimo da spec são verificadas no envio. O servidor deve guardar o arquivo original (ver HANDOFF_CODEX.md).
+30. **Salvamento automático.** Além do botão "Salvar rascunho", o rascunho é salvo ao trocar de etapa.

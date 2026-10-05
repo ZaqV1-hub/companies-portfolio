@@ -334,6 +334,15 @@
       "pe": "PE",
       "expansion": "Expansão",
       "distribution": "Distribuição"
+    },
+    "org_status": {
+      "awaiting_validation": "Aguardando validação",
+      "filling": "Em preenchimento",
+      "in_review": "Em revisão",
+      "returned": "Devolvido",
+      "published": "Publicado",
+      "provisional": "Provisório",
+      "offline": "Fora do ar"
     }
   },
   "filters": {
@@ -347,5 +356,382 @@
     "any": "Todos",
     "trl_min": "TRL {n} ou mais",
     "clear": "Limpar filtros"
+  },
+  "fields": {
+    "name": {
+      "label": "Nome da organização",
+      "help": "Como a organização deve aparecer no diretório."
+    },
+    "logo_url": {
+      "label": "Logo",
+      "help": "PNG ou SVG com fundo transparente, mínimo 512 px."
+    },
+    "description": {
+      "label": "Descrição",
+      "help": "O que a organização faz, em poucas frases. Aparece no topo do perfil e no card."
+    },
+    "website": {
+      "label": "Site",
+      "help": "Endereço completo, começando com https://"
+    },
+    "place": {
+      "label": "Cidade e UF",
+      "help": "Cidade da sede e estado."
+    },
+    "size": {
+      "label": "Porte",
+      "help": "Média: faturamento até R$ 300 mi. Grande: acima de R$ 300 mi."
+    },
+    "segments": {
+      "label": "Segmentos de atuação",
+      "help": "Marque todos que se aplicam. Usado nos filtros do diretório."
+    },
+    "partnership_types": {
+      "label": "Tipo de parceria buscada",
+      "help": "Aparece no topo do card \"O que buscamos\"."
+    },
+    "focal_point": {
+      "label": "Ponto focal",
+      "help": "Interno: nunca aparece para o investidor. Recebe os avisos de pedido de contato."
+    },
+    "summary": {
+      "label": "Resumo do projeto",
+      "help": "Aparece no seletor de projetos do perfil."
+    },
+    "segment": {
+      "label": "Segmento",
+      "help": "Área terapêutica + modalidade. Ex.: Oncologia — anticorpo monoclonal."
+    },
+    "trl": {
+      "label": "Estágio: TRL",
+      "help": "Nível de maturidade tecnológica, de 1 a 9."
+    },
+    "regulatory_phase": {
+      "label": "Estágio: fase regulatória",
+      "help": "Fase atual do produto principal."
+    },
+    "lead_product_name": {
+      "label": "Produto principal: nome",
+      "help": "Nome ou código do produto."
+    },
+    "lead_product_moa": {
+      "label": "Produto principal: mecanismo de ação",
+      "help": "Como o produto funciona e para que serve."
+    },
+    "pipeline": {
+      "label": "Pipeline",
+      "help": "Outros produtos em desenvolvimento: nome e indicação."
+    },
+    "patents_filed": {
+      "label": "Patentes depositadas",
+      "help": "Números dos pedidos e países."
+    },
+    "patents_granted": {
+      "label": "Patentes concedidas",
+      "help": "Números das patentes e países."
+    },
+    "fto": {
+      "label": "Análise de FTO",
+      "help": "Liberdade de operação (freedom to operate)."
+    },
+    "milestones": {
+      "label": "Marcos",
+      "help": "Pelo menos um: período (mês/ano ou semestre) e descrição."
+    },
+    "rounds": {
+      "label": "Investimento buscado",
+      "help": "Uma linha por rodada: estágio, período previsto, valor em USD e finalidade."
+    },
+    "use_of_funds": {
+      "label": "Uso dos recursos",
+      "help": "Como o investimento será usado."
+    },
+    "raised": {
+      "label": "Captado até hoje",
+      "help": "Uma linha por fonte, em USD. A plataforma soma o total."
+    },
+    "revenue": {
+      "label": "Faturamento anual",
+      "help": "Valor inteiro em USD e o ano."
+    },
+    "gtm_models": {
+      "label": "Go-to-market",
+      "help": "Como o produto chegará ao mercado."
+    },
+    "gtm_text": {
+      "label": "Go-to-market: detalhes",
+      "help": "Complemento opcional."
+    },
+    "target_markets": {
+      "label": "Mercados-alvo",
+      "help": "Usado nos filtros do diretório."
+    },
+    "platform_type": {
+      "label": "Tipo de plataforma",
+      "help": "Aparece abaixo do nome. Ex.: Diagnóstico molecular point-of-care."
+    },
+    "maturity": {
+      "label": "Maturidade",
+      "help": "Situação de operação da plataforma."
+    },
+    "platform_description": {
+      "label": "Descrição da plataforma",
+      "help": "Complementa a descrição da organização."
+    },
+    "technology_tags": {
+      "label": "Tecnologia",
+      "help": "Marque as tecnologias da plataforma. Usado nos filtros."
+    },
+    "technology_text": {
+      "label": "Tecnologia: detalhes",
+      "help": "Complemento opcional."
+    },
+    "business_models": {
+      "label": "Modelo de negócio",
+      "help": "Como a plataforma gera receita."
+    },
+    "business_model_text": {
+      "label": "Modelo de negócio: detalhes",
+      "help": "Complemento opcional."
+    },
+    "traction": {
+      "label": "Tração",
+      "help": "Clientes, parcerias e métricas."
+    },
+    "competitive_edge": {
+      "label": "Diferencial competitivo",
+      "help": "O que diferencia a plataforma das alternativas."
+    },
+    "services": {
+      "label": "Serviços",
+      "help": "Marque os serviços oferecidos."
+    },
+    "services_text": {
+      "label": "Serviços: detalhes",
+      "help": "Complemento opcional."
+    },
+    "molecule_types": {
+      "label": "Tipos de moléculas e produtos",
+      "help": "Com o que a organização trabalha."
+    },
+    "capacity_scales": {
+      "label": "Capacidade instalada: escala",
+      "help": "Escalas de produção disponíveis."
+    },
+    "utilization_pct": {
+      "label": "Taxa de utilização (%)",
+      "help": "Percentual da capacidade em uso, de 0 a 100."
+    },
+    "capacity_text": {
+      "label": "Capacidade: detalhes",
+      "help": "Complemento opcional."
+    },
+    "certifications": {
+      "label": "Certificações",
+      "help": "Aparecem como selos no perfil."
+    },
+    "certificate_numbers": {
+      "label": "Número dos certificados",
+      "help": "Opcional."
+    },
+    "clients": {
+      "label": "Perfil de clientes",
+      "help": "Número de clientes ativos e perfil."
+    },
+    "exports": {
+      "label": "Exportações",
+      "help": "Informe os valores exportados."
+    },
+    "expansion_plan": {
+      "label": "Plano de expansão",
+      "help": "Próximos passos de crescimento."
+    },
+    "investment_types": {
+      "label": "Tipo de investimento desejado",
+      "help": "Aparece no card \"O que buscamos\"."
+    },
+    "investment_range": {
+      "label": "Valor buscado",
+      "help": "Mínimo e máximo, em USD."
+    },
+    "therapeutic_areas": {
+      "label": "Áreas terapêuticas / escopo",
+      "help": "Áreas atendidas."
+    },
+    "scope_text": {
+      "label": "Escopo: detalhes",
+      "help": "Complemento opcional."
+    },
+    "models": {
+      "label": "Modelos",
+      "help": "Espécies, in vitro, in vivo."
+    },
+    "partner_sites": {
+      "label": "Centros parceiros",
+      "help": "Um centro por linha."
+    },
+    "institution_type": {
+      "label": "Tipo de instituição",
+      "help": "Aparece abaixo do nome."
+    },
+    "product_portfolio": {
+      "label": "Portfólio de produtos",
+      "help": "Pelo menos um item: categoria e descrição."
+    },
+    "production_capacity": {
+      "label": "Capacidade de produção",
+      "help": "Volumes e plantas."
+    },
+    "export_markets": {
+      "label": "Mercados de exportação",
+      "help": "Para onde a organização exporta."
+    },
+    "export_markets_text": {
+      "label": "Mercados de exportação: detalhes",
+      "help": "Complemento opcional."
+    },
+    "partnership_interests": {
+      "label": "Interesses de parceria",
+      "help": "Pelo menos uma área: área e descrição. Aparece em destaque."
+    },
+    "partnership_models": {
+      "label": "Modelo de parceria",
+      "help": "Aparece no card \"O que buscamos\"."
+    },
+    "expansion_projects": {
+      "label": "Projetos de expansão",
+      "help": "Projetos de crescimento em andamento ou planejados."
+    },
+    "investment_description": {
+      "label": "Investimento buscado: descrição",
+      "help": "Complemento opcional."
+    },
+    "products": {
+      "label": "Produtos e serviços",
+      "help": "Um item por linha."
+    },
+    "products_text": {
+      "label": "Produtos: detalhes",
+      "help": "Complemento opcional."
+    },
+    "markets_served": {
+      "label": "Mercados atendidos",
+      "help": "Onde a organização vende."
+    },
+    "markets_text": {
+      "label": "Mercados: detalhes",
+      "help": "Complemento opcional."
+    },
+    "market_share": {
+      "label": "Market share",
+      "help": "Percentual (0–100) e o segmento."
+    },
+    "expansion_strategy": {
+      "label": "Estratégia de expansão",
+      "help": "Próximos passos de crescimento."
+    },
+    "leadership": {
+      "label": "Liderança",
+      "help": "Até 4 pessoas: nome, cargo e uma linha de experiência."
+    },
+    "cover_url": {
+      "label": "Imagem de capa",
+      "help": "JPG ou PNG, 1920 × 720 px, até 8 MB. Fica no fundo do cabeçalho."
+    },
+    "gallery": {
+      "label": "Galeria de fotos",
+      "help": "Até 6 imagens próprias, mínimo 1600 px no lado maior, com legenda."
+    }
+  },
+  "form": {
+    "title": "Meu perfil",
+    "progress": "Etapa {n} de {total}",
+    "save_draft": "Salvar rascunho",
+    "saved": "Rascunho salvo",
+    "next": "Próxima etapa →",
+    "prev": "← Etapa anterior",
+    "required_hint": "* obrigatório",
+    "step_organization": "Organização",
+    "step_project": "Projeto",
+    "step_leadership": "Liderança",
+    "step_images": "Imagens",
+    "step_preview": "Prévia e envio",
+    "reviewed_step": "Revisei esta etapa",
+    "imported": "Importado do formulário · confirme",
+    "previous_answer": "Resposta anterior: {answer}",
+    "usd_error": "Informe o valor em dólares americanos, apenas números",
+    "chars": "{n}/{max}",
+    "submit": "Enviar para revisão",
+    "submit_blocked": "Para enviar, resolva os itens abaixo:",
+    "submitted": "Perfil enviado para revisão. A equipe Abiquifi/B2H vai analisar e você receberá um e-mail.",
+    "unreviewed_step": "Marque \"Revisei esta etapa\" em: {step}",
+    "go_to": "ir para o campo",
+    "preview_intro": "É assim que o investidor verá a página. Confira nos dois idiomas antes de enviar.",
+    "preview_lang": "Idioma da prévia",
+    "preview_en_note": "A versão em inglês dos textos é revisada pela equipe. Textos novos aparecem em português até a revisão.",
+    "add": "+ Adicionar",
+    "remove": "Remover",
+    "none_raised": "Nenhum valor captado",
+    "pre_revenue": "Pré-receita",
+    "no_exports": "Não exporta",
+    "year": "Ano",
+    "month": "Mês",
+    "semester": "Semestre",
+    "period": "Período",
+    "semester_1": "1º semestre",
+    "semester_2": "2º semestre",
+    "amount_usd": "Valor (USD)",
+    "min_usd": "Mínimo (USD)",
+    "max_usd": "Máximo (USD)",
+    "stage": "Estágio",
+    "purpose": "Finalidade",
+    "source": "Fonte",
+    "total": "Total",
+    "name": "Nome",
+    "indication": "Indicação",
+    "description": "Descrição",
+    "category": "Categoria",
+    "area": "Área",
+    "role": "Cargo",
+    "experience": "Experiência (uma linha)",
+    "email": "E-mail",
+    "phone": "Telefone com DDI",
+    "city": "Cidade",
+    "state": "UF",
+    "client_count": "Clientes ativos",
+    "pct_revenue": "% do faturamento",
+    "destinations": "Destinos",
+    "pct": "Percentual (%)",
+    "segment": "Segmento",
+    "caption": "Legenda",
+    "upload": "Enviar imagem",
+    "replace": "Trocar imagem",
+    "choose": "Selecione…",
+    "select_period": "Selecione",
+    "image_too_small": "Imagem pequena demais: mínimo {min} px.",
+    "image_type": "Formato não aceito.",
+    "image_too_big": "Arquivo acima do limite.",
+    "locked_review": "Seu perfil está em revisão pela equipe. A versão publicada continua no ar até a aprovação; o formulário fica bloqueado durante a revisão.",
+    "returned": "A equipe devolveu o perfil para ajustes:",
+    "status": "Status",
+    "view_public": "Ver página pública",
+    "updating_public": "No ar: perfil provisório (selo \"Em atualização\")",
+    "en_reviewed_by_team": "Preencha em português. A versão em inglês é revisada pela equipe.",
+    "errors": {
+      "required": "Campo obrigatório.",
+      "too_long": "Máximo de {max} caracteres.",
+      "url": "Informe uma URL válida (https://…).",
+      "email": "E-mail inválido.",
+      "phone": "Informe o telefone com DDI, ex.: +55 11 91234-5678.",
+      "percent": "Número inteiro de 0 a 100.",
+      "usd": "Informe o valor em dólares americanos, apenas números",
+      "range": "O mínimo é maior que o máximo.",
+      "min_items": "Inclua pelo menos {min} item.",
+      "item_incomplete": "Complete o item {item}.",
+      "raised_required": "Inclua uma fonte ou marque \"Nenhum valor captado\".",
+      "year_required": "Informe o ano.",
+      "max_items": "Máximo de {max} itens.",
+      "caption_required": "A imagem {item} precisa de legenda."
+    }
   }
 }

@@ -3,6 +3,7 @@
 // (seed JSON + localStorage); the real version calls the HTTP API with the same
 // inputs and outputs (see docs/HANDOFF_CODEX.md). All functions are async on purpose.
 import * as store from './mockStore.js';
+import { validateDraft } from '../lib/profileValidation.js';
 
 export async function init() {
   await store.init();
@@ -110,4 +111,103 @@ export async function listDemoCompanyAccounts() {
     const o = orgs.find((x) => x.id === u.organization_id);
     return { user_id: u.id, organization_name: o ? o.name : u.organization_id };
   }).sort((a, b) => a.organization_name.localeCompare(b.organization_name));
+}
+
+// ------------------------------------------------------------------ company area: profile form (spec 1, 4.2 and 5)
+const EDITABLE_STATUSES = ['awaiting_validation', 'filling', 'returned', 'published', 'provisional', 'offline'];
+
+function now() {
+  return new Date().toISOString();
+}
+
+async function requireUser(role) {
+  const u = await getCurrentUser();
+  if (!u || u.role !== role) throw new Error('forbidden');
+  return u;
+}
+
+function snapshotContent(org, projects) {
+  const keys = ['name', 'logo_url', 'cover_url', 'description', 'website', 'city', 'state', 'size', 'segments',
+    'partnership_types', 'leadership', 'gallery', 'focal_point'];
+  const organization = {};
+  keys.forEach((k) => { organization[k] = org[k] === undefined ? null : org[k]; });
+  return {
+    organization,
+    projects: projects.filter((p) => p.organization_id === org.id).sort((a, b) => a.sort_order - b.sort_order)
+      .map((p) => ({ id: p.id, profile_type: p.profile_type, summary: p.summary, fields: p.fields })),
+  };
+}
+
+/** The organization's open draft (filling / in_review / returned), or null. */
+function openDraft(orgId) {
+  return store.find('profile_versions', (v) => v.organization_id === orgId && v.kind === 'draft'
+    && ['filling', 'in_review', 'returned'].includes(v.status))[0] || null;
+}
+
+/**
+ * Company form data for the logged-in company user. Creates the draft from the published (or provisional)
+ * profile on first access. For organizations that were never approved, "reference only" fields start empty
+ * and the previous Google Forms answer is shown next to them (spec 1, 5.2 and 7).
+ * @returns {Promise<{organization, draft, imports, firstValidation: boolean}>}
+ */
+export async function getMyProfileForm() {
+  const user = await requireUser('company_user');
+  const org = store.get('organizations', user.organization_id);
+  const firstValidation = !org.last_approved_at;
+  const imports = firstValidation ? store.find('form_imports', (r) => r.organization_id === org.id) : [];
+  let draft = openDraft(org.id);
+  if (!draft) {
+    const content = snapshotContent(org, store.all('projects'));
+    imports.filter((r) => r.mode === 'reference').forEach((r) => {
+      const p = content.projects.find((x) => x.id === r.project_id);
+      if (!p) return;
+      delete p.fields[r.field];
+      if (r.field === 'raised') delete p.fields.raised_none;
+    });
+    draft = store.insert('profile_versions', {
+      id: store.newId('pv'), organization_id: org.id, kind: 'draft', status: 'filling', content, reviewed_steps: {},
+      created_at: now(), updated_at: now(), submitted_at: null, submitted_by: null, review_comment: null, reviewed_at: null, reviewed_by: null,
+    });
+  }
+  return {
+    organization: { id: org.id, name: org.name, status: org.status, public_state: org.public_state, last_approved_at: org.last_approved_at },
+    draft,
+    imports: imports.map((r) => ({ project_id: r.project_id, field: r.field, mode: r.mode, previous_answer: r.previous_answer })),
+    firstValidation,
+  };
+}
+
+/** Saves the draft ("Salvar rascunho"). Allowed while the draft is not under review. */
+export async function saveMyProfileDraft(content, reviewedSteps) {
+  const user = await requireUser('company_user');
+  const org = store.get('organizations', user.organization_id);
+  const draft = openDraft(org.id);
+  if (!draft || draft.status === 'in_review') return { ok: false, error: 'locked' };
+  // the company cannot add, remove or retype projects (spec 1, 4.6: the team creates projects)
+  const projectIds = draft.content.projects.map((p) => p.id + ':' + p.profile_type).join();
+  if (content.projects.map((p) => p.id + ':' + p.profile_type).join() !== projectIds) return { ok: false, error: 'projects_changed' };
+  const saved = store.update('profile_versions', draft.id, { content, reviewed_steps: reviewedSteps, status: 'filling', updated_at: now() });
+  if (EDITABLE_STATUSES.includes(org.status) && org.status !== 'filling') store.update('organizations', org.id, { status: 'filling' });
+  return { ok: true, draft: saved };
+}
+
+/**
+ * "Enviar para revisão": re-validates (required fields + every step reviewed), moves the draft to the
+ * team's review queue and notifies the team. The published version stays online meanwhile (spec 1, 4.3).
+ */
+export async function submitMyProfileForReview(content, reviewedSteps) {
+  const user = await requireUser('company_user');
+  const saved = await saveMyProfileDraft(content, reviewedSteps);
+  if (!saved.ok) return saved;
+  const check = validateDraft(content, reviewedSteps);
+  if (!check.ok) return { ok: false, error: 'invalid', check };
+  const draft = store.update('profile_versions', saved.draft.id, { status: 'in_review', submitted_at: now(), submitted_by: user.id, review_comment: null });
+  store.update('organizations', user.organization_id, { status: 'in_review' });
+  queueEmail('profile_submitted', 'team', { organization_id: user.organization_id });
+  return { ok: true, draft };
+}
+
+/** MOCK of the e-mails the server will send (docs/HANDOFF_CODEX.md lists them all). */
+function queueEmail(template, to, data) {
+  store.insert('email_outbox', { id: store.newId('mail'), template, to, data, created_at: now(), sent: false });
 }

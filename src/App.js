@@ -8,6 +8,7 @@ import { AppShell } from './components/AppShell.js';
 import { DirectoryPage } from './pages/public/DirectoryPage.js';
 import { ProfilePage } from './pages/public/ProfilePage.js';
 import { LoginPage } from './pages/LoginPage.js';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -30,9 +31,13 @@ function CompanyArea({ user, route, onLogout }) {
     { key: 'contacts', label: t('app.nav_contacts'), onClick: () => navigate('/company/contacts') },
     { key: 'public', label: t('app.nav_view_public'), onClick: () => navigate('/org/' + user.organization_id) },
   ].map((n) => ({ ...n, current: n.key === section }));
-  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>
-    <${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />
-  <//>`;
+  let content;
+  if (section === 'profile') {
+    content = html`<${ProfileFormPage} stepParam=${route.query.step} onNavigateStep=${(id) => navigate('/company/profile?step=' + encodeURIComponent(id))} />`;
+  } else {
+    content = html`<${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />`;
+  }
+  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }
 
 function TeamArea({ user, route, onLogout }) {

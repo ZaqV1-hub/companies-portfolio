@@ -135,7 +135,7 @@ def build_profile_entities():
 # ------------------------------------------------------------------ Google Forms pre-load (spec 1, section 7)
 # Which fields came from the form ("Importado do formulário · confirme") and which are reference only
 # ("Resposta anterior: …"). The previous answers below are the raw June/2026 texts (or fictitious ones).
-def build_form_imports(projects):
+def build_form_imports(projects, organizations):
     raw = {
         'imunotera-terah7': {
             'rounds': 'USD 1M (Seed) · USD 3M (Series A)',
@@ -178,6 +178,12 @@ def build_form_imports(projects):
                 out.append({'project_id': p['id'], 'organization_id': p['organization_id'], 'field': key, 'mode': 'prefilled', 'previous_answer': None})
         for key, answer in raw.get(p['id'], {}).items():
             out.append({'project_id': p['id'], 'organization_id': p['organization_id'], 'field': key, 'mode': 'reference', 'previous_answer': answer})
+    # organization fields (table 5.3): name (col. C) is always pre-filled; size, segments, partnership type and
+    # focal point (cols. BM, BN, BO, BK, BL) only exist in 15 of the 39 answers (spec 1, 5.3)
+    for o in organizations:
+        keys = ['name'] + (['size', 'segments', 'partnership_types', 'focal_point'] if o['size'] else [])
+        for key in keys:
+            out.append({'project_id': None, 'organization_id': o['id'], 'field': key, 'mode': 'prefilled', 'previous_answer': None})
     for i, row in enumerate(out):
         row['id'] = 'fi-%03d' % (i + 1)
     return out
@@ -414,7 +420,7 @@ def main():
         'organizations': organizations,
         'projects': projects,
         'profile_versions': build_versions(organizations, projects),
-        'form_imports': build_form_imports(projects),
+        'form_imports': build_form_imports(projects, organizations),
         'users': build_users(organizations),
         'institutions': institutions,
         'contacts': contacts,

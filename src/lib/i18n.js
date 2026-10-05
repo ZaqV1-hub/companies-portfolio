@@ -46,12 +46,16 @@ function initialLang() {
 
 const LangContext = createContext(null);
 
-export function LangProvider({ children }) {
-  const [lang, setLang] = useState(initialLang);
+/** `forced` pins a language for a sub-tree (used by the bilingual preview) without touching the page. */
+export function LangProvider({ children, forced }) {
+  const [chosen, setChosen] = useState(initialLang);
+  const lang = forced || chosen;
+  const setLang = forced ? () => {} : setChosen;
   useEffect(() => {
+    if (forced) return;
     document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
     try { localStorage.setItem(LANG_KEY, lang); } catch (err) { /* ignore */ }
-  }, [lang]);
+  }, [lang, forced]);
   const value = useMemo(() => ({
     lang,
     setLang,
@@ -59,7 +63,7 @@ export function LangProvider({ children }) {
     tx: (field) => pick(lang, field),
     // label of a closed-list value: label('markets', 'europe')
     label: (list, v) => translate(lang, 'enum.' + list + '.' + v),
-  }), [lang]);
+  }), [lang, forced]);
   return html`<${LangContext.Provider} value=${value}>${children}<//>`;
 }
 
