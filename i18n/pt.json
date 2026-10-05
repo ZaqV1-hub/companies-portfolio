@@ -29,7 +29,7 @@
   "home": {
     "kicker": "Portfólio de empresas · Saúde · Biotech · Farma · 2026–2028",
     "title": "As startups brasileiras que estão redefinindo a saúde e a biotecnologia",
-    "intro": "Curadoria da Abiquifi & Bio2Health — um diretório vivo de empresas e instituições brasileiras prontas para parcerias, licenciamento e investimento internacional.",
+    "intro": "O Brazilian Pharma & Health é o programa da Abiquifi e da ApexBrasil que conecta investidores internacionais a empresas brasileiras de saúde, biotecnologia e farma. Um diretório vivo com curadoria da Abiquifi & Bio2Health, pronto para parcerias, licenciamento e investimento.",
     "stat_orgs": "Organizações no portfólio",
     "stat_projects": "Projetos",
     "stat_profiles": "Perfis",
@@ -161,49 +161,191 @@
     "F": "Insumos e serviços"
   },
   "enum": {
-    "size": { "startup": "Startup", "medium": "Média", "large": "Grande" },
+    "size": {
+      "startup": "Startup",
+      "medium": "Média",
+      "large": "Grande"
+    },
     "segments": {
-      "pharmaceutical": "Farmacêutico", "biotechnology": "Biotecnologia", "human_health": "Saúde humana",
-      "animal_health": "Saúde animal", "devices_diagnostics": "Dispositivos e diagnósticos", "apis": "IFAs",
-      "biodiversity_bioeconomy": "Biodiversidade / Bioeconomia", "cro": "CRO", "other": "Outro"
+      "pharmaceutical": "Farmacêutico",
+      "biotechnology": "Biotecnologia",
+      "human_health": "Saúde humana",
+      "animal_health": "Saúde animal",
+      "devices_diagnostics": "Dispositivos e diagnósticos",
+      "apis": "IFAs",
+      "biodiversity_bioeconomy": "Biodiversidade / Bioeconomia",
+      "cro": "CRO",
+      "other": "Outro"
     },
     "partnership_types": {
-      "vc": "VC", "joint_venture": "Joint venture", "co_development": "Co-desenvolvimento",
-      "market_distribution": "Parceria de mercado / distribuição internacional", "out_licensing": "Licenciamento (out-licensing)",
+      "vc": "VC",
+      "joint_venture": "Joint venture",
+      "co_development": "Co-desenvolvimento",
+      "market_distribution": "Parceria de mercado / distribuição internacional",
+      "out_licensing": "Licenciamento (out-licensing)",
       "infrastructure_investment": "Investimento em infraestrutura"
     },
     "markets": {
-      "brazil": "Brasil", "north_america": "América do Norte", "latin_america": "América Latina", "europe": "Europa",
-      "asia": "Ásia", "oceania": "Oceania", "africa": "África"
+      "brazil": "Brasil",
+      "north_america": "América do Norte",
+      "latin_america": "América Latina",
+      "europe": "Europa",
+      "asia": "Ásia",
+      "oceania": "Oceania",
+      "africa": "África"
     },
-    "regulatory_phase": { "preclinical": "Pré-clínico", "phase_1": "Fase I", "phase_2": "Fase II", "phase_3": "Fase III", "registered": "Registrado" },
-    "fto": { "yes": "Sim", "no": "Não", "in_progress": "Em andamento" },
-    "round_stage": { "pre_seed": "Pré-seed", "seed": "Seed", "series_a": "Série A", "series_b": "Série B", "series_c_plus": "Série C+", "other": "Outro" },
+    "regulatory_phase": {
+      "preclinical": "Pré-clínico",
+      "phase_1": "Fase I",
+      "phase_2": "Fase II",
+      "phase_3": "Fase III",
+      "registered": "Registrado"
+    },
+    "fto": {
+      "yes": "Sim",
+      "no": "Não",
+      "in_progress": "Em andamento"
+    },
+    "round_stage": {
+      "pre_seed": "Pré-seed",
+      "seed": "Seed",
+      "series_a": "Série A",
+      "series_b": "Série B",
+      "series_c_plus": "Série C+",
+      "other": "Outro"
+    },
     "raised_source": {
-      "fapesp": "FAPESP", "finep": "FINEP", "bndes": "BNDES", "cnpq": "CNPq", "embrapii": "Embrapii", "angel": "Anjo",
-      "vc": "VC", "cvc": "CVC", "award": "Prêmio", "donation": "Doação", "own_resources": "Recursos próprios", "other": "Outro"
+      "fapesp": "FAPESP",
+      "finep": "FINEP",
+      "bndes": "BNDES",
+      "cnpq": "CNPq",
+      "embrapii": "Embrapii",
+      "angel": "Anjo",
+      "vc": "VC",
+      "cvc": "CVC",
+      "award": "Prêmio",
+      "donation": "Doação",
+      "own_resources": "Recursos próprios",
+      "other": "Outro"
     },
-    "gtm_models": { "out_licensing": "Out-licensing", "co_development": "Co-desenvolvimento", "direct_sales": "Venda direta", "partnership_distribution": "Parceria / distribuição" },
-    "maturity": { "pre_operational": "Pré-operação", "partially_operational": "Operacional parcial", "fully_operational": "Operacional completo" },
-    "technology_tags": { "ai_ml": "IA/ML", "genomics": "Genômica", "electrochemistry": "Eletroquímica", "biosensors": "Biossensores", "microfluidics": "Microfluídica", "fermentation": "Fermentação", "other": "Outra" },
-    "business_models": { "equipment": "Equipamento", "consumables": "Consumíveis", "saas": "SaaS", "licensing": "Licenciamento", "service": "Serviço" },
-    "c_services": { "process_development": "Desenvolvimento de processo", "formulation": "Formulação", "manufacturing": "Manufatura", "analytical": "Analítico" },
-    "molecule_types": { "small_molecules": "Pequenas moléculas", "biologics": "Biológicos", "antibodies": "Anticorpos", "vaccines": "Vacinas", "apis": "IFAs", "other": "Outro" },
-    "capacity_scale": { "laboratory": "Escala laboratorial", "pilot": "Escala piloto", "commercial": "Escala comercial" },
+    "gtm_models": {
+      "out_licensing": "Out-licensing",
+      "co_development": "Co-desenvolvimento",
+      "direct_sales": "Venda direta",
+      "partnership_distribution": "Parceria / distribuição"
+    },
+    "maturity": {
+      "pre_operational": "Pré-operação",
+      "partially_operational": "Operacional parcial",
+      "fully_operational": "Operacional completo"
+    },
+    "technology_tags": {
+      "ai_ml": "IA/ML",
+      "genomics": "Genômica",
+      "electrochemistry": "Eletroquímica",
+      "biosensors": "Biossensores",
+      "microfluidics": "Microfluídica",
+      "fermentation": "Fermentação",
+      "other": "Outra"
+    },
+    "business_models": {
+      "equipment": "Equipamento",
+      "consumables": "Consumíveis",
+      "saas": "SaaS",
+      "licensing": "Licenciamento",
+      "service": "Serviço"
+    },
+    "c_services": {
+      "process_development": "Desenvolvimento de processo",
+      "formulation": "Formulação",
+      "manufacturing": "Manufatura",
+      "analytical": "Analítico"
+    },
+    "molecule_types": {
+      "small_molecules": "Pequenas moléculas",
+      "biologics": "Biológicos",
+      "antibodies": "Anticorpos",
+      "vaccines": "Vacinas",
+      "apis": "IFAs",
+      "other": "Outro"
+    },
+    "capacity_scale": {
+      "laboratory": "Escala laboratorial",
+      "pilot": "Escala piloto",
+      "commercial": "Escala comercial"
+    },
     "certifications": {
-      "gmp": "GMP", "iso": "ISO", "bpl": "BPL", "bpc": "BPC", "anvisa": "Anvisa", "reblas": "REBLAS", "fda": "FDA", "ema": "EMA",
-      "dmf": "DMF", "who": "OMS", "who_pq": "OMS PQ", "other": "Outra"
+      "gmp": "GMP",
+      "iso": "ISO",
+      "bpl": "BPL",
+      "bpc": "BPC",
+      "anvisa": "Anvisa",
+      "reblas": "REBLAS",
+      "fda": "FDA",
+      "ema": "EMA",
+      "dmf": "DMF",
+      "who": "OMS",
+      "who_pq": "OMS PQ",
+      "other": "Outra"
     },
-    "client_profiles": { "startups": "Startups", "national_pharma": "Farma nacional", "multinational": "Multinacionais" },
-    "c_investment_types": { "jv": "JV", "pe": "PE", "infrastructure_expansion": "Expansão de infraestrutura", "strategic_partner": "Parceiro estratégico" },
-    "d_services": { "preclinical": "Pré-clínico", "clinical_phase_1_4": "Clínico Fase I–IV", "analytical": "Analítico", "quality_control": "Controle de qualidade", "bpl": "BPL" },
+    "client_profiles": {
+      "startups": "Startups",
+      "national_pharma": "Farma nacional",
+      "multinational": "Multinacionais"
+    },
+    "c_investment_types": {
+      "jv": "JV",
+      "pe": "PE",
+      "infrastructure_expansion": "Expansão de infraestrutura",
+      "strategic_partner": "Parceiro estratégico"
+    },
+    "d_services": {
+      "preclinical": "Pré-clínico",
+      "clinical_phase_1_4": "Clínico Fase I–IV",
+      "analytical": "Analítico",
+      "quality_control": "Controle de qualidade",
+      "bpl": "BPL"
+    },
     "therapeutic_areas": {
-      "oncology": "Oncologia", "infectious_diseases": "Doenças infecciosas", "immunology": "Imunologia", "cns": "Sistema nervoso central",
-      "cardiovascular": "Cardiovascular", "dermatology": "Dermatologia", "metabolic": "Metabólico", "animal_health": "Saúde animal",
-      "consumer_goods": "Bens de consumo", "other": "Outro"
+      "oncology": "Oncologia",
+      "infectious_diseases": "Doenças infecciosas",
+      "immunology": "Imunologia",
+      "cns": "Sistema nervoso central",
+      "cardiovascular": "Cardiovascular",
+      "dermatology": "Dermatologia",
+      "metabolic": "Metabólico",
+      "animal_health": "Saúde animal",
+      "consumer_goods": "Bens de consumo",
+      "other": "Outro"
     },
-    "d_investment_types": { "expansion": "Expansão", "strategic_partner": "Parceiro estratégico", "jv": "JV" },
-    "e_partnership_models": { "co_development": "Co-desenvolvimento", "technology_transfer": "Transferência de tecnologia", "jv": "JV", "licensing": "Licenciamento" },
-    "f_partnership_models": { "jv": "JV", "pe": "PE", "expansion": "Expansão", "distribution": "Distribuição" }
+    "d_investment_types": {
+      "expansion": "Expansão",
+      "strategic_partner": "Parceiro estratégico",
+      "jv": "JV"
+    },
+    "e_partnership_models": {
+      "co_development": "Co-desenvolvimento",
+      "technology_transfer": "Transferência de tecnologia",
+      "jv": "JV",
+      "licensing": "Licenciamento"
+    },
+    "f_partnership_models": {
+      "jv": "JV",
+      "pe": "PE",
+      "expansion": "Expansão",
+      "distribution": "Distribuição"
+    }
+  },
+  "filters": {
+    "size": "Porte",
+    "segment": "Segmento",
+    "partnership": "Tipo de parceria",
+    "market": "Mercado-alvo",
+    "phase": "Fase regulatória",
+    "trl": "TRL",
+    "maturity": "Maturidade",
+    "any": "Todos",
+    "trl_min": "TRL {n} ou mais",
+    "clear": "Limpar filtros"
   }
 }

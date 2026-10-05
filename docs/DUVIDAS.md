@@ -11,7 +11,7 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 ## Perfil e página pública
 
 4. **Nome do projeto.** A spec não define um campo "nome do projeto". No seletor de projetos e no card, o título de cada projeto é o subtítulo do perfil (segmento, tipo de plataforma, serviços, tipo de instituição ou produtos), seguido do "Resumo do projeto".
-5. **Card de organização com vários projetos.** O card mostra o chip, o subtítulo, o estágio e o resumo de "O que buscamos" do **primeiro** projeto (ordem `sort_order`), seguidos de "X projects", na ordem da spec 6.1. Os filtros consideram todos os projetos da organização. O link do card abre o primeiro projeto; os demais ficam no seletor.
+5. **Card de organização com vários projetos.** O card mostra o chip, o subtítulo, o estágio e o resumo de "O que buscamos" do **primeiro** projeto (ordem `sort_order`), seguidos de "X projects", na ordem da spec 6.1. Os filtros consideram todos os projetos da organização. O link do card abre o primeiro projeto; os demais ficam no seletor. Quando há filtro de projeto ativo (perfil, mercado, fase, TRL, maturidade), o card mostra e abre o projeto que atende ao filtro.
 6. **Título do card lateral em inglês.** A spec chama o card de "O que buscamos" e o primeiro item de "Looking for". Em inglês o card ficou "What We're Looking For" e o item "Looking for"; em português, "O que buscamos" e "Buscamos".
 7. **Gráfico de estágio.** A tabela 6.3 não inclui o gráfico na ordem da coluna principal; ele ficou no cabeçalho, junto do chip de estágio, para não alterar a ordem dos blocos.
 8. **Status dos marcos.** O protótipo mostrava "Concluído / Em andamento / Previsto" em cada marco, calculado pela data. A spec não pede isso, mas também não proíbe; foi mantido (cálculo automático, não é campo).
@@ -32,3 +32,6 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 15. **Foto da liderança.** A spec (5.5) pede nome, cargo e uma linha de experiência, sem foto. A página mostra as iniciais num círculo no lugar da foto.
 16. **Dois rodapés no perfil.** O rodapé do perfil (texto do programa + data da última aprovação, spec 6.2 item 7) fica no fim da página, e o rodapé geral do site (com o link da equipe) fica logo abaixo.
 17. **Perfil provisório no rodapé.** Sem aprovação, o rodapé mostra "Perfil provisório montado pela equipe… aguardando a validação da empresa" no lugar da data da última aprovação.
+18. **Filtro de TRL.** A spec lista "TRL" entre os filtros sem dizer o formato. Foi usado "TRL n ou mais" (mínimo), que é o uso mais comum para investidores.
+19. **Filtros de mercado em E e F.** O filtro "Mercados-alvo" também considera "Mercados de exportação" (Perfil E) e "Mercados atendidos" (Perfil F), que usam a mesma lista de mercados.
+20. **Filtros combinados.** Porte, segmento e tipo de parceria são da organização; perfil, mercado, fase, TRL e maturidade precisam valer para o **mesmo** projeto.

@@ -4,21 +4,23 @@ import * as api from '../../services/api.js';
 import { useI18n } from '../../lib/i18n.js';
 import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js';
 import { OrgCard } from '../../components/OrgCard.js';
+import { EMPTY_FILTERS, FILTER_DEFS, activeFilterCount, matchesFilters, matchingProject } from '../../lib/directoryFilters.js';
 
 export function DirectoryPage() {
-  const { t } = useI18n();
+  const { t, label } = useI18n();
   const [orgs, setOrgs] = useState(null);
   const [query, setQuery] = useState('');
-  const [profile, setProfile] = useState(null);
+  const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const profile = filters.profile;
+  const setFilter = (key, value) => setFilters({ ...filters, [key]: value });
 
   useEffect(() => { api.listPublicOrganizations().then(setOrgs); }, []);
 
   const filtered = useMemo(() => {
     if (!orgs) return [];
     const q = query.trim().toLowerCase();
-    return orgs.filter((o) => (!profile || o.projects.some((p) => p.profile_type === profile))
-      && (!q || searchText(o).includes(q)));
-  }, [orgs, query, profile]);
+    return orgs.filter((o) => matchesFilters(o, filters) && (!q || searchText(o).includes(q)));
+  }, [orgs, query, filters]);
 
   if (!orgs) return html`<div class="section">${t('common.loading')}</div>`;
   const featured = orgs.filter((o) => o.is_featured);
@@ -50,8 +52,18 @@ export function DirectoryPage() {
       <div class="search-card">
         <input class="input" type="search" value=${query} placeholder=${t('home.search_placeholder')} onInput=${(e) => setQuery(e.target.value)} />
         <div class="chips">
-          <button type="button" class="chip" aria-pressed=${!profile} onClick=${() => setProfile(null)}>${t('home.all')}</button>
-          ${PROFILE_TYPES.map((p) => html`<button key=${p} type="button" class="chip" aria-pressed=${profile === p} onClick=${() => setProfile(p)}>${t('profile_type.' + p)}</button>`)}
+          <button type="button" class="chip" aria-pressed=${!profile} onClick=${() => setFilter('profile', '')}>${t('home.all')}</button>
+          ${PROFILE_TYPES.map((p) => html`<button key=${p} type="button" class="chip" aria-pressed=${profile === p} onClick=${() => setFilter('profile', p)}>${t('profile_type.' + p)}</button>`)}
+        </div>
+        <div class="filters">
+          ${FILTER_DEFS.map(([key, list, values]) => html`<label key=${key} class="filter">
+            <span>${t('filters.' + key)}</span>
+            <select class=${filters[key] ? 'on' : ''} value=${filters[key]} onChange=${(e) => setFilter(key, e.target.value)}>
+              <option value="">${t('filters.any')}</option>
+              ${values.map((v) => html`<option key=${v} value=${v}>${list ? label(list, v) : t('filters.trl_min', { n: v })}</option>`)}
+            </select>
+          </label>`)}
+          ${activeFilterCount(filters) > 0 && html`<button type="button" class="btn-link filters-clear" onClick=${() => setFilters(EMPTY_FILTERS)}>${t('filters.clear')}</button>`}
         </div>
       </div>
     </div>
@@ -60,7 +72,7 @@ export function DirectoryPage() {
       <div class="section-head"><h2 class="h2">${profile ? t('profile_type.' + profile) : t('home.full_portfolio')}</h2>
         <div class="section-note">${t('home.results', { n: filtered.length })}</div></div>
       ${filtered.length
-        ? html`<div class="grid-cards">${filtered.map((o) => html`<${OrgCard} key=${o.id} org=${o} />`)}</div>`
+        ? html`<div class="grid-cards">${filtered.map((o) => html`<${OrgCard} key=${o.id} org=${o} project=${matchingProject(o, filters)} />`)}</div>`
         : html`<div class="empty-state"><strong>${t('home.no_results_title')}</strong>${t('home.no_results_text')}</div>`}
     </section>
   </div>`;

@@ -16,13 +16,13 @@ function CardStage({ project, i18n }) {
   </div>`;
 }
 
-export function OrgCard({ org, featured }) {
+export function OrgCard({ org, featured, project: shown }) {
   const i18n = useI18n();
   const { t, tx } = i18n;
-  const project = org.projects[0];
+  const project = shown || org.projects[0];
   const n = org.projects.length;
   const summary = lookingForSummary(project, i18n);
-  return html`<a class=${cx('card', featured && 'featured')} href=${href('/org/' + org.id)}>
+  return html`<a class=${cx('card', featured && 'featured')} href=${href('/org/' + org.id + (project !== org.projects[0] ? '?project=' + project.id : ''))}>
     <div class="card-cover" style=${org.cover_url ? { backgroundImage: "linear-gradient(165deg, rgba(20,27,52,.18), rgba(20,27,52,.5)), url('" + org.cover_url + "')" } : null}>
       <${LogoPlate} org=${org} className="logo-plate" />
       ${org.public_state === 'provisional' && html`<span class="cover-badge updating">${t('common.updating')}</span>`}

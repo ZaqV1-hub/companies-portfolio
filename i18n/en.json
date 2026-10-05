@@ -29,7 +29,7 @@
   "home": {
     "kicker": "Companies Portfolio · Health · Biotech · Pharma · 2026–2028",
     "title": "The Brazilian startups redefining health and biotechnology",
-    "intro": "Curated by Abiquifi & Bio2Health — a living directory of Brazilian companies and institutions ready for partnerships, licensing and international investment.",
+    "intro": "Brazilian Pharma & Health is the Abiquifi and ApexBrasil program that connects international investors to Brazilian health, biotech and pharma companies. A living directory curated by Abiquifi & Bio2Health, ready for partnerships, licensing and investment.",
     "stat_orgs": "Organizations in the portfolio",
     "stat_projects": "Projects",
     "stat_profiles": "Profiles",
@@ -161,49 +161,191 @@
     "F": "Specialty Inputs"
   },
   "enum": {
-    "size": { "startup": "Startup", "medium": "Mid-size", "large": "Large" },
+    "size": {
+      "startup": "Startup",
+      "medium": "Mid-size",
+      "large": "Large"
+    },
     "segments": {
-      "pharmaceutical": "Pharmaceutical", "biotechnology": "Biotechnology", "human_health": "Human health",
-      "animal_health": "Animal health", "devices_diagnostics": "Devices & diagnostics", "apis": "APIs",
-      "biodiversity_bioeconomy": "Biodiversity / Bioeconomy", "cro": "CRO", "other": "Other"
+      "pharmaceutical": "Pharmaceutical",
+      "biotechnology": "Biotechnology",
+      "human_health": "Human health",
+      "animal_health": "Animal health",
+      "devices_diagnostics": "Devices & diagnostics",
+      "apis": "APIs",
+      "biodiversity_bioeconomy": "Biodiversity / Bioeconomy",
+      "cro": "CRO",
+      "other": "Other"
     },
     "partnership_types": {
-      "vc": "Venture capital", "joint_venture": "Joint venture", "co_development": "Co-development",
-      "market_distribution": "International market / distribution partnership", "out_licensing": "Out-licensing",
+      "vc": "Venture capital",
+      "joint_venture": "Joint venture",
+      "co_development": "Co-development",
+      "market_distribution": "International market / distribution partnership",
+      "out_licensing": "Out-licensing",
       "infrastructure_investment": "Infrastructure investment"
     },
     "markets": {
-      "brazil": "Brazil", "north_america": "North America", "latin_america": "Latin America", "europe": "Europe",
-      "asia": "Asia", "oceania": "Oceania", "africa": "Africa"
+      "brazil": "Brazil",
+      "north_america": "North America",
+      "latin_america": "Latin America",
+      "europe": "Europe",
+      "asia": "Asia",
+      "oceania": "Oceania",
+      "africa": "Africa"
     },
-    "regulatory_phase": { "preclinical": "Pre-clinical", "phase_1": "Phase I", "phase_2": "Phase II", "phase_3": "Phase III", "registered": "Registered" },
-    "fto": { "yes": "Yes", "no": "No", "in_progress": "In progress" },
-    "round_stage": { "pre_seed": "Pre-seed", "seed": "Seed", "series_a": "Series A", "series_b": "Series B", "series_c_plus": "Series C+", "other": "Other" },
+    "regulatory_phase": {
+      "preclinical": "Pre-clinical",
+      "phase_1": "Phase I",
+      "phase_2": "Phase II",
+      "phase_3": "Phase III",
+      "registered": "Registered"
+    },
+    "fto": {
+      "yes": "Yes",
+      "no": "No",
+      "in_progress": "In progress"
+    },
+    "round_stage": {
+      "pre_seed": "Pre-seed",
+      "seed": "Seed",
+      "series_a": "Series A",
+      "series_b": "Series B",
+      "series_c_plus": "Series C+",
+      "other": "Other"
+    },
     "raised_source": {
-      "fapesp": "FAPESP", "finep": "FINEP", "bndes": "BNDES", "cnpq": "CNPq", "embrapii": "Embrapii", "angel": "Angel investors",
-      "vc": "Venture capital", "cvc": "Corporate VC", "award": "Awards", "donation": "Donations", "own_resources": "Own resources", "other": "Other"
+      "fapesp": "FAPESP",
+      "finep": "FINEP",
+      "bndes": "BNDES",
+      "cnpq": "CNPq",
+      "embrapii": "Embrapii",
+      "angel": "Angel investors",
+      "vc": "Venture capital",
+      "cvc": "Corporate VC",
+      "award": "Awards",
+      "donation": "Donations",
+      "own_resources": "Own resources",
+      "other": "Other"
     },
-    "gtm_models": { "out_licensing": "Out-licensing", "co_development": "Co-development", "direct_sales": "Direct sales", "partnership_distribution": "Partnership / distribution" },
-    "maturity": { "pre_operational": "Pre-operational", "partially_operational": "Partially operational", "fully_operational": "Fully operational" },
-    "technology_tags": { "ai_ml": "AI/ML", "genomics": "Genomics", "electrochemistry": "Electrochemistry", "biosensors": "Biosensors", "microfluidics": "Microfluidics", "fermentation": "Fermentation", "other": "Other" },
-    "business_models": { "equipment": "Equipment", "consumables": "Consumables", "saas": "SaaS", "licensing": "Licensing", "service": "Services" },
-    "c_services": { "process_development": "Process development", "formulation": "Formulation", "manufacturing": "Manufacturing", "analytical": "Analytical" },
-    "molecule_types": { "small_molecules": "Small molecules", "biologics": "Biologics", "antibodies": "Antibodies", "vaccines": "Vaccines", "apis": "APIs", "other": "Other" },
-    "capacity_scale": { "laboratory": "Laboratory scale", "pilot": "Pilot scale", "commercial": "Commercial scale" },
+    "gtm_models": {
+      "out_licensing": "Out-licensing",
+      "co_development": "Co-development",
+      "direct_sales": "Direct sales",
+      "partnership_distribution": "Partnership / distribution"
+    },
+    "maturity": {
+      "pre_operational": "Pre-operational",
+      "partially_operational": "Partially operational",
+      "fully_operational": "Fully operational"
+    },
+    "technology_tags": {
+      "ai_ml": "AI/ML",
+      "genomics": "Genomics",
+      "electrochemistry": "Electrochemistry",
+      "biosensors": "Biosensors",
+      "microfluidics": "Microfluidics",
+      "fermentation": "Fermentation",
+      "other": "Other"
+    },
+    "business_models": {
+      "equipment": "Equipment",
+      "consumables": "Consumables",
+      "saas": "SaaS",
+      "licensing": "Licensing",
+      "service": "Services"
+    },
+    "c_services": {
+      "process_development": "Process development",
+      "formulation": "Formulation",
+      "manufacturing": "Manufacturing",
+      "analytical": "Analytical"
+    },
+    "molecule_types": {
+      "small_molecules": "Small molecules",
+      "biologics": "Biologics",
+      "antibodies": "Antibodies",
+      "vaccines": "Vaccines",
+      "apis": "APIs",
+      "other": "Other"
+    },
+    "capacity_scale": {
+      "laboratory": "Laboratory scale",
+      "pilot": "Pilot scale",
+      "commercial": "Commercial scale"
+    },
     "certifications": {
-      "gmp": "GMP", "iso": "ISO", "bpl": "GLP (BPL)", "bpc": "GCP (BPC)", "anvisa": "ANVISA", "reblas": "REBLAS", "fda": "FDA", "ema": "EMA",
-      "dmf": "DMF", "who": "WHO", "who_pq": "WHO PQ", "other": "Other"
+      "gmp": "GMP",
+      "iso": "ISO",
+      "bpl": "GLP (BPL)",
+      "bpc": "GCP (BPC)",
+      "anvisa": "ANVISA",
+      "reblas": "REBLAS",
+      "fda": "FDA",
+      "ema": "EMA",
+      "dmf": "DMF",
+      "who": "WHO",
+      "who_pq": "WHO PQ",
+      "other": "Other"
     },
-    "client_profiles": { "startups": "Startups", "national_pharma": "Brazilian pharma", "multinational": "Multinationals" },
-    "c_investment_types": { "jv": "Joint venture", "pe": "Private equity", "infrastructure_expansion": "Infrastructure expansion", "strategic_partner": "Strategic partner" },
-    "d_services": { "preclinical": "Pre-clinical", "clinical_phase_1_4": "Clinical Phase I–IV", "analytical": "Analytical", "quality_control": "Quality control", "bpl": "GLP studies" },
+    "client_profiles": {
+      "startups": "Startups",
+      "national_pharma": "Brazilian pharma",
+      "multinational": "Multinationals"
+    },
+    "c_investment_types": {
+      "jv": "Joint venture",
+      "pe": "Private equity",
+      "infrastructure_expansion": "Infrastructure expansion",
+      "strategic_partner": "Strategic partner"
+    },
+    "d_services": {
+      "preclinical": "Pre-clinical",
+      "clinical_phase_1_4": "Clinical Phase I–IV",
+      "analytical": "Analytical",
+      "quality_control": "Quality control",
+      "bpl": "GLP studies"
+    },
     "therapeutic_areas": {
-      "oncology": "Oncology", "infectious_diseases": "Infectious diseases", "immunology": "Immunology", "cns": "Central nervous system",
-      "cardiovascular": "Cardiovascular", "dermatology": "Dermatology", "metabolic": "Metabolic", "animal_health": "Animal health",
-      "consumer_goods": "Consumer goods", "other": "Other"
+      "oncology": "Oncology",
+      "infectious_diseases": "Infectious diseases",
+      "immunology": "Immunology",
+      "cns": "Central nervous system",
+      "cardiovascular": "Cardiovascular",
+      "dermatology": "Dermatology",
+      "metabolic": "Metabolic",
+      "animal_health": "Animal health",
+      "consumer_goods": "Consumer goods",
+      "other": "Other"
     },
-    "d_investment_types": { "expansion": "Expansion", "strategic_partner": "Strategic partner", "jv": "Joint venture" },
-    "e_partnership_models": { "co_development": "Co-development", "technology_transfer": "Technology transfer", "jv": "Joint venture", "licensing": "Licensing" },
-    "f_partnership_models": { "jv": "Joint venture", "pe": "Private equity", "expansion": "Expansion", "distribution": "Distribution" }
+    "d_investment_types": {
+      "expansion": "Expansion",
+      "strategic_partner": "Strategic partner",
+      "jv": "Joint venture"
+    },
+    "e_partnership_models": {
+      "co_development": "Co-development",
+      "technology_transfer": "Technology transfer",
+      "jv": "Joint venture",
+      "licensing": "Licensing"
+    },
+    "f_partnership_models": {
+      "jv": "Joint venture",
+      "pe": "Private equity",
+      "expansion": "Expansion",
+      "distribution": "Distribution"
+    }
+  },
+  "filters": {
+    "size": "Size",
+    "segment": "Segment",
+    "partnership": "Partnership type",
+    "market": "Target market",
+    "phase": "Regulatory phase",
+    "trl": "TRL",
+    "maturity": "Maturity",
+    "any": "Any",
+    "trl_min": "TRL {n} or higher",
+    "clear": "Clear filters"
   }
 }
