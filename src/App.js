@@ -9,6 +9,7 @@ import { DirectoryPage } from './pages/public/DirectoryPage.js';
 import { ProfilePage } from './pages/public/ProfilePage.js';
 import { LoginPage } from './pages/LoginPage.js';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -43,15 +44,20 @@ function CompanyArea({ user, route, onLogout }) {
 function TeamArea({ user, route, onLogout }) {
   const { t } = useI18n();
   const section = route.parts[1] || 'review';
+  const [queue, setQueue] = useState(0);
+  useEffect(() => { api.listReviewQueue().then((q) => setQueue(q.length)); }, [route.path]);
   const nav = [
-    { key: 'review', label: t('app.nav_review'), onClick: () => navigate('/team/review') },
+    { key: 'review', label: t('app.nav_review'), badge: queue || null, onClick: () => navigate('/team/review') },
     { key: 'orgs', label: t('app.nav_orgs'), onClick: () => navigate('/team/orgs') },
     { key: 'crm', label: t('app.nav_crm'), onClick: () => navigate('/team/crm') },
     { key: 'settings', label: t('app.nav_settings'), onClick: () => navigate('/team/settings') },
   ].map((n) => ({ ...n, current: n.key === section }));
-  return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>
-    <${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />
-  <//>`;
+  let content;
+  if (section === 'review' && route.parts[2]) content = html`<${ReviewPage} key=${route.parts[2]} versionId=${route.parts[2]} />`;
+  else if (section === 'review') content = html`<${ReviewQueuePage} key=${route.path} />`;
+  else if (section === 'orgs') content = html`<${OrganizationsPage} />`;
+  else content = html`<${Placeholder} title=${nav.find((n) => n.current)?.label || ''} />`;
+  return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }
 
 function Routes() {

@@ -48,3 +48,11 @@ Pontos em que as especificações (docs/especificacao-perfil.md = **spec 1**, do
 28. **Separador de milhar no campo de valor.** O separador segue o idioma da área da empresa: ponto em português ("1.000.000") e vírgula em inglês ("1,000,000"). A vírgula é recusada em português, por ser decimal; o ponto é recusado em inglês, pelo mesmo motivo.
 29. **Imagens no protótipo.** Sem servidor, as imagens enviadas ficam no navegador, reduzidas para no máximo 1600 px de largura. As regras de formato e tamanho mínimo da spec são verificadas no envio. O servidor deve guardar o arquivo original (ver HANDOFF_CODEX.md).
 30. **Salvamento automático.** Além do botão "Salvar rascunho", o rascunho é salvo ao trocar de etapa.
+
+## Revisão pela equipe
+
+31. **Ordem da fila.** "Ordenada por data" foi interpretado como do envio mais antigo para o mais recente (quem esperou mais aparece primeiro).
+32. **O que a equipe edita.** Na tela de revisão, a equipe edita só a versão em inglês dos textos (spec 1, 4.3). Para mudar o conteúdo em português ou valores, a equipe usa "Devolver" com comentário.
+33. **"Versão anterior" de empresa nova.** Sem versão publicada, a coluna da esquerda mostra a resposta do Google Forms dos campos "só referência" e "—" nos demais.
+34. **Reativar / tirar do ar.** A lista de organizações tem um botão para tirar o perfil do ar ou reativá-lo manualmente (spec 1, 4.4). A saída automática no 60º dia fica para o servidor (rotina por data, fora deste escopo).
+35. **Alerta de perfil desatualizado.** A lista de organizações já mostra "N dias sem atualização" quando um perfil publicado passa do prazo configurado (120 dias por padrão). O e-mail correspondente fica para o servidor.

@@ -211,3 +211,102 @@ export async function submitMyProfileForReview(content, reviewedSteps) {
 function queueEmail(template, to, data) {
   store.insert('email_outbox', { id: store.newId('mail'), template, to, data, created_at: now(), sent: false });
 }
+
+// ------------------------------------------------------------------ team panel: profile review (spec 1, 4.3 and 4.4)
+
+function todayDate() {
+  return now().slice(0, 10);
+}
+
+/** Review queue: drafts sent for review, oldest submission first. */
+export async function listReviewQueue() {
+  await requireUser('team');
+  const orgs = store.all('organizations');
+  return store.find('profile_versions', (v) => v.kind === 'draft' && v.status === 'in_review')
+    .sort((a, b) => (a.submitted_at || '').localeCompare(b.submitted_at || ''))
+    .map((v) => {
+      const o = orgs.find((x) => x.id === v.organization_id);
+      return { version_id: v.id, organization_id: o.id, organization_name: o.name, submitted_at: v.submitted_at,
+        first_validation: !o.last_approved_at, public_state: o.public_state, projects: v.content.projects.length };
+    });
+}
+
+/**
+ * Review screen data: the new version, the previous one (published or provisional profile; null for a
+ * new company) and the Google Forms answers kept as reference.
+ */
+export async function getReview(versionId) {
+  await requireUser('team');
+  const draft = store.get('profile_versions', versionId);
+  if (!draft) return null;
+  const org = store.get('organizations', draft.organization_id);
+  const previous = org.public_state === 'hidden' && !org.last_approved_at ? null : snapshotContent(org, store.all('projects'));
+  const imports = store.find('form_imports', (r) => r.organization_id === org.id && r.mode === 'reference')
+    .map((r) => ({ project_id: r.project_id, field: r.field, previous_answer: r.previous_answer }));
+  return { organization: { id: org.id, name: org.name, status: org.status, public_state: org.public_state, last_approved_at: org.last_approved_at },
+    draft, previous, previousIsProvisional: org.public_state === 'provisional', imports };
+}
+
+/** Team saves its English edits without deciding yet. */
+export async function saveReviewEdits(versionId, content) {
+  await requireUser('team');
+  return store.update('profile_versions', versionId, { content, updated_at: now() });
+}
+
+/** "Aprovar": publishes the version and records "Atualizado em" (spec 1, 4.3). */
+export async function approveReview(versionId, content) {
+  const user = await requireUser('team');
+  const draft = store.get('profile_versions', versionId);
+  if (!draft || draft.status !== 'in_review') return { ok: false, error: 'not_in_review' };
+  const day = todayDate();
+  const o = content.organization;
+  store.update('organizations', draft.organization_id, {
+    name: o.name, logo_url: o.logo_url, cover_url: o.cover_url, description: o.description, website: o.website, city: o.city,
+    state: o.state, size: o.size, segments: o.segments, partnership_types: o.partnership_types, leadership: o.leadership,
+    gallery: o.gallery, focal_point: o.focal_point,
+    status: 'published', public_state: 'published', last_approved_at: day, last_updated_at: day,
+  });
+  content.projects.forEach((p) => store.update('projects', p.id, { summary: p.summary, fields: p.fields }));
+  const version = store.update('profile_versions', versionId, { kind: 'published', status: 'published', content,
+    reviewed_at: now(), reviewed_by: user.id, approved_at: now() });
+  queueEmail('profile_approved', 'company', { organization_id: draft.organization_id });
+  return { ok: true, version };
+}
+
+/** "Devolver": requires a comment; the profile goes back to the company for editing. */
+export async function returnReview(versionId, content, comment) {
+  const user = await requireUser('team');
+  if (!comment || !comment.trim()) return { ok: false, error: 'comment_required' };
+  const draft = store.get('profile_versions', versionId);
+  if (!draft || draft.status !== 'in_review') return { ok: false, error: 'not_in_review' };
+  store.update('profile_versions', versionId, { content, status: 'returned', review_comment: comment.trim(), reviewed_at: now(), reviewed_by: user.id });
+  store.update('organizations', draft.organization_id, { status: 'returned' });
+  queueEmail('profile_returned', 'company', { organization_id: draft.organization_id, comment: comment.trim() });
+  return { ok: true };
+}
+
+/** Organizations with their status for the team panel (spec 1, 4.4). Internal data included. */
+export async function listOrganizationsForTeam() {
+  await requireUser('team');
+  const projects = store.all('projects');
+  const settings = store.get('settings', 'settings');
+  const today = new Date(todayDate());
+  return store.all('organizations').map((o) => {
+    const last = o.last_updated_at ? new Date(o.last_updated_at) : null;
+    const days = last ? Math.floor((today - last) / 86400000) : null;
+    return { id: o.id, name: o.name, status: o.status, public_state: o.public_state, last_approved_at: o.last_approved_at,
+      last_updated_at: o.last_updated_at, days_since_update: days,
+      outdated: o.public_state === 'published' && days != null && days >= settings.deadlines.outdated_profile_alert_days,
+      projects: projects.filter((p) => p.organization_id === o.id).map((p) => p.profile_type),
+      focal_point: o.focal_point, demo: !!o.demo, is_featured: o.is_featured };
+  }).sort((a, b) => a.name.localeCompare(b.name));
+}
+
+/** The team can switch a provisional / offline profile manually (spec 1, 4.4: "A equipe pode reativar manualmente"). */
+export async function setOrganizationPublicState(orgId, publicState) {
+  await requireUser('team');
+  const patch = { public_state: publicState };
+  if (publicState === 'hidden') patch.status = 'offline';
+  if (publicState === 'provisional') patch.status = 'provisional';
+  return store.update('organizations', orgId, patch);
+}
