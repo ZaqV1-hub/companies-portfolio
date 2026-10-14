@@ -621,7 +621,7 @@ app.post('/api/team/documents', requireRole('team'), documentUpload.single('file
   const titlePt=String(req.body?.title_pt||'').trim();
   const titleEn=String(req.body?.title_en||'').trim();
   const file=req.file;
-  if (!titlePt || !titleEn || titlePt.length>160 || titleEn.length>160 || !file || file.mimetype!=='application/pdf' || !file.buffer.subarray(0,5).equals(Buffer.from('%PDF-')))
+  if (!titlePt || !titleEn || titlePt.length>160 || titleEn.length>160 || !file || !file.buffer.subarray(0,5).equals(Buffer.from('%PDF-')))
     return res.status(400).json({ error:'invalid_document' });
   const id=crypto.randomUUID();
   const storedName=`${id}.pdf`;
