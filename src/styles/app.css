@@ -472,7 +472,9 @@ button { font-family: var(--font-body); }
 .auth-consents { display: flex; flex-direction: column; gap: 9px; }
 .auth-consents .btn-link { display: inline; padding: 0; font-size: inherit; }
 .legal-backdrop { z-index: 101; align-items: center; }
-.legal-modal { max-width: 620px; }
+.legal-modal { max-width: 620px; max-height: calc(100vh - 48px); overflow-y: auto; }
+.legal-copy { color: var(--text-2); font-size: 14px; line-height: 1.65; }
+.legal-copy p { margin: 0 0 1em; }
 .auth-switch { font-size: 13px; color: var(--muted); margin: 0; }
 .link-accent { color: var(--accent); font-weight: 800; }
 .verify { align-items: flex-start; }

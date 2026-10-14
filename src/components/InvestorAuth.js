@@ -1,6 +1,6 @@
 // Investor welcome, verified sign-up, login and password recovery.
 import { html, useEffect, useState } from '../lib/html.js';
-import * as api from '../services/api.js?v=20261014-auth1';
+import * as api from '../services/api.js?v=20261014-legal1';
 import { useI18n } from '../lib/i18n.js';
 import { countryOptions } from '../lib/countries.js';
 
@@ -142,7 +142,7 @@ export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, on
       ${mode === 'login' && html`<${Login} onLoggedIn=${onDone} switchTo=${setMode} />`}
       ${mode === 'forgot' && html`<${Forgot} switchTo=${setMode} />`}
     </div>
-    ${legal && html`<div class="modal-backdrop legal-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) setLegal(null); }}><div class="modal legal-modal" role="dialog" aria-modal="true" aria-label=${t('legal.' + legal + '_title')}><button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${() => setLegal(null)}>×</button><h2 class="form-title">${t('legal.' + legal + '_title')}</h2><p class="prose">${t('legal.placeholder')}</p></div></div>`}
+    ${legal && html`<div class="modal-backdrop legal-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) setLegal(null); }}><div class="modal legal-modal" role="dialog" aria-modal="true" aria-label=${t('legal.' + legal + '_title')}><button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${() => setLegal(null)}>×</button><h2 class="form-title">${t('legal.' + legal + '_title')}</h2><div class="legal-copy">${t('legal.' + legal + '_body').split('\n\n').map((paragraph) => html`<p>${paragraph}</p>`)}</div></div></div>`}
   </div>`;
 }
 

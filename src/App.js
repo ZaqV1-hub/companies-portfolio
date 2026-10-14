@@ -1,14 +1,14 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261014-auth1';
+import * as api from './services/api.js?v=20261014-legal1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-auth1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-legal1';
 import { AppShell } from './components/AppShell.js';
 import { DirectoryPage } from './pages/public/DirectoryPage.js';
 import { ProfilePage } from './pages/public/ProfilePage.js';
-import { LoginPage } from './pages/LoginPage.js?v=20261014-auth1';
+import { LoginPage } from './pages/LoginPage.js?v=20261014-legal1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { ContactsListPage } from './pages/crm/ContactsListPage.js';
@@ -100,7 +100,7 @@ function Routes() {
 
 function LegalPage({ kind }) {
   const { t } = useI18n();
-  return html`<div class="section" style=${{ maxWidth: '760px' }}><h1 class="h2">${t('legal.' + kind + '_title')}</h1><p class="prose">${t('legal.placeholder')}</p></div>`;
+  return html`<div class="section" style=${{ maxWidth: '760px' }}><h1 class="h2">${t('legal.' + kind + '_title')}</h1><div class="legal-copy">${t('legal.' + kind + '_body').split('\n\n').map((paragraph) => html`<p>${paragraph}</p>`)}</div></div>`;
 }
 
 /** Public site: directory, profiles and the investor account (spec 2, 6.1). */

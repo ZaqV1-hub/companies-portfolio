@@ -205,7 +205,7 @@ app.post('/api/investors', signupLimiter, async (req, res) => {
     if (dupes.length) { await connection.rollback(); return res.status(409).json({ ok: false, error: 'email_taken' }); }
     await connection.execute('INSERT INTO users (id,role,name,email,password_hash,lang,investor_profile,terms_accepted_at,privacy_accepted_at,email_verified_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())',
       [id, 'investor', signup.name, email, await bcrypt.hash(String(data.password), 12), data.lang === 'pt' ? 'pt' : 'en', jsonColumn({ institution: signup.institution, country: data.country.toUpperCase(), city: data.city, role: data.role || null, investor_type: data.investor_type || null, phone: data.phone || null, linkedin: data.linkedin || null }), new Date(), new Date()]);
-    await connection.execute('INSERT INTO consents (id,user_id,terms_version,privacy_version,accepted_at) VALUES (?,?,?,?,UTC_TIMESTAMP())', [`c-${crypto.randomUUID()}`, id, '2026-10', '2026-10']);
+    await connection.execute('INSERT INTO consents (id,user_id,terms_version,privacy_version,accepted_at) VALUES (?,?,?,?,UTC_TIMESTAMP())', [`c-${crypto.randomUUID()}`, id, '2026-10-draft', '2026-10-draft']);
     await connection.execute('DELETE FROM investor_email_challenges WHERE email=?', [email.toLowerCase()]);
     await connection.commit();
     await new Promise((resolve,reject) => req.session.regenerate((error) => error ? reject(error) : resolve()));
