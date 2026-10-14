@@ -8,7 +8,7 @@ const dictionaries = {};
 
 export async function loadDictionaries() {
   await Promise.all(LANGS.map(async (l) => {
-    const res = await fetch('i18n/' + l + '.json');
+    const res = await fetch('i18n/' + l + '.json', { cache: 'no-store' });
     dictionaries[l] = await res.json();
   }));
 }
