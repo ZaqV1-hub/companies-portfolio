@@ -239,8 +239,8 @@ button { font-family: var(--font-body); }
 .sidebar-role { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #6f7799; margin-bottom: 10px; }
 .sidebar-user { font-size: 14px; font-weight: 700; }
 .nav { display: flex; flex-direction: column; gap: 4px; }
-.nav button { text-align: left; padding: 11px 14px; border-radius: 10px; border: none; cursor: pointer; font-size: 13.5px; font-weight: 600; background: transparent; color: var(--on-navy); }
-.nav button[aria-current='page'] { font-weight: 800; background: rgba(203, 232, 43, 0.16); color: var(--lime); }
+.nav a { display: block; text-align: left; padding: 11px 14px; border-radius: 10px; border: none; cursor: pointer; font-size: 13.5px; font-weight: 600; background: transparent; color: var(--on-navy); text-decoration: none; }
+.nav a[aria-current='page'] { font-weight: 800; background: rgba(203, 232, 43, 0.16); color: var(--lime); }
 .sidebar-logout { margin-top: auto; background: transparent; border: 1px solid rgba(255, 255, 255, 0.2); color: var(--on-navy); padding: 11px 14px; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; }
 .sidebar-logout:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 .shell-main { flex: 1; min-width: 0; background: var(--bg); padding: 32px 36px 64px; }

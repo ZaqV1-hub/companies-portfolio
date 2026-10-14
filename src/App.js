@@ -34,9 +34,9 @@ function CompanyArea({ user, route, onLogout }) {
   const { t } = useI18n();
   const section = route.parts[1] || 'profile';
   const nav = [
-    { key: 'profile', label: t('app.nav_profile'), onClick: () => navigate('/company/profile') },
-    { key: 'contacts', label: t('app.nav_contacts'), onClick: () => navigate('/company/contacts') },
-    { key: 'public', label: t('app.nav_view_public'), onClick: () => navigate('/org/' + user.organization_id) },
+    { key: 'profile', label: t('app.nav_profile'), href: href('/company/profile') },
+    { key: 'contacts', label: t('app.nav_contacts'), href: href('/company/contacts') },
+    { key: 'public', label: t('app.nav_view_public'), href: href('/org/' + user.organization_id) },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
   if (section === 'profile') {
@@ -59,10 +59,10 @@ function TeamArea({ user, route, onLogout }) {
   const [queue, setQueue] = useState(0);
   useEffect(() => { api.listReviewQueue().then((q) => setQueue(q.length)); }, [route.path]);
   const nav = [
-    { key: 'review', label: t('app.nav_review'), badge: queue || null, onClick: () => navigate('/team/review') },
-    { key: 'orgs', label: t('app.nav_orgs'), onClick: () => navigate('/team/orgs') },
-    { key: 'crm', label: t('app.nav_crm'), onClick: () => navigate('/team/crm') },
-    { key: 'settings', label: t('app.nav_settings'), onClick: () => navigate('/team/settings') },
+    { key: 'review', label: t('app.nav_review'), badge: queue || null, href: href('/team/review') },
+    { key: 'orgs', label: t('app.nav_orgs'), href: href('/team/orgs') },
+    { key: 'crm', label: t('app.nav_crm'), href: href('/team/crm') },
+    { key: 'settings', label: t('app.nav_settings'), href: href('/team/settings') },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
   if (section === 'review' && route.parts[2]) content = html`<${ReviewPage} key=${route.parts[2]} versionId=${route.parts[2]} />`;

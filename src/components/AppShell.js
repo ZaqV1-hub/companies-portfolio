@@ -4,7 +4,7 @@ import { useI18n } from '../lib/i18n.js';
 import { LangSwitch } from './LangSwitch.js';
 
 /**
- * @param {{roleLabel: string, userLabel: string, nav: {key: string, label: string, onClick: Function, current?: boolean}[], onLogout: Function}} props
+ * @param {{roleLabel: string, userLabel: string, nav: {key: string, label: string, href: string, current?: boolean}[], onLogout: Function}} props
  */
 export function AppShell({ roleLabel, userLabel, nav, onLogout, children }) {
   const { t } = useI18n();
@@ -16,7 +16,7 @@ export function AppShell({ roleLabel, userLabel, nav, onLogout, children }) {
         <div class="sidebar-user">${userLabel}</div>
       </div>
       <nav class="nav">${nav.map((n) => html`
-        <button key=${n.key} type="button" aria-current=${n.current ? 'page' : null} onClick=${n.onClick}>${n.label}${n.badge ? html` <span class="nav-badge">${n.badge}</span>` : null}</button>`)}
+        <a key=${n.key} href=${n.href} aria-current=${n.current ? 'page' : null}>${n.label}${n.badge ? html` <span class="nav-badge">${n.badge}</span>` : null}</a>`)}
       </nav>
       <div style=${{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <${LangSwitch} dark=${true} />
