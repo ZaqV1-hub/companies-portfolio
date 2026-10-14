@@ -638,7 +638,7 @@ app.post('/api/uploads', requireRole('company_user'), upload.single('image'), as
       if (!['png','jpeg'].includes(metadata.format)) return res.status(415).json({ error:'image_type' });
       width = metadata.width; height = metadata.height; extension = metadata.format === 'jpeg' ? 'jpg' : 'png';
     }
-    if (!width || !height || Math.max(width,height) < (kind === 'gallery' || kind === 'cover' ? 1600 : 512)) return res.status(400).json({ error:'image_too_small' });
+    if (!width || !height || (kind === 'cover' ? width < 1920 || height < 720 : Math.max(width,height) < (kind === 'gallery' ? 1600 : 512))) return res.status(400).json({ error:kind === 'cover' ? 'image_cover_dimensions' : 'image_too_small' });
     await fs.mkdir(uploadRoot,{recursive:true});
     const filename = `${crypto.randomUUID()}.${extension}`;
     await fs.writeFile(path.join(uploadRoot,filename),bytes,{flag:'wx'});

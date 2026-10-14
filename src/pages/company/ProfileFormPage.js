@@ -6,11 +6,11 @@ import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href } from '../../lib/router.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js';
-import { fieldProblems, validateDraft } from '../../lib/profileValidation.js';
+import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261014-profile1';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js';
-import { ProfileView } from '../../components/profile/ProfileView.js';
+import { FieldInput } from '../../components/form/inputs.js?v=20261014-profile1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261014-profile1';
 
 function problemText(i18n, p) {
   return i18n.t('form.errors.' + p.code, p);
@@ -185,6 +185,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
         <span class="form-help">${t('form.progress', { n: stepIndex + 1, total: steps.length })} · ${t('form.required_hint')}</span>
       </div>
       ${step.kind !== 'preview' && step.kind !== 'images' && html`<p class="form-help lang-note">${t('form.en_reviewed_by_team')}</p>`}
+      ${step.kind === 'project' && html`<p class="notice currency-note">${t('form.currency_note')}</p>`}
       ${body}
       ${step.kind !== 'preview' && html`<label class="reviewed-check">
         <input type="checkbox" checked=${!!reviewed[step.id]} disabled=${locked} onChange=${(e) => setReviewedStep(step.id, e.target.checked)} />

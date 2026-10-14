@@ -180,6 +180,7 @@ function readImage(file, { minSide, maxMB, types }, kind) {
       if (file.type === 'image/svg+xml') { uploadImage(file, kind).then(resolve, reject); return; }
       const img = new Image();
       img.onload = () => {
+        if (kind === 'cover' && (img.naturalWidth < 1920 || img.naturalHeight < 720)) { reject(new Error('image_cover_dimensions')); return; }
         if (minSide && Math.max(img.naturalWidth, img.naturalHeight) < minSide) { reject(new Error('image_too_small')); return; }
         uploadImage(file, kind).then(resolve, reject);
       };
@@ -192,7 +193,7 @@ function readImage(file, { minSide, maxMB, types }, kind) {
 
 const IMAGE_RULES = {
   logo: { minSide: 512, types: ['image/png', 'image/svg+xml'] },
-  cover: { minSide: 1600, maxMB: 8, types: ['image/jpeg', 'image/png'] },
+  cover: { minSide: 1920, maxMB: 8, types: ['image/jpeg', 'image/png'] },
   gallery: { minSide: 1600, types: ['image/jpeg', 'image/png'] },
 };
 

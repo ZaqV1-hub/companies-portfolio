@@ -19,7 +19,7 @@ function textPt(v) {
   return v && typeof v === 'object' ? (v.pt || '') : (v || '');
 }
 
-const isWholeUSD = (n) => n == null || n === '' || (Number.isInteger(n) && n >= 0);
+const isWholeUSD = (n) => n == null || n === '' || (Number.isSafeInteger(n) && n >= 0);
 
 /** Problems of one field: [{code, ...}] (empty = valid). `code` maps to i18n "form.errors.<code>". */
 export function fieldProblems(field, value) {
@@ -101,6 +101,25 @@ export function fieldProblems(field, value) {
         if (!isWholeUSD(v.amount_usd)) out.push({ code: 'usd' });
         if (!v.year) out.push({ code: 'year_required' });
       }
+      break;
+    }
+    case 'exports_c': {
+      const v = value || {};
+      if (!v.none && v.amount_usd != null && v.amount_usd !== '') {
+        if (!isWholeUSD(v.amount_usd)) out.push({ code: 'usd' });
+        if (!v.year) out.push({ code: 'year_required' });
+      }
+      break;
+    }
+    case 'exports_pct':
+    case 'market_share': {
+      const pct = value?.pct;
+      if (pct != null && pct !== '' && !(Number.isInteger(pct) && pct >= 0 && pct <= 100)) out.push({ code: 'percent' });
+      break;
+    }
+    case 'clients': {
+      const count = value?.count;
+      if (count != null && count !== '' && !(Number.isSafeInteger(count) && count >= 0)) out.push({ code: 'whole_number' });
       break;
     }
     case 'leaders':

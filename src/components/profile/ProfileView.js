@@ -45,11 +45,10 @@ function Header({ org, project, i18n, backHref }) {
           <div class="hero-meta">
             ${chip && html`<span class="meta-chip">${chip}</span>`}
             ${org.size && html`<span class="meta-chip">${i18n.label('size', org.size)}</span>`}
+            ${(org.segments || []).map((segment) => html`<span class="meta-chip" key=${segment}>${i18n.label('segments', segment)}</span>`)}
             ${place && html`<span>${place}</span>`}
             ${org.website && html`<a href=${org.website} target="_blank" rel="noopener">${org.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</a>`}
-            ${org.public_state === 'provisional' || !org.last_approved_at
-              ? html`<span class="badge-updating">${t('common.updating')}</span>`
-              : html`<span>${t('common.updated_on', { date: formatDate(org.last_approved_at, i18n.lang) })}</span>`}
+            ${(org.public_state === 'provisional' || !org.last_approved_at) && html`<span class="badge-updating">${t('common.updating')}</span>`}
           </div>
           <${StageChart} project=${project} i18n=${i18n} />
         </div>
@@ -119,15 +118,20 @@ export function ProfileView({ org, projectId, onSelectProject, onRequestContact,
   const cta = html`<${LookingForCard} org=${org} project=${project} i18n=${i18n}
     onRequestContact=${() => onRequestContact(project.id)} contactState=${contactState} />`;
   const side = otherSideCards(org, project, i18n);
+  const blocks = mainBlocks(org, project, i18n);
   return html`<div class="profile">
     <${Header} org=${org} project=${project} i18n=${i18n} backHref=${backHref} />
-    <div class=${cx('profile-body', org.projects.length > 1 && 'has-projects')}>
-      <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
+    <div class="profile-body">
       <div class="profile-cta-mobile">${cta}</div>
-      <main class="profile-main">${mainBlocks(org, project, i18n)}</main>
+      <main class="profile-main">
+        ${blocks[0]}
+        <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
+        ${blocks.slice(1)}
+      </main>
       <aside class="profile-side">
         <div class="profile-cta-desktop">${cta}</div>
         ${side}
+        ${org.last_approved_at && org.public_state === 'published' && html`<div class="side-card profile-updated"><div class="side-label">${i18n.t('profile.updated_label')}</div><p>${formatDate(org.last_approved_at, i18n.lang)}</p></div>`}
       </aside>
       <${Leadership} org=${org} i18n=${i18n} />
       <${Gallery} org=${org} i18n=${i18n} />
