@@ -469,6 +469,10 @@ button { font-family: var(--font-body); }
 .level-tag.muted { color: var(--muted); }
 .check-line.has-error { color: #b42318; }
 .check-line a { color: var(--accent); font-weight: 700; }
+.auth-consents { display: flex; flex-direction: column; gap: 9px; }
+.auth-consents .btn-link { display: inline; padding: 0; font-size: inherit; }
+.legal-backdrop { z-index: 101; align-items: center; }
+.legal-modal { max-width: 620px; }
 .auth-switch { font-size: 13px; color: var(--muted); margin: 0; }
 .link-accent { color: var(--accent); font-weight: 800; }
 .verify { align-items: flex-start; }

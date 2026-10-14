@@ -11,13 +11,15 @@ import { DOMParser, XMLSerializer } from '@xmldom/xmldom';
 import bcrypt from 'bcryptjs';
 import { createPool, jsonColumn } from './db/connection.js';
 import { MySQLSessionStore } from './db/mysql-session-store.js';
+import { mailAvailable, sendAuthMail } from './auth-mail.js';
 import { validateDraft } from '../src/lib/profileValidation.js';
 import { businessDaysBetween } from '../src/lib/crm.js';
 
 const pool = createPool();
 const app = express();
 const port = Number(process.env.API_PORT || 4317);
-const demoMode = process.env.DEMO_MODE === 'true';
+const investorSessionMs = 30 * 24 * 60 * 60 * 1000;
+const tokenHash = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
   throw new Error('SESSION_SECRET must contain at least 32 characters.');
@@ -143,13 +145,51 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     if (user.role === 'investor' && !user.email_verified_at) return res.json({ ok: false, error: 'not_verified', user_id: user.id });
     await new Promise((resolve, reject) => req.session.regenerate((err) => err ? reject(err) : resolve()));
     req.session.user = { id: user.id, role: user.role };
+    if (user.role === 'investor') req.session.cookie.maxAge = investorSessionMs;
     res.json({ ok: true, user: safeUser(user,user.organization_name) });
   } catch (error) { routeError(res, error); }
 });
 app.post('/api/auth/logout', (req, res) => req.session.destroy((error) => error ? routeError(res, error) : res.status(204).end()));
 
+app.post('/api/investors/email/start', signupLimiter, async (req, res) => {
+  if (!mailAvailable()) return res.status(503).json({ ok: false, error: 'email_unavailable' });
+  const email = String(req.body.email || '').trim().toLowerCase();
+  const name = String(req.body.name || '').trim();
+  const institution = String(req.body.institution || '').trim();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || name.length < 2 || !institution || !req.body.accept_terms || !req.body.accept_privacy)
+    return res.status(400).json({ ok: false, error: 'invalid' });
+  try {
+    const [dupes] = await pool.execute('SELECT id FROM users WHERE email_normalized=?', [email]);
+    if (dupes.length) return res.status(409).json({ ok: false, error: 'email_taken' });
+    const token = crypto.randomBytes(32).toString('base64url');
+    await pool.execute('INSERT INTO investor_email_challenges (email,name,institution,token_hash,expires_at,created_at) VALUES (?,?,?,?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR),UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE name=VALUES(name),institution=VALUES(institution),token_hash=VALUES(token_hash),expires_at=VALUES(expires_at),created_at=VALUES(created_at)', [email,name,institution,tokenHash(token)]);
+    try { await sendAuthMail(email, 'verify', token); res.json({ ok: true }); }
+    catch (mailError) { console.error('Investor email delivery failed:', mailError.message); res.status(503).json({ ok: false, error: 'email_delivery_failed' }); }
+  } catch (error) { routeError(res,error); }
+});
+
+app.post('/api/investors/email/confirm', loginLimiter, async (req, res) => {
+  try {
+    const token = String(req.body.token || '');
+    if (token.length < 32) return res.status(400).json({ ok: false, error: 'invalid_token' });
+    const [rows] = await pool.execute('SELECT email,name,institution FROM investor_email_challenges WHERE token_hash=? AND expires_at > UTC_TIMESTAMP()', [tokenHash(token)]);
+    if (!rows.length) return res.status(400).json({ ok: false, error: 'invalid_token' });
+    req.session.investorSignup = { ...rows[0], verifiedAt: Date.now() };
+    await new Promise((resolve,reject) => req.session.save((error) => error ? reject(error) : resolve()));
+    res.json({ ok: true, data: rows[0] });
+  } catch (error) { routeError(res,error); }
+});
+
+app.get('/api/investors/email/status', (req,res) => {
+  const signup = req.session.investorSignup;
+  res.json({ verified: Boolean(signup && Date.now() - signup.verifiedAt < 24 * 60 * 60 * 1000), data: signup ? { email:signup.email,name:signup.name,institution:signup.institution } : null });
+});
+
 app.post('/api/investors', signupLimiter, async (req, res) => {
   const data = req.body || {};
+  const signup = req.session.investorSignup;
+  if (!signup || Date.now() - signup.verifiedAt >= 24 * 60 * 60 * 1000 || String(data.email || '').trim().toLowerCase() !== signup.email)
+    return res.status(403).json({ ok: false, error: 'email_not_verified' });
   const required = ['name', 'institution', 'email', 'country', 'city', 'password'];
   const fields = required.filter((field) => !String(data[field] || '').trim());
   if (!data.accept_terms) fields.push('accept_terms');
@@ -157,42 +197,70 @@ app.post('/api/investors', signupLimiter, async (req, res) => {
   if (fields.length) return res.status(400).json({ ok: false, error: 'missing', fields });
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) || !/^[A-Za-z]{2}$/.test(data.country) || String(data.password).length < 10) return res.status(400).json({ ok: false, error: 'invalid' });
   const id = `u-${crypto.randomUUID()}`;
-  const token = crypto.randomBytes(32).toString('base64url');
-  const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
     const email = String(data.email).trim();
     const [dupes] = await connection.execute('SELECT id FROM users WHERE email_normalized=?', [email.toLowerCase()]);
     if (dupes.length) { await connection.rollback(); return res.status(409).json({ ok: false, error: 'email_taken' }); }
-    await connection.execute('INSERT INTO users (id,role,name,email,password_hash,lang,investor_profile,terms_accepted_at,privacy_accepted_at,verification_token_hash,created_at) VALUES (?,?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',
-      [id, 'investor', String(data.name).trim(), email, await bcrypt.hash(String(data.password), 12), data.lang === 'pt' ? 'pt' : 'en', jsonColumn({ institution: data.institution, country: data.country.toUpperCase(), city: data.city, role: data.role || null, investor_type: data.investor_type || null, phone: data.phone || null, linkedin: data.linkedin || null }), new Date(), new Date(), tokenHash]);
+    await connection.execute('INSERT INTO users (id,role,name,email,password_hash,lang,investor_profile,terms_accepted_at,privacy_accepted_at,email_verified_at,created_at) VALUES (?,?,?,?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())',
+      [id, 'investor', signup.name, email, await bcrypt.hash(String(data.password), 12), data.lang === 'pt' ? 'pt' : 'en', jsonColumn({ institution: signup.institution, country: data.country.toUpperCase(), city: data.city, role: data.role || null, investor_type: data.investor_type || null, phone: data.phone || null, linkedin: data.linkedin || null }), new Date(), new Date()]);
     await connection.execute('INSERT INTO consents (id,user_id,terms_version,privacy_version,accepted_at) VALUES (?,?,?,?,UTC_TIMESTAMP())', [`c-${crypto.randomUUID()}`, id, '2026-10', '2026-10']);
-    await connection.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())', [`m-${crypto.randomUUID()}`, 'investor_verify_email', email, jsonColumn({ token })]);
+    await connection.execute('DELETE FROM investor_email_challenges WHERE email=?', [email.toLowerCase()]);
     await connection.commit();
-    res.status(201).json({ ok: true, user_id: id, ...(demoMode ? { verification_token: token } : {}) });
+    await new Promise((resolve,reject) => req.session.regenerate((error) => error ? reject(error) : resolve()));
+    req.session.user = { id, role:'investor' };
+    req.session.cookie.maxAge = investorSessionMs;
+    res.status(201).json({ ok:true, user:{ id,role:'investor',name:signup.name,email,organization_id:null,organization_name:null,email_verified:true } });
   } catch (error) { await connection.rollback(); if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ ok: false, error: 'email_taken' }); routeError(res, error); }
   finally { connection.release(); }
 });
 app.post('/api/investors/verify', async (req, res) => {
   try {
-    const tokenHash = crypto.createHash('sha256').update(String(req.body.token || '')).digest('hex');
-    const [rows] = await pool.execute('SELECT * FROM users WHERE verification_token_hash=? AND role=?', [tokenHash, 'investor']);
+    const [rows] = await pool.execute('SELECT * FROM users WHERE verification_token_hash=? AND verification_expires_at > UTC_TIMESTAMP() AND role=?', [tokenHash(String(req.body.token || '')), 'investor']);
     if (!rows.length) return res.status(400).json({ ok: false, error: 'invalid_token' });
-    await pool.execute('UPDATE users SET email_verified_at=UTC_TIMESTAMP(), verification_token_hash=NULL WHERE id=?', [rows[0].id]);
+    await pool.execute('UPDATE users SET email_verified_at=UTC_TIMESTAMP(), verification_token_hash=NULL, verification_expires_at=NULL WHERE id=?', [rows[0].id]);
     await new Promise((resolve,reject)=>req.session.regenerate((err)=>err?reject(err):resolve()));
     req.session.user = { id: rows[0].id, role: 'investor' };
+    req.session.cookie.maxAge = investorSessionMs;
     res.json({ ok: true, user: safeUser({ ...rows[0], email_verified_at: new Date() }) });
   } catch (error) { routeError(res, error); }
 });
 app.post('/api/investors/verify/resend', loginLimiter, async (req, res) => {
+  if (!mailAvailable()) return res.status(503).json({ ok: false, error: 'email_unavailable' });
   try {
     const [rows] = await pool.execute("SELECT id,email FROM users WHERE email_normalized=? AND role='investor' AND email_verified_at IS NULL", [String(req.body.email || '').trim().toLowerCase()]);
     if (!rows.length) return res.json({ ok: true });
     const token = crypto.randomBytes(32).toString('base64url');
-    await pool.execute('UPDATE users SET verification_token_hash=? WHERE id=?', [crypto.createHash('sha256').update(token).digest('hex'), rows[0].id]);
-    await pool.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())', [`m-${crypto.randomUUID()}`, 'investor_verify_email', rows[0].email, jsonColumn({ token })]);
-    res.json({ ok: true, ...(demoMode ? { verification_token: token } : {}) });
+    await pool.execute('UPDATE users SET verification_token_hash=?, verification_expires_at=DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR) WHERE id=?', [tokenHash(token), rows[0].id]);
+    await sendAuthMail(rows[0].email, 'verify', token);
+    res.json({ ok: true });
+  } catch (error) { routeError(res, error); }
+});
+
+app.post('/api/auth/password-reset/request', loginLimiter, async (req, res) => {
+  if (!mailAvailable()) return res.status(503).json({ ok: false, error: 'email_unavailable' });
+  try {
+    const email = String(req.body.email || '').trim().toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ ok: false, error: 'invalid_email' });
+    const [rows] = await pool.execute('SELECT id,email FROM users WHERE email_normalized=?', [email]);
+    if (rows.length) {
+      const token = crypto.randomBytes(32).toString('base64url');
+      await pool.execute('UPDATE users SET password_reset_token_hash=?, password_reset_expires_at=DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 HOUR) WHERE id=?', [tokenHash(token), rows[0].id]);
+      try { await sendAuthMail(rows[0].email, 'reset', token); } catch (mailError) { console.error('Password reset email delivery failed:', mailError.message); }
+    }
+    res.json({ ok: true });
+  } catch (error) { routeError(res, error); }
+});
+
+app.post('/api/auth/password-reset/confirm', loginLimiter, async (req, res) => {
+  try {
+    const token = String(req.body.token || '');
+    const password = String(req.body.password || '');
+    if (token.length < 32 || password.length < 10) return res.status(400).json({ ok: false, error: 'invalid' });
+    const [result] = await pool.execute('UPDATE users SET password_hash=?, password_reset_token_hash=NULL, password_reset_expires_at=NULL WHERE password_reset_token_hash=? AND password_reset_expires_at > UTC_TIMESTAMP()', [await bcrypt.hash(password, 12), tokenHash(token)]);
+    if (!result.affectedRows) return res.status(400).json({ ok: false, error: 'invalid_token' });
+    res.json({ ok: true });
   } catch (error) { routeError(res, error); }
 });
 

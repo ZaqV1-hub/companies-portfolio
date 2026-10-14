@@ -53,9 +53,14 @@ export async function listOrganizationsForTeam() { return request('/team/organiz
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
 
 export async function registerInvestor(data) { return post('/investors', data); }
+export async function startInvestorEmail(data) { return post('/investors/email/start', data); }
+export async function confirmInvestorEmail(token) { return post('/investors/email/confirm', { token }); }
+export async function investorEmailStatus() { return request('/investors/email/status'); }
 export async function verifyInvestorEmail(token) { return post('/investors/verify', { token }); }
 export async function resendVerification(email) { return post('/investors/verify/resend', { email }); }
 export async function loginInvestor(email, password) { return login(email, password, 'investor'); }
+export async function requestPasswordReset(email) { return post('/auth/password-reset/request', { email }); }
+export async function confirmPasswordReset(token, password) { return post('/auth/password-reset/confirm', { token,password }); }
 export async function requestContact(organizationId, projectId) { return post(`/organizations/${q(organizationId)}/contact-requests`, { project_id: projectId }); }
 
 export async function listContactRows() { return request('/contacts'); }

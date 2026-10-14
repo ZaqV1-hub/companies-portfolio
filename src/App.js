@@ -4,7 +4,7 @@ import * as api from './services/api.js';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js';
-import { InvestorAuthModal } from './components/InvestorAuth.js';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js';
 import { AppShell } from './components/AppShell.js';
 import { DirectoryPage } from './pages/public/DirectoryPage.js';
 import { ProfilePage } from './pages/public/ProfilePage.js';
@@ -114,7 +114,7 @@ function PublicSite({ route, user, setUser }) {
   const requestContact = (org, projectId) => new Promise((resolve) => {
     const run = async () => resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null);
     if (investor && investor.email_verified) run();
-    else setAuth({ mode: 'signup', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
+    else setAuth({ mode: 'welcome', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
   });
   const done = (u) => {
     setUser(u);
@@ -124,16 +124,26 @@ function PublicSite({ route, user, setUser }) {
   };
   const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); };
   const logout = async () => { await api.logout(); setUser(null); };
+  const [verifyError,setVerifyError] = useState(false);
+  useEffect(() => {
+    if (first !== 'verify-email') return;
+    api.confirmInvestorEmail(route.query.token).then((result) => {
+      setAuth({ mode:'signup', prefill:result.data });
+      navigate('/');
+    }).catch(() => setVerifyError(true));
+  }, [first,route.query.token]);
 
   let page;
   if (first === 'org' && second) page = html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`;
+  else if (first === 'verify-email') page = html`<div class="section"><h1 class="form-title">${t('investor.verify_title')}</h1><p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p></div>`;
+  else if (first === 'reset-password') page = html`<${ResetPasswordPage} token=${route.query.token} />`;
   else if (first === 'legal') page = html`<${LegalPage} kind=${second === 'privacy' ? 'privacy' : 'terms'} />`;
   else page = html`<${DirectoryPage} />`;
   return html`<div class="page">
-    <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'login' })} onLogout=${logout} />
+    <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'welcome' })} onLogout=${logout} />
     ${page}
     <${PublicFooter} />
-    ${auth && html`<${InvestorAuthModal} initialMode=${auth.mode} reason=${auth.reason} onDone=${done} onClose=${close} />`}
+    ${auth && html`<${InvestorAuthModal} initialMode=${auth.mode} reason=${auth.reason} prefill=${auth.prefill} onDone=${done} onClose=${close} />`}
   </div>`;
 }
 

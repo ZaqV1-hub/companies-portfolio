@@ -12,18 +12,25 @@ export function LoginPage({ role, onLoggedIn }) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
+  const [forgot, setForgot] = useState(false);
+  const [sent, setSent] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
     setBusy(true);
     setError(null);
     try {
+      if (forgot) {
+        await api.requestPasswordReset(email);
+        setSent(true);
+        return;
+      }
       const res = await api.login(email, password, isTeam ? 'team' : 'company_user');
       if (!res.ok) { setError(t('login.invalid')); return; }
       onLoggedIn(res.user);
       navigate(isTeam ? '/team' : '/company');
-    } catch {
-      setError(t('login.invalid'));
+    } catch (err) {
+      setError(forgot && err.data?.error === 'email_unavailable' ? t('investor.email_unavailable') : forgot ? t('investor.try_again') : t('login.invalid'));
     } finally {
       setBusy(false);
     }
@@ -47,15 +54,18 @@ export function LoginPage({ role, onLoggedIn }) {
     <div class="split-form">
       <form class="split-form-inner" onSubmit=${submit}>
         <div class="kicker">${t('login.' + k + '_kicker')}</div>
-        <h1 class="form-title">${t('login.' + k + '_title')}</h1>
-        <p class="form-subtitle">${t('login.' + k + '_subtitle')}</p>
+        <h1 class="form-title">${forgot ? t('investor.forgot_password') : t('login.' + k + '_title')}</h1>
+        <p class="form-subtitle">${forgot ? t('investor.reset_intro') : t('login.' + k + '_subtitle')}</p>
         <div class="stack">
           <label><span class="field-label">${t('common.email')}</span>
             <input class="input input-sm" type="email" value=${email} onInput=${(e) => setEmail(e.target.value)} placeholder="name@company.com" /></label>
-          <label><span class="field-label">${t('common.password')}</span>
+          ${!forgot && html`<label><span class="field-label">${t('common.password')}</span>
             <input class="input input-sm" type="password" value=${password} onInput=${(e) => setPassword(e.target.value)} placeholder="••••••••" /></label>
+          `}
           ${error && html`<div class="form-error" role="alert">${error}</div>`}
-          <button type="submit" class="btn btn-lime btn-xl" disabled=${busy} style=${{ marginTop: '8px' }}>${t('common.log_in')}</button>
+          ${sent && html`<p class="section-note" role="status">${t('investor.reset_sent')}</p>`}
+          <button type="submit" class="btn btn-lime btn-xl" disabled=${busy} style=${{ marginTop: '8px' }}>${forgot ? t('investor.send_reset') : t('common.log_in')}</button>
+          <button type="button" class="btn-link" onClick=${() => { setForgot(!forgot); setError(null); setSent(false); }}>${forgot ? t('investor.back_login') : t('investor.forgot_password')}</button>
           <a class="btn-link" href=${href('/')} style=${{ marginTop: '10px' }}>${t('common.back_public')}</a>
         </div>
       </form>

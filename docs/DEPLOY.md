@@ -9,6 +9,7 @@ O site chama-se `CompaniesPortfolio` (ID 98) e usa a pasta `C:\Sites\AzureIIS\co
 O `web.config` do site encaminha somente `/api` para `http://127.0.0.1:4317/api`. URL Rewrite e ARR já estavam instalados. Para que imagens públicas possam ser lidas sem ampliar permissões para outros sites, a autenticação anônima deste site usa a identidade do seu application pool. A pasta do site e a pasta de uploads já concedem leitura a essa identidade.
 
 As áreas privadas abrem em `/empresa` e `/painel`. O `web.config` também encaminha essas rotas, os perfis públicos em `/org` e as páginas `/legal` para `index.html`. O script de publicação preserva o `web.config` já instalado no IIS; quando a regra de rotas mudar no repositório, atualize esse arquivo no site separadamente.
+Os links de confirmação e recuperação usam `/verify-email` e `/reset-password`; essas rotas também precisam apontar para `index.html` no IIS.
 
 ## API, serviço e logs
 
@@ -28,7 +29,8 @@ Os logs do WinSW ficam em `C:\Services\CompaniesPortfolioApi\logs` e rodam por t
 
 O arquivo de ambiente está fora do site em `C:\Secrets\companiesportfolio\test.env`. A pasta e o arquivo autorizam o Administrador e o SID exclusivo do serviço da API. Não copie esse arquivo para o repositório, para a pasta pública nem para backups compartilhados sem proteção.
 
-As variáveis configuradas são `NODE_ENV`, `API_PORT`, `PUBLIC_ORIGIN`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DEMO_MODE`, `SESSION_TTL_SECONDS`, `UPLOAD_ROOT` e `SESSION_SECRET`. Não inclua os valores em código, Git, logs ou documentação. `DEMO_MODE=true` habilita as rotas de demonstração neste ambiente; em outros ambientes, deixe-as desligadas.
+As variáveis configuradas são `NODE_ENV`, `API_PORT`, `PUBLIC_ORIGIN`, `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `DEMO_MODE`, `SESSION_TTL_SECONDS`, `UPLOAD_ROOT` e `SESSION_SECRET`. Não inclua os valores em código, Git, logs ou documentação. A antiga opção `DEMO_MODE` já não permite contornar a verificação de e-mail; ela pode ser retirada da configuração quando conveniente.
+Para habilitar o cadastro do investidor e a recuperação de senha por e-mail, configure também `SMTP_HOST`, `SMTP_PORT` (465 ou 587), `SMTP_FROM` e, se o servidor exigir autenticação, `SMTP_USER` e `SMTP_PASSWORD` no mesmo arquivo protegido. Enquanto o SMTP não estiver configurado, a API responde que o envio está indisponível e não conclui o primeiro passo do cadastro. O e-mail precisa ser confirmado antes da criação da conta; o link vale 24 horas. O link de redefinição de senha vale uma hora. A sessão do investidor dura 30 dias após o cadastro ou login.
 
 O banco de teste é `companiesportfolio_test`, no MySQL 8.0.32, porta 3306. A API conecta-se como `cp_test_app` em `localhost`, com acesso restrito a esse banco. O banco deve ser provisionado previamente por um administrador de MySQL; a conta da aplicação não cria bancos nem usuários.
 
