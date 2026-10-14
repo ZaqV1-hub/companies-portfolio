@@ -1,0 +1,67 @@
+# Automatic publication of Companies Portfolio.
+# Every push to main (and the "Run workflow" button) runs the checks on a GitHub machine and, if they
+# pass, publishes on the Windows VM through a self-hosted runner installed there (see docs/DEPLOY.md,
+# "Publicação automática"). The VM job only runs deploy/windows/deploy.ps1.
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Only list what would change (no backup, no restart, no copy)'
+        type: boolean
+        default: false
+
+# One publication at a time; a newer push waits for the running one instead of cancelling it.
+concurrency:
+  group: deploy-companiesportfolio
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: JavaScript syntax (front and API)
+        run: |
+          for f in $(git ls-files 'src/*.js' 'server/*.js'); do node --check "$f"; done
+
+      - name: JSON files (translations and seed)
+        run: |
+          for f in $(git ls-files 'i18n/*.json' 'data/seed/*.json' 'server/package.json'); do
+            node -e "JSON.parse(require('fs').readFileSync(process.argv[1], 'utf8'))" "$f"
+          done
+
+      - name: API dependencies install from the lockfile
+        working-directory: server
+        run: npm ci --omit=dev --include=optional --no-audit --no-fund
+
+  deploy:
+    name: Publish on the VM
+    needs: checks
+    runs-on: [self-hosted, windows, companiesportfolio]
+    environment: production
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          clean: true
+
+      - name: Run deploy script
+        shell: powershell
+        run: |
+          $dry = '${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}' -eq 'true'
+          & .\deploy\windows\deploy.ps1 -DryRun:$dry
+          if (-not $?) { exit 1 }

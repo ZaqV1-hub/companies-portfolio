@@ -48,10 +48,84 @@ Uploads ficam em `C:\CompaniesPortfolioData\uploads`, fora do código. O IIS pub
 
 Antes da troca, a versão estática original foi copiada para `C:\Sites\AzureIIS\backups\companiesportfolio-static-20261005-084359`. Preserve esse backup até que o cliente aprove a versão nova. Faça outro backup da pasta do site antes de cada publicação futura.
 
-## Atualização futura
+## Publicação automática (GitHub Actions)
 
-No checkout autorizado do repositório `ZaqV1-hub/companies-portfolio`, atualize a partir da `main` e confirme a revisão que será publicada. Antes de substituir arquivos, copie `C:\Sites\AzureIIS\companiesportfolio` para uma nova pasta de backup sob `C:\Sites\AzureIIS\backups`.
+Cada push na `main` publica a nova versão na VM sem intervenção. O fluxo está em `.github/workflows/deploy.yml`:
 
-Copie os arquivos públicos do front para `C:\Sites\AzureIIS\companiesportfolio`, preservando o `web.config` configurado para o proxy. Copie `server` para `C:\Services\CompaniesPortfolioApi\app\server` e `data\seed` para `C:\Services\CompaniesPortfolioApi\app\data\seed`, sem sobrescrever o arquivo externo de ambiente. Na pasta `C:\Services\CompaniesPortfolioApi\app\server`, use Node 22.14.0 e seu npm empacotado para reinstalar dependências: `& $node $npm ci --omit=dev --include=optional`. Rode somente as migrações pendentes com `& $node $npm run migrate`; não rode o seed em uma atualização normal. Em seguida, reinicie apenas `CompaniesPortfolioApi` e confirme o resultado em `http://127.0.0.1:4317/api/health` e `https://companiesportfolio.brevia.company/api/health`.
+1. **Checks** (máquina do GitHub): sintaxe de todo o JavaScript do front e da API, validade dos JSON (traduções e seed) e instalação das dependências da API a partir do `package-lock.json`. Se algo falhar, nada é publicado.
+2. **Publish on the VM** (runner instalado na própria VM): baixa a revisão da `main` e roda `deploy/windows/deploy.ps1`.
+
+O script `deploy/windows/deploy.ps1` faz os mesmos passos da publicação manual:
+
+- confere pastas, serviço, Node e arquivo de ambiente;
+- faz backup do site e da API em `C:\Sites\AzureIIS\backups\companiesportfolio-auto-<data-hora>` e mantém só os 10 últimos backups automáticos (o backup estático original não é tocado);
+- para **somente** o serviço `CompaniesPortfolioApi`, copia `server` e `data\seed`, roda `npm ci --omit=dev --include=optional` e `npm run migrate` (apenas migrações pendentes), religa o serviço e espera `/api/health` responder;
+- copia o front (`index.html`, `src`, `i18n`, `assets`, `vendor`) para a pasta do site, **mantendo o `web.config` do site**;
+- confere `https://companiesportfolio.brevia.company/api/health` e a página inicial;
+- grava a revisão publicada em `C:\Services\CompaniesPortfolioApi\app\deploy-info.json`.
+
+Se qualquer etapa falhar, o script restaura automaticamente o site e a API a partir do backup e religa o serviço. **Migrações de banco não são desfeitas automaticamente**: se uma migração rodou antes da falha, avalie o banco manualmente.
+
+O script nunca roda o seed nem o `reset-demo` e não usa `iisreset`. Também não reinicia pools nem altera bindings, certificados, outros sites ou o arquivo de ambiente.
+
+### Acompanhar e repetir
+
+- Andamento e logs: aba **Actions** do repositório, workflow **Deploy**.
+- Publicar de novo sem novo commit, ou só simular: **Actions → Deploy → Run workflow**. A opção `dry_run` lista o que mudaria sem copiar, parar ou fazer backup.
+- Para exigir aprovação antes de cada publicação: **Settings → Environments → production → Required reviewers**.
+
+### Instalação do runner na VM (uma vez, por um administrador)
+
+O runner é um serviço Windows que busca os jobs no GitHub. Ele só faz conexões de saída (HTTPS para github.com); não abre nenhuma porta na VM.
+
+1. **Criar a conta de serviço** do runner, sem privilégios de administrador. Exemplo: usuário local `svc-cp-deploy`, com senha forte e que nunca expira.
+2. **Dar à conta só as permissões necessárias** (PowerShell como administrador):
+
+   ```powershell
+   $acct = "$env:COMPUTERNAME\svc-cp-deploy"
+   icacls 'C:\Sites\AzureIIS\companiesportfolio' /grant "${acct}:(OI)(CI)M"
+   icacls 'C:\Services\CompaniesPortfolioApi\app' /grant "${acct}:(OI)(CI)M"
+   icacls 'C:\Sites\AzureIIS\backups' /grant "${acct}:(OI)(CI)M"
+   icacls 'C:\Secrets\companiesportfolio\test.env' /grant "${acct}:R"
+   icacls 'C:\Lumi\runtime\node-v22.14.0-win-x64' /grant "${acct}:(OI)(CI)RX"
+   ```
+
+   Permissão para parar e iniciar **somente** o `CompaniesPortfolioApi`:
+
+   ```powershell
+   $sid = (New-Object System.Security.Principal.NTAccount($acct)).Translate([System.Security.Principal.SecurityIdentifier]).Value
+   $sd = (sc.exe sdshow CompaniesPortfolioApi | Out-String).Trim()
+   # Acrescenta "consultar, iniciar, parar" para a conta, antes da parte S: (auditoria), se houver
+   $ace = "(A;;RPWPLCRC;;;$sid)"
+   $newSd = if ($sd -match 'S:') { $sd -replace 'S:', "${ace}S:" } else { $sd + $ace }
+   sc.exe sdset CompaniesPortfolioApi $newSd
+   ```
+
+3. **Registrar o runner**: no GitHub, abra **Settings → Actions → Runners → New self-hosted runner → Windows (x64)** e siga os comandos de download da página numa pasta como `C:\actions-runner-companiesportfolio`. Na configuração, use o token mostrado na página:
+
+   ```powershell
+   .\config.cmd --url https://github.com/ZaqV1-hub/companies-portfolio --token <TOKEN-DA-PAGINA> `
+     --name companiesportfolio-vm --labels companiesportfolio --work _work `
+     --runasservice --windowslogonaccount "$env:COMPUTERNAME\svc-cp-deploy" --windowslogonpassword '<senha>'
+   ```
+
+   O rótulo `companiesportfolio` é o que o workflow procura (junto com `self-hosted` e `windows`, que o runner já recebe sozinho). O token de registro vale por uma hora e não deve ser guardado.
+
+4. **Opcional**: instalar o Git for Windows, para o checkout ser mais rápido (sem ele, o runner baixa o código pela API do GitHub).
+5. **Testar**: **Actions → Deploy → Run workflow** com `dry_run` marcado. Depois rode sem `dry_run`, ou faça um push na `main`.
+
+Para remover o runner: `.\config.cmd remove --token <TOKEN>`, com um token gerado na mesma página do GitHub.
+
+## Publicação manual (alternativa)
+
+Se o runner estiver parado, a mesma publicação pode ser feita à mão na VM. Abra o PowerShell como um usuário com as permissões acima, num checkout atualizado da `main`:
+
+```powershell
+git pull
+powershell -NoProfile -ExecutionPolicy Bypass -File .\deploy\windows\deploy.ps1           # publica
+powershell -NoProfile -ExecutionPolicy Bypass -File .\deploy\windows\deploy.ps1 -DryRun   # só simula
+```
+
+Todos os caminhos (site, API, Node, arquivo de ambiente, URLs de health) têm valores padrão iguais aos desta VM e podem ser trocados por parâmetros do script.
 
 Não use `iisreset`, não reinicie pools compartilhados e não altere bindings, certificados ou bancos de outros clientes. A publicação estática não requer reiniciar o IIS nem o application pool.
