@@ -32,16 +32,13 @@ const put = (path, body) => request(path, { method: 'PUT', body });
 const post = (path, body) => request(path, { method: 'POST', body });
 
 export async function init() { await request('/health'); }
-export async function resetDemoData() { return post('/demo/reset'); }
 export async function listPublicOrganizations() { return request('/public/organizations'); }
 export async function getPublicOrganization(id) { try { return await request(`/public/organizations/${q(id)}`); } catch (error) { if (error.status === 404) return null; throw error; } }
 export async function getPublicSettings() { return request('/public/settings'); }
 
 export async function getCurrentUser() { try { return await request('/me'); } catch (error) { if (error.status === 401) return null; throw error; } }
 export async function login(email, password, role) { return post('/auth/login', { email, password, role }); }
-export async function loginAs(userId) { return post('/demo/login-as', { user_id: userId }); }
 export async function logout() { return post('/auth/logout'); }
-export async function listDemoCompanyAccounts() { return request('/demo/company-accounts'); }
 
 export async function getMyProfileForm() { return request('/me/profile-form'); }
 export async function saveMyProfileDraft(content, reviewedSteps) { return put('/me/profile-draft', { content, reviewed_steps: reviewedSteps }); }

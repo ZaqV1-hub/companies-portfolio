@@ -1,30 +1,49 @@
-// Hash router: works on any static server (#/org/nintx?project=x). The real deploy can keep it.
+// Clean URLs for the public site and both private areas; old hash links still resolve.
 import { useEffect, useState } from './html.js';
 
-function parse(hash) {
-  const raw = (hash || '').replace(/^#/, '') || '/';
-  const [path, qs] = raw.split('?');
+function appPath(pathname) {
+  return pathname.replace(/^\/empresa(?=\/|$)/, '/company').replace(/^\/painel(?=\/|$)/, '/team');
+}
+
+function publicPath(path) {
+  return path.replace(/^\/company(?=\/|$)/, '/empresa').replace(/^\/team(?=\/|$)/, '/painel');
+}
+
+function parse() {
+  const legacy = location.hash.startsWith('#/') ? location.hash.slice(1) : null;
+  const url = new URL(legacy || location.href, location.origin);
+  const path = appPath(url.pathname);
   const query = {};
-  new URLSearchParams(qs || '').forEach((v, k) => { query[k] = v; });
+  url.searchParams.forEach((v, k) => { query[k] = v; });
   return { path, parts: path.split('/').filter(Boolean), query };
 }
 
 export function useRoute() {
-  const [route, setRoute] = useState(() => parse(location.hash));
+  const [route, setRoute] = useState(parse);
   useEffect(() => {
-    const onChange = () => setRoute(parse(location.hash));
+    const onChange = () => setRoute(parse());
     window.addEventListener('hashchange', onChange);
-    return () => window.removeEventListener('hashchange', onChange);
+    window.addEventListener('popstate', onChange);
+    window.addEventListener('app:navigate', onChange);
+    return () => {
+      window.removeEventListener('hashchange', onChange);
+      window.removeEventListener('popstate', onChange);
+      window.removeEventListener('app:navigate', onChange);
+    };
   }, []);
   return route;
 }
 
 export function navigate(path, { keepScroll } = {}) {
-  if (location.hash !== '#' + path) location.hash = path;
+  const url = publicPath(path);
+  if (location.pathname + location.search + location.hash !== url) {
+    history.pushState(null, '', url);
+    window.dispatchEvent(new Event('app:navigate'));
+  }
   if (!keepScroll) window.scrollTo(0, 0);
 }
 
-/** Props for a link: html`<a ...${link('/org/x')}>` keeps real hrefs (open in new tab works). */
+/** Links work directly, including reloads and opening in a new tab. */
 export function href(path) {
-  return '#' + path;
+  return publicPath(path);
 }

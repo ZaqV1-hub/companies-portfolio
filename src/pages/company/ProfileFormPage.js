@@ -4,6 +4,7 @@ import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
+import { href } from '../../lib/router.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js';
 import { fieldProblems, validateDraft } from '../../lib/profileValidation.js';
 import { draftToPublic } from '../../lib/draftPreview.js';
@@ -158,7 +159,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
         <h1 class="page-title">${org.name}</h1>
         <div class="page-subtitle">
           ${t('form.status')}: <span class=${'status-pill s-' + status}>${i18n.label('org_status', status)}</span>
-          ${org.public_state !== 'hidden' && html` · <a href=${'#/org/' + org.id} target="_blank">${t('form.view_public')} ↗</a>`}
+          ${org.public_state !== 'hidden' && html` · <a href=${href('/org/' + org.id)} target="_blank">${t('form.view_public')} ↗</a>`}
           ${org.public_state === 'provisional' && html` · ${t('form.updating_public')}`}
         </div>
       </div>

@@ -206,7 +206,7 @@ export function OrganizationsPage() {
         <div>${r.last_updated_at ? formatDate(r.last_updated_at, lang) : '—'}
           ${r.outdated && html`<div class="cell-alert">${t('orgs.outdated', { n: r.days_since_update })}</div>`}</div>
         <div style=${{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          ${r.public_state !== 'hidden' && html`<a class="btn btn-outline" href=${'#/org/' + r.id} target="_blank">↗</a>`}
+          ${r.public_state !== 'hidden' && html`<a class="btn btn-outline" href=${href('/org/' + r.id)} target="_blank">↗</a>`}
           <button type="button" class="btn btn-outline" onClick=${() => toggleOnline(r)}>${r.public_state === 'hidden' ? t('orgs.reactivate') : t('orgs.take_offline')}</button>
         </div>
       </div>`)}

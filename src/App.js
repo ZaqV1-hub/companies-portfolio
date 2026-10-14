@@ -21,7 +21,7 @@ function PublicFooter() {
   const { t } = useI18n();
   return html`<footer class="public-footer">
     <span>${t('profile.footer')}</span>
-    <a href=${href('/team/login')}>${t('topbar.team_access')}</a>
+    <a href=${href('/team')}>${t('topbar.team_access')}</a>
   </footer>`;
 }
 

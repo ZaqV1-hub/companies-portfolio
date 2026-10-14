@@ -1,5 +1,5 @@
-// Login for company users and the program team (MOCK: any seed user, password "demo").
-import { html, useEffect, useState } from '../lib/html.js';
+// Login for company users and the program team.
+import { html, useState } from '../lib/html.js';
 import * as api from '../services/api.js';
 import { useI18n } from '../lib/i18n.js';
 import { href, navigate } from '../lib/router.js';
@@ -8,22 +8,25 @@ import { LangSwitch } from '../components/LangSwitch.js';
 export function LoginPage({ role, onLoggedIn }) {
   const { t } = useI18n();
   const isTeam = role === 'team';
-  const [email, setEmail] = useState(isTeam ? 'team@abiquifi.org.br' : '');
+  const [email, setEmail] = useState(isTeam ? 'teste@abiquifi' : 'teste@imunotera');
   const [password, setPassword] = useState('');
-  const [accounts, setAccounts] = useState([]);
-  const [demoUser, setDemoUser] = useState('');
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    if (!isTeam) api.listDemoCompanyAccounts().then((list) => { setAccounts(list); setDemoUser(list.length ? list[0].user_id : ''); });
-  }, [isTeam]);
+  const [busy, setBusy] = useState(false);
 
   const submit = async (e) => {
     e.preventDefault();
-    const res = !isTeam && !email && demoUser ? await api.loginAs(demoUser) : await api.login(email, password, isTeam ? 'team' : 'company_user');
-    if (!res.ok) { setError(t('login.invalid')); return; }
-    onLoggedIn(res.user);
-    navigate(isTeam ? '/team' : '/company');
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await api.login(email, password, isTeam ? 'team' : 'company_user');
+      if (!res.ok) { setError(t('login.invalid')); return; }
+      onLoggedIn(res.user);
+      navigate(isTeam ? '/team' : '/company');
+    } catch {
+      setError(t('login.invalid'));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const k = isTeam ? 'team' : 'company';
@@ -51,13 +54,8 @@ export function LoginPage({ role, onLoggedIn }) {
             <input class="input input-sm" type="email" value=${email} onInput=${(e) => setEmail(e.target.value)} placeholder="name@company.com" /></label>
           <label><span class="field-label">${t('common.password')}</span>
             <input class="input input-sm" type="password" value=${password} onInput=${(e) => setPassword(e.target.value)} placeholder="••••••••" /></label>
-          ${!isTeam && html`<label><span class="field-label">${t('login.demo_as')}</span>
-            <select class="input input-sm" value=${demoUser} onChange=${(e) => { setDemoUser(e.target.value); setEmail(''); }}>
-              ${accounts.map((a) => html`<option key=${a.user_id} value=${a.user_id}>${a.organization_name}</option>`)}
-            </select></label>`}
           ${error && html`<div class="form-error" role="alert">${error}</div>`}
-          <button type="submit" class="btn btn-lime btn-xl" style=${{ marginTop: '8px' }}>${t('common.log_in')}</button>
-          <div class="section-note">${t('login.demo_hint')}</div>
+          <button type="submit" class="btn btn-lime btn-xl" disabled=${busy} style=${{ marginTop: '8px' }}>${t('common.log_in')}</button>
           <a class="btn-link" href=${href('/')} style=${{ marginTop: '10px' }}>${t('common.back_public')}</a>
         </div>
       </form>

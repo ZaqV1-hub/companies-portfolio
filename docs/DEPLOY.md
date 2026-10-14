@@ -8,6 +8,8 @@ O site chama-se `CompaniesPortfolio` (ID 98) e usa a pasta `C:\Sites\AzureIIS\co
 
 O `web.config` do site encaminha somente `/api` para `http://127.0.0.1:4317/api`. URL Rewrite e ARR já estavam instalados. Para que imagens públicas possam ser lidas sem ampliar permissões para outros sites, a autenticação anônima deste site usa a identidade do seu application pool. A pasta do site e a pasta de uploads já concedem leitura a essa identidade.
 
+As áreas privadas abrem em `/empresa` e `/painel`. O `web.config` também encaminha essas rotas, os perfis públicos em `/org` e as páginas `/legal` para `index.html`. O script de publicação preserva o `web.config` já instalado no IIS; quando a regra de rotas mudar no repositório, atualize esse arquivo no site separadamente.
+
 ## API, serviço e logs
 
 A API usa Node.js 22.14.0 com Express e escuta apenas em `127.0.0.1:4317`. O serviço Windows chama-se `CompaniesPortfolioApi`, inicia automaticamente e reinicia após falha. Ele segue o padrão WinSW usado na VM. O wrapper e a configuração ficam em `C:\Services\CompaniesPortfolioApi`; o código executável está em `C:\Services\CompaniesPortfolioApi\app\server`.
@@ -43,6 +45,8 @@ $npm = 'C:\Lumi\runtime\node-v22.14.0-win-x64\node_modules\npm\bin\npm-cli.js'
 A migração verifica a conexão com o banco já existente e cria apenas as tabelas da aplicação. O seed carrega os arquivos de `data/seed/`, preserva os IDs e gera hashes para as senhas. Ele inclui os registros marcados como demo. Não rode o seed ou `reset-demo` durante uma atualização normal, pois essas operações podem regravar dados de demonstração.
 
 Uploads ficam em `C:\CompaniesPortfolioData\uploads`, fora do código. O IIS publica essa pasta no caminho `/uploads`; a identidade do application pool lê os arquivos e o SID do serviço grava neles. A API valida tipo, dimensão e tamanho e sanitiza SVG antes de gravar.
+
+Os usuários, sessões, perfis e registros do CRM ficam no banco MySQL da VM. As imagens enviadas ficam na pasta de uploads da VM, e o banco guarda os caminhos usados pelos perfis. As áreas de empresa e equipe exigem login por e-mail e senha; a antiga entrada de demonstração sem senha foi removida.
 
 ## Backup da versão estática anterior
 

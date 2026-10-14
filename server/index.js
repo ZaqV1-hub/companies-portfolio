@@ -1,9 +1,6 @@
 import crypto from 'node:crypto';
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { promisify } from 'node:util';
-import { execFile } from 'node:child_process';
-import { fileURLToPath } from 'node:url';
 import express from 'express';
 import session from 'express-session';
 import rateLimit from 'express-rate-limit';
@@ -18,7 +15,6 @@ import { validateDraft } from '../src/lib/profileValidation.js';
 import { businessDaysBetween } from '../src/lib/crm.js';
 
 const pool = createPool();
-const execFileAsync = promisify(execFile);
 const app = express();
 const port = Number(process.env.API_PORT || 4317);
 const demoMode = process.env.DEMO_MODE === 'true';
@@ -762,29 +758,6 @@ app.put('/api/team/settings', requireRole('team'), async (req, res) => {
     res.json({ ok: true });
   } catch (error) { routeError(res, error); }
 });
-
-if (demoMode) {
-  app.post('/api/demo/login-as', async (req, res) => {
-    try {
-      const [rows] = await pool.execute('SELECT u.*, o.name AS organization_name FROM users u LEFT JOIN organizations o ON o.id=u.organization_id WHERE u.id=? AND u.is_demo=1', [req.body.user_id]);
-      if (!rows.length) return res.status(404).json({ ok: false, error: 'not_found' });
-      await new Promise((resolve,reject)=>req.session.regenerate((err)=>err?reject(err):resolve()));
-      req.session.user = { id: rows[0].id, role: rows[0].role };
-      res.json({ ok: true, user: safeUser(rows[0], rows[0].organization_name) });
-    } catch (error) { routeError(res, error); }
-  });
-  app.get('/api/demo/company-accounts', async (_req, res) => {
-    try { const [rows] = await pool.query("SELECT u.id AS user_id, COALESCE(o.name,u.organization_id) AS organization_name FROM users u LEFT JOIN organizations o ON o.id=u.organization_id WHERE u.is_demo=1 AND u.role='company_user' ORDER BY organization_name"); res.json(rows); }
-    catch (error) { routeError(res, error); }
-  });
-  app.post('/api/demo/reset', requireRole('team'), async (_req,res) => {
-    try {
-      const seedPath = new URL('./db/seed.js',import.meta.url);
-      await execFileAsync(process.execPath,[fileURLToPath(seedPath),'--reset-demo'],{cwd:path.dirname(fileURLToPath(seedPath)),env:process.env,windowsHide:true});
-      res.json({ok:true});
-    } catch(error) { routeError(res,error); }
-  });
-}
 
 app.use('/api', (_req, res) => res.status(404).json({ error: 'not_found' }));
 let httpServer;
