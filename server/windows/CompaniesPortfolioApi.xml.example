@@ -1,0 +1,14 @@
+<service>
+  <id>CompaniesPortfolioApi</id>
+  <name>CompaniesPortfolio API</name>
+  <description>Companies Portfolio Node.js API</description>
+  <executable>%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe</executable>
+  <arguments>-NoProfile -NonInteractive -ExecutionPolicy Bypass -File "C:\Services\CompaniesPortfolioApi\run-api.ps1" -AppRoot "C:\Services\CompaniesPortfolioApi\app\server" -NodeExe "C:\Lumi\runtime\node-v22.14.0-win-x64\node.exe" -EnvFile "C:\Secrets\companiesportfolio\test.env"</arguments>
+  <logpath>C:\Services\CompaniesPortfolioApi\logs</logpath>
+  <log mode="roll-by-size">
+    <sizeThreshold>10485760</sizeThreshold>
+    <keepFiles>5</keepFiles>
+  </log>
+  <onfailure action="restart" delay="10 sec" />
+  <resetfailure>1 hour</resetfailure>
+</service>

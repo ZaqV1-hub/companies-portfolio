@@ -99,7 +99,7 @@ function Verify({ userId, token, email, onVerified }) {
     if (res.ok) onVerified(res.user);
   };
   const resend = async () => {
-    const res = await api.resendVerification(userId);
+    const res = await api.resendVerification(email);
     if (res.ok) { setToken(res.verification_token); setSent(true); }
   };
   return html`<div class="auth-form verify">
