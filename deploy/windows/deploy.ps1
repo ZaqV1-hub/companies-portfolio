@@ -29,7 +29,7 @@
 #>
 [CmdletBinding()]
 param(
-  [string] $SourceRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path,
+  [string] $SourceRoot = '',
   [string] $SiteRoot = 'C:\Sites\AzureIIS\companiesportfolio',
   [string] $AppRoot = 'C:\Services\CompaniesPortfolioApi\app',
   [string] $BackupRoot = 'C:\Sites\AzureIIS\backups',
@@ -46,6 +46,7 @@ param(
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+if (-not $SourceRoot) { $SourceRoot = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path }
 
 # Public front: only these go to the IIS folder (docs, tools, server, seed and originals stay out).
 $FrontDirs = @('src', 'i18n', 'assets', 'vendor')

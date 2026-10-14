@@ -78,11 +78,11 @@ O script nunca roda o seed nem o `reset-demo` e não usa `iisreset`. Também nã
 
 O runner é um serviço Windows que busca os jobs no GitHub. Ele só faz conexões de saída (HTTPS para github.com); não abre nenhuma porta na VM.
 
-1. **Criar a conta de serviço** do runner, sem privilégios de administrador. Exemplo: usuário local `svc-cp-deploy`, com senha forte e que nunca expira.
+1. **Criar a conta de serviço** do runner, sem privilégios de administrador e com senha forte que nunca expira. Esta VM é um controlador de domínio (`A4BEDU`), por isso a conta usada é a conta de domínio `A4BEDU\svc-cp-deploy`; não há contas locais nesta máquina.
 2. **Dar à conta só as permissões necessárias** (PowerShell como administrador):
 
    ```powershell
-   $acct = "$env:COMPUTERNAME\svc-cp-deploy"
+   $acct = 'A4BEDU\svc-cp-deploy'
    icacls 'C:\Sites\AzureIIS\companiesportfolio' /grant "${acct}:(OI)(CI)M"
    icacls 'C:\Services\CompaniesPortfolioApi\app' /grant "${acct}:(OI)(CI)M"
    icacls 'C:\Sites\AzureIIS\backups' /grant "${acct}:(OI)(CI)M"
@@ -101,12 +101,12 @@ O runner é um serviço Windows que busca os jobs no GitHub. Ele só faz conexõ
    sc.exe sdset CompaniesPortfolioApi $newSd
    ```
 
-3. **Registrar o runner**: no GitHub, abra **Settings → Actions → Runners → New self-hosted runner → Windows (x64)** e siga os comandos de download da página numa pasta como `C:\actions-runner-companiesportfolio`. Na configuração, use o token mostrado na página:
+3. **Registrar o runner**: no GitHub, abra **Settings → Actions → Runners → New self-hosted runner → Windows (x64)** e siga os comandos de download da página na pasta `C:\actions-runner-companiesportfolio`, usada nesta VM. Na configuração, use o token mostrado na página:
 
    ```powershell
    .\config.cmd --url https://github.com/ZaqV1-hub/companies-portfolio --token <TOKEN-DA-PAGINA> `
      --name companiesportfolio-vm --labels companiesportfolio --work _work `
-     --runasservice --windowslogonaccount "$env:COMPUTERNAME\svc-cp-deploy" --windowslogonpassword '<senha>'
+     --runasservice --windowslogonaccount 'A4BEDU\svc-cp-deploy' --windowslogonpassword '<senha>'
    ```
 
    O rótulo `companiesportfolio` é o que o workflow procura (junto com `self-hosted` e `windows`, que o runner já recebe sozinho). O token de registro vale por uma hora e não deve ser guardado.
