@@ -84,11 +84,15 @@ O runner é um serviço Windows que busca os jobs no GitHub. Ele só faz conexõ
    ```powershell
    $acct = 'A4BEDU\svc-cp-deploy'
    icacls 'C:\Sites\AzureIIS\companiesportfolio' /grant "${acct}:(OI)(CI)M"
+   icacls 'C:\Services\CompaniesPortfolioApi' /grant "${acct}:RX"
    icacls 'C:\Services\CompaniesPortfolioApi\app' /grant "${acct}:(OI)(CI)M"
    icacls 'C:\Sites\AzureIIS\backups' /grant "${acct}:(OI)(CI)M"
+   icacls 'C:\Secrets\companiesportfolio' /grant "${acct}:RX"
    icacls 'C:\Secrets\companiesportfolio\test.env' /grant "${acct}:R"
    icacls 'C:\Lumi\runtime\node-v22.14.0-win-x64' /grant "${acct}:(OI)(CI)RX"
    ```
+
+   As permissões `RX` nas pastas pais da API e do ambiente permitem à conta acessar somente os caminhos necessários dentro delas. O script põe o Node 22 no início do `PATH` ao chamar o npm, inclusive para os comandos filhos de migração.
 
    Permissão para parar e iniciar **somente** o `CompaniesPortfolioApi`:
 

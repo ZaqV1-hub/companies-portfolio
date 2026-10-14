@@ -69,11 +69,14 @@ function Invoke-Mirror([string] $From, [string] $To, [string[]] $Extra = @()) {
 
 function Invoke-Node([string[]] $Arguments, [string] $WorkingDirectory) {
   Push-Location -LiteralPath $WorkingDirectory
+  $previousPath = $env:PATH
+  $env:PATH = (Split-Path -Parent $NodeExe) + ';' + $previousPath
   $ErrorActionPreference = 'Continue'   # npm writes warnings to stderr; judge by exit code
   try {
     & $NodeExe @Arguments | Out-Host
     if ($LASTEXITCODE -ne 0) { throw "node $($Arguments -join ' ') failed with code $LASTEXITCODE" }
   } finally {
+    $env:PATH = $previousPath
     Pop-Location
   }
 }
