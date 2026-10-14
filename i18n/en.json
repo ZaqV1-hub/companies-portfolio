@@ -143,7 +143,8 @@
     "nav_review": "Review queue",
     "nav_orgs": "Organizations",
     "nav_crm": "Contacts registry",
-    "nav_settings": "Settings"
+    "nav_settings": "Settings",
+    "nav_documents": "Documents"
   },
   "profile_type": {
     "A": "Drug Discovery & Product Development",
@@ -1132,6 +1133,31 @@
     "apex_strategic_category": "Strategic category",
     "apex_notes": "Service notes",
     "apex_continuity": "Continuity per year (calculated)"
+  },
+  "documents": {
+    "title": "Program documents",
+    "intro": "Guides and materials about opportunities in the portfolio.",
+    "empty": "Published documents will appear here.",
+    "view": "View",
+    "open_new_tab": "Open PDF in a new tab",
+    "manage_title": "Home page documents",
+    "manage_intro": "Upload PDFs and choose which ones appear beside the directory filters.",
+    "add": "Add document",
+    "title_pt": "Portuguese title",
+    "title_en": "English title",
+    "file": "PDF file",
+    "limit": "PDF only, up to 25 MB. The file is stored on the VM.",
+    "upload": "Upload PDF",
+    "list": "Uploaded documents",
+    "empty_admin": "No documents uploaded.",
+    "published": "Published",
+    "draft": "Hidden",
+    "save": "Save titles",
+    "publish": "Publish",
+    "unpublish": "Hide",
+    "delete": "Remove",
+    "confirm_delete": "Permanently remove this document?",
+    "error": "Could not save the document. Check the PDF and try again."
   },
   "settings": {
     "title": "Settings",

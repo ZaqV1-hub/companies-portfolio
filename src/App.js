@@ -3,12 +3,12 @@ import { html, useEffect, useState } from './lib/html.js';
 import * as api from './services/api.js?v=20261014-legal1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
-import { TopBar } from './components/TopBar.js';
+import { TopBar } from './components/TopBar.js?v=20261014-documents1';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-legal1';
-import { AppShell } from './components/AppShell.js';
-import { DirectoryPage } from './pages/public/DirectoryPage.js';
+import { AppShell } from './components/AppShell.js?v=20261014-documents1';
+import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-documents1';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-profile1';
-import { LoginPage } from './pages/LoginPage.js?v=20261014-legal1';
+import { LoginPage } from './pages/LoginPage.js?v=20261014-documents1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-profile1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { ContactsListPage } from './pages/crm/ContactsListPage.js';
@@ -16,12 +16,12 @@ import { NewContactPage } from './pages/crm/NewContactPage.js';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js';
 import { CrmDashboardPage } from './pages/team/CrmDashboardPage.js';
 import { SettingsPage } from './pages/team/SettingsPage.js';
+import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-documents1';
 
 function PublicFooter() {
   const { t } = useI18n();
   return html`<footer class="public-footer">
     <span>${t('profile.footer')}</span>
-    <a href=${href('/team')}>${t('topbar.team_access')}</a>
   </footer>`;
 }
 
@@ -63,6 +63,7 @@ function TeamArea({ user, route, onLogout }) {
     { key: 'orgs', label: t('app.nav_orgs'), href: href('/team/orgs') },
     { key: 'crm', label: t('app.nav_crm'), href: href('/team/crm') },
     { key: 'settings', label: t('app.nav_settings'), href: href('/team/settings') },
+    { key: 'documents', label: t('app.nav_documents'), href: href('/team/documents') },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
   if (section === 'review' && route.parts[2]) content = html`<${ReviewPage} key=${route.parts[2]} versionId=${route.parts[2]} />`;
@@ -72,6 +73,7 @@ function TeamArea({ user, route, onLogout }) {
   else if (section === 'crm' && route.parts[2]) content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/team/crm" team=${true} />`;
   else if (section === 'crm') content = html`<${CrmDashboardPage} />`;
   else if (section === 'settings') content = html`<${SettingsPage} />`;
+  else if (section === 'documents') content = html`<${DocumentsPage} />`;
   else content = html`<${NotFound} />`;
   return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }

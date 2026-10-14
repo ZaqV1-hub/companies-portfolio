@@ -49,6 +49,8 @@ A migração verifica a conexão com o banco já existente e cria apenas as tabe
 
 Uploads ficam em `C:\CompaniesPortfolioData\uploads`, fora do código. O IIS publica essa pasta no caminho `/uploads`; a identidade do application pool lê os arquivos e o SID do serviço grava neles. A API valida tipo, dimensão e tamanho e sanitiza SVG antes de gravar.
 
+Os PDFs publicados pela equipe ficam em `C:\CompaniesPortfolioData\documents` (ou no caminho definido por `DOCUMENT_ROOT`), fora da pasta pública do IIS. Só a API serve documentos publicados, por `/api/public/documents/:id/file`. A equipe envia e gerencia os PDFs em `/painel/documents`; a página inicial os mostra ao lado dos filtros. Inclua essa pasta no plano de backup dos dados, junto com `uploads`. A publicação automática do código não apaga nem copia essas pastas.
+
 Os usuários, sessões, perfis e registros do CRM ficam no banco MySQL da VM. As imagens enviadas ficam na pasta de uploads da VM, e o banco guarda os caminhos usados pelos perfis. As áreas de empresa e equipe exigem login por e-mail e senha; a antiga entrada de demonstração sem senha foi removida.
 
 ## Backup da versão estática anterior

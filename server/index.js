@@ -111,7 +111,7 @@ app.get('/api/health', async (_req, res) => {
 
 app.get('/api/public/organizations', async (_req, res) => {
   try {
-    const [orgs] = await pool.query("SELECT * FROM organizations WHERE public_state IN ('published','provisional') ORDER BY is_featured DESC, name");
+    const [orgs] = await pool.query("SELECT * FROM organizations WHERE public_state IN ('published','provisional') ORDER BY name");
     if (!orgs.length) return res.json([]);
     const ids = orgs.map((org) => org.id);
     const [projects] = await pool.query(`SELECT id, organization_id, profile_type, sort_order, summary, fields FROM projects WHERE organization_id IN (${ids.map(() => '?').join(',')}) ORDER BY sort_order`, ids);
@@ -593,6 +593,64 @@ app.get('/api/team/contacts/dashboard', requireRole('team'), async (req,res) => 
 
 const upload = multer({ storage:multer.memoryStorage(), limits:{ fileSize:20*1024*1024, files:1 } });
 const uploadRoot = path.resolve(process.env.UPLOAD_ROOT || 'C:/CompaniesPortfolioData/uploads');
+const documentRoot = path.resolve(process.env.DOCUMENT_ROOT || path.join(uploadRoot, '..', 'documents'));
+const documentUpload = multer({ storage:multer.memoryStorage(), limits:{ fileSize:25*1024*1024, files:1 } });
+const documentFields = 'id,title_pt,title_en,original_name,published,created_at,updated_at';
+const documentView = (row) => ({ ...row, published:Boolean(row.published), url:`/api/public/documents/${row.id}/file` });
+async function sendDocument(req, res, publicOnly) {
+  try {
+    const [rows] = await pool.execute(`SELECT stored_name,original_name FROM public_documents WHERE id=?${publicOnly ? ' AND published=TRUE' : ''}`, [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error:'not_found' });
+    const file = path.join(documentRoot, rows[0].stored_name);
+    res.set('Content-Type', 'application/pdf');
+    res.set('Content-Disposition', `inline; filename="${rows[0].stored_name}"`);
+    res.sendFile(file);
+  } catch (error) { routeError(res,error); }
+}
+app.get('/api/public/documents', async (_req,res) => {
+  try { const [rows]=await pool.query(`SELECT ${documentFields} FROM public_documents WHERE published=TRUE ORDER BY created_at DESC`); res.json(rows.map(documentView)); }
+  catch(error){ routeError(res,error); }
+});
+app.get('/api/public/documents/:id/file', (req,res) => sendDocument(req,res,true));
+app.get('/api/team/documents', requireRole('team'), async (_req,res) => {
+  try { const [rows]=await pool.query(`SELECT ${documentFields} FROM public_documents ORDER BY created_at DESC`); res.json(rows.map(documentView)); }
+  catch(error){ routeError(res,error); }
+});
+app.get('/api/team/documents/:id/file', requireRole('team'), (req,res) => sendDocument(req,res,false));
+app.post('/api/team/documents', requireRole('team'), documentUpload.single('file'), async (req,res) => {
+  const titlePt=String(req.body?.title_pt||'').trim();
+  const titleEn=String(req.body?.title_en||'').trim();
+  const file=req.file;
+  if (!titlePt || !titleEn || titlePt.length>160 || titleEn.length>160 || !file || file.mimetype!=='application/pdf' || !file.buffer.subarray(0,5).equals(Buffer.from('%PDF-')))
+    return res.status(400).json({ error:'invalid_document' });
+  const id=crypto.randomUUID();
+  const storedName=`${id}.pdf`;
+  try {
+    await fs.mkdir(documentRoot,{recursive:true});
+    await fs.writeFile(path.join(documentRoot,storedName),file.buffer,{flag:'wx'});
+    await pool.execute('INSERT INTO public_documents (id,title_pt,title_en,original_name,stored_name,published,created_at,updated_at) VALUES (?,?,?,?,?,FALSE,UTC_TIMESTAMP(),UTC_TIMESTAMP())',
+      [id,titlePt,titleEn,path.basename(file.originalname).slice(0,255),storedName]);
+    res.status(201).json({ ok:true,id });
+  } catch(error) { await fs.unlink(path.join(documentRoot,storedName)).catch(()=>{}); routeError(res,error); }
+});
+app.patch('/api/team/documents/:id', requireRole('team'), async (req,res) => {
+  const titlePt=String(req.body?.title_pt||'').trim();
+  const titleEn=String(req.body?.title_en||'').trim();
+  const published=req.body?.published;
+  if (!titlePt || !titleEn || titlePt.length>160 || titleEn.length>160 || typeof published!=='boolean') return res.status(400).json({ error:'invalid_document' });
+  try { const [result]=await pool.execute('UPDATE public_documents SET title_pt=?,title_en=?,published=?,updated_at=UTC_TIMESTAMP() WHERE id=?', [titlePt,titleEn,published,req.params.id]);
+    if(!result.affectedRows)return res.status(404).json({error:'not_found'});
+    res.json({ok:true});
+  } catch(error){routeError(res,error);}
+});
+app.delete('/api/team/documents/:id', requireRole('team'), async (req,res) => {
+  try { const [rows]=await pool.execute('SELECT stored_name FROM public_documents WHERE id=?',[req.params.id]);
+    if(!rows.length)return res.status(404).json({error:'not_found'});
+    await pool.execute('DELETE FROM public_documents WHERE id=?',[req.params.id]);
+    await fs.unlink(path.join(documentRoot,rows[0].stored_name)).catch(()=>{});
+    res.json({ok:true});
+  } catch(error){routeError(res,error);}
+});
 function numericSvgLength(value) { const match = String(value || '').match(/^\s*(\d+(?:\.\d+)?)(?:px)?\s*$/i); return match ? Number(match[1]) : null; }
 function sanitizeSvg(source) {
   const doc = new DOMParser({ onError: (_level, message) => { throw new Error(`invalid_svg:${message}`); } }).parseFromString(source, 'image/svg+xml');

@@ -1,20 +1,22 @@
-// Directory / home (spec 1, 6.1): top bar, program presentation, featured, search and filters, cards.
+// Directory / home: program presentation, search and filters, documents, company cards.
 import { html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js';
+import * as api from '../../services/api.js?v=20261014-documents1';
 import { useI18n } from '../../lib/i18n.js';
 import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js';
-import { OrgCard } from '../../components/OrgCard.js';
+import { OrgCard } from '../../components/OrgCard.js?v=20261014-documents1';
 import { EMPTY_FILTERS, FILTER_DEFS, activeFilterCount, matchesFilters, matchingProject } from '../../lib/directoryFilters.js';
 
 export function DirectoryPage() {
-  const { t, label } = useI18n();
+  const { t, label, lang } = useI18n();
   const [orgs, setOrgs] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [selectedDocument, setSelectedDocument] = useState(null);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(EMPTY_FILTERS);
   const profile = filters.profile;
   const setFilter = (key, value) => setFilters({ ...filters, [key]: value });
 
-  useEffect(() => { api.listPublicOrganizations().then(setOrgs); }, []);
+  useEffect(() => { api.listPublicOrganizations().then(setOrgs); api.listPublicDocuments().then(setDocuments).catch(()=>setDocuments([])); }, []);
 
   const filtered = useMemo(() => {
     if (!orgs) return [];
@@ -23,7 +25,6 @@ export function DirectoryPage() {
   }, [orgs, query, filters]);
 
   if (!orgs) return html`<div class="section">${t('common.loading')}</div>`;
-  const featured = orgs.filter((o) => o.is_featured);
   const projectCount = orgs.reduce((n, o) => n + o.projects.length, 0);
 
   return html`<div>
@@ -43,12 +44,7 @@ export function DirectoryPage() {
       </div>
     </section>
 
-    ${featured.length > 0 && html`<section class="section" style=${{ paddingTop: '56px', paddingBottom: '8px', marginTop: '0' }}>
-      <div class="section-head"><h2 class="h2">${t('home.featured')}</h2><div class="section-note">${t('home.featured_note')}</div></div>
-      <div class="grid-featured">${featured.slice(0, 3).map((o) => html`<${OrgCard} key=${o.id} org=${o} featured=${true} />`)}</div>
-    </section>`}
-
-    <div class="search-wrap" style=${featured.length ? { marginTop: '48px' } : null}>
+    <div class="search-wrap discovery-layout">
       <div class="search-card">
         <input class="input" type="search" value=${query} placeholder=${t('home.search_placeholder')} onInput=${(e) => setQuery(e.target.value)} />
         <div class="chips">
@@ -66,6 +62,11 @@ export function DirectoryPage() {
           ${activeFilterCount(filters) > 0 && html`<button type="button" class="btn-link filters-clear" onClick=${() => setFilters(EMPTY_FILTERS)}>${t('filters.clear')}</button>`}
         </div>
       </div>
+      <aside class="home-documents" aria-label=${t('documents.title')}>
+        <div class="home-documents-head"><span class="home-documents-icon" aria-hidden="true">PDF</span><h2>${t('documents.title')}</h2></div>
+        <p>${t('documents.intro')}</p>
+        ${documents.length ? html`<div class="home-document-list">${documents.map((document)=>html`<button type="button" class="home-document" key=${document.id} onClick=${()=>setSelectedDocument(document)}><span class="home-document-name">${lang==='pt' ? document.title_pt : document.title_en}</span><span class="home-document-view">${t('documents.view')} ↗</span></button>`)}</div>` : html`<p class="home-documents-empty">${t('documents.empty')}</p>`}
+      </aside>
     </div>
 
     <section class="section">
@@ -75,5 +76,11 @@ export function DirectoryPage() {
         ? html`<div class="grid-cards">${filtered.map((o) => html`<${OrgCard} key=${o.id} org=${o} project=${matchingProject(o, filters)} />`)}</div>`
         : html`<div class="empty-state"><strong>${t('home.no_results_title')}</strong>${t('home.no_results_text')}</div>`}
     </section>
+    ${selectedDocument && html`<div class="doc-modal-backdrop" onClick=${(event)=>{if(event.target===event.currentTarget)setSelectedDocument(null)}}>
+      <div class="doc-modal" role="dialog" aria-modal="true" aria-label=${lang==='pt' ? selectedDocument.title_pt : selectedDocument.title_en}>
+        <div class="doc-modal-head"><strong>${lang==='pt' ? selectedDocument.title_pt : selectedDocument.title_en}</strong><div><a class="btn btn-outline" href=${selectedDocument.url} target="_blank" rel="noopener">${t('documents.open_new_tab')}</a><button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${()=>setSelectedDocument(null)}>×</button></div></div>
+        <iframe title=${lang==='pt' ? selectedDocument.title_pt : selectedDocument.title_en} src=${selectedDocument.url}></iframe>
+      </div>
+    </div>`}
   </div>`;
 }

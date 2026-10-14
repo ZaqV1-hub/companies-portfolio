@@ -35,6 +35,7 @@ export async function init() { await request('/health'); }
 export async function listPublicOrganizations() { return request('/public/organizations'); }
 export async function getPublicOrganization(id) { try { return await request(`/public/organizations/${q(id)}`); } catch (error) { if (error.status === 404) return null; throw error; } }
 export async function getPublicSettings() { return request('/public/settings'); }
+export async function listPublicDocuments() { return request('/public/documents'); }
 
 export async function getCurrentUser() { try { return await request('/me'); } catch (error) { if (error.status === 401) return null; throw error; } }
 export async function login(email, password, role) { return post('/auth/login', { email, password, role }); }
@@ -82,3 +83,14 @@ export async function mergeInstitutions(keepId, dropId) { return post('/team/mer
 export async function getCrmDashboard(year) { return request(`/team/contacts/dashboard?year=${q(year)}`); }
 export async function getSettings() { return request('/team/settings'); }
 export async function updateSettings(patch) { return put('/team/settings', patch); }
+export async function listTeamDocuments() { return request('/team/documents'); }
+export async function uploadDocument(file, titlePt, titleEn) {
+  const form = new FormData();
+  form.append('file', file); form.append('title_pt', titlePt); form.append('title_en', titleEn);
+  const response = await fetch('/api/team/documents', { method:'POST', credentials:'same-origin', body:form });
+  const result = await response.json().catch(() => null);
+  if (!response.ok) throw new Error(result?.error || `http_${response.status}`);
+  return result;
+}
+export async function updateDocument(id, data) { return request(`/team/documents/${q(id)}`, { method:'PATCH', body:data }); }
+export async function deleteDocument(id) { return request(`/team/documents/${q(id)}`, { method:'DELETE' }); }

@@ -143,7 +143,8 @@
     "nav_review": "Fila de revisão",
     "nav_orgs": "Organizações",
     "nav_crm": "Registro de contatos",
-    "nav_settings": "Configurações"
+    "nav_settings": "Configurações",
+    "nav_documents": "Documentos"
   },
   "profile_type": {
     "A": "Desenvolvimento de produto",
@@ -1132,6 +1133,31 @@
     "apex_strategic_category": "Categoria estratégica",
     "apex_notes": "Observações do atendimento",
     "apex_continuity": "Continuidade por ano (calculado)"
+  },
+  "documents": {
+    "title": "Documentos do programa",
+    "intro": "Guias e materiais para conhecer as oportunidades do portfólio.",
+    "empty": "Os documentos publicados aparecerão aqui.",
+    "view": "Visualizar",
+    "open_new_tab": "Abrir PDF em outra aba",
+    "manage_title": "Documentos da página inicial",
+    "manage_intro": "Envie PDFs e escolha quais aparecem ao lado dos filtros do diretório.",
+    "add": "Adicionar documento",
+    "title_pt": "Título em português",
+    "title_en": "Título em inglês",
+    "file": "Arquivo PDF",
+    "limit": "Somente PDF, até 25 MB. O arquivo fica salvo na VM.",
+    "upload": "Enviar PDF",
+    "list": "Documentos enviados",
+    "empty_admin": "Nenhum documento enviado.",
+    "published": "Publicado",
+    "draft": "Oculto",
+    "save": "Salvar títulos",
+    "publish": "Publicar",
+    "unpublish": "Ocultar",
+    "delete": "Remover",
+    "confirm_delete": "Remover este documento permanentemente?",
+    "error": "Não foi possível salvar o documento. Confira o PDF e tente novamente."
   },
   "settings": {
     "title": "Configurações",

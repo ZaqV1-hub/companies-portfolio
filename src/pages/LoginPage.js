@@ -3,7 +3,7 @@ import { html, useState } from '../lib/html.js';
 import * as api from '../services/api.js?v=20261014-legal1';
 import { useI18n } from '../lib/i18n.js';
 import { href, navigate } from '../lib/router.js';
-import { LangSwitch } from '../components/LangSwitch.js';
+import { LangSwitch } from '../components/LangSwitch.js?v=20261014-documents1';
 
 export function LoginPage({ role, onLoggedIn }) {
   const { t } = useI18n();

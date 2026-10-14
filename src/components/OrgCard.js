@@ -1,6 +1,6 @@
 // Directory card (spec 1, 6.1): logo, name, profile chip, subtitle, 2 lines of description,
 // stage (profiles A and B), "What we're looking for" summary, number of projects; "Updating" badge when provisional.
-import { cx, html } from '../lib/html.js';
+import { html } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
 import { lookingForSummary, stage, subtitle } from '../lib/profileModel.js';
 import { href } from '../lib/router.js';
@@ -16,13 +16,13 @@ function CardStage({ project, i18n }) {
   </div>`;
 }
 
-export function OrgCard({ org, featured, project: shown }) {
+export function OrgCard({ org, project: shown }) {
   const i18n = useI18n();
   const { t, tx } = i18n;
   const project = shown || org.projects[0];
   const n = org.projects.length;
   const summary = lookingForSummary(project, i18n);
-  return html`<a class=${cx('card', featured && 'featured')} href=${href('/org/' + org.id + (project !== org.projects[0] ? '?project=' + project.id : ''))}>
+  return html`<a class="card" href=${href('/org/' + org.id + (project !== org.projects[0] ? '?project=' + project.id : ''))}>
     <div class="card-cover" style=${org.cover_url ? { backgroundImage: "linear-gradient(165deg, rgba(20,27,52,.18), rgba(20,27,52,.5)), url('" + org.cover_url + "')" } : null}>
       <${LogoPlate} org=${org} className="logo-plate" />
       ${org.public_state === 'provisional' && html`<span class="cover-badge updating">${t('common.updating')}</span>`}
@@ -40,7 +40,7 @@ export function OrgCard({ org, featured, project: shown }) {
           ${summary && html`<div class="card-metric">${summary}</div>`}
           ${n > 1 && html`<div class="card-projects">${t('common.projects_count', { n })}</div>`}
         </div>
-        <div class="card-more">${featured ? t('home.view_profile') : t('home.view_more')}</div>
+        <div class="card-more">${t('home.view_more')}</div>
       </div>
     </div>
   </a>`;

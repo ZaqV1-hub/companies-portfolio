@@ -7,6 +7,6 @@ export function LangSwitch({ dark }) {
   return html`
     <div class=${cx('lang-switch', dark && 'on-dark')} role="group" aria-label=${t('common.language')}>
       ${LANGS.map((l) => html`
-        <button key=${l} type="button" aria-pressed=${lang === l} onClick=${() => setLang(l)}>${t('common.lang_' + l)}</button>`)}
+        <button key=${l} type="button" aria-label=${t('common.lang_' + l)} aria-pressed=${lang === l} onClick=${() => setLang(l)}><img src=${`assets/img/flag-${l}.svg`} alt="" />${t('common.lang_' + l)}</button>`)}
     </div>`;
 }
