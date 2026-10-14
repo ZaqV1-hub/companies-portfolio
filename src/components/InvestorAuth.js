@@ -1,6 +1,6 @@
 // Investor welcome, verified sign-up, login and password recovery.
 import { html, useEffect, useState } from '../lib/html.js';
-import * as api from '../services/api.js';
+import * as api from '../services/api.js?v=20261014-auth1';
 import { useI18n } from '../lib/i18n.js';
 import { countryOptions } from '../lib/countries.js';
 

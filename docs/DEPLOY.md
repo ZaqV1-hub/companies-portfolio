@@ -10,6 +10,7 @@ O `web.config` do site encaminha somente `/api` para `http://127.0.0.1:4317/api`
 
 As áreas privadas abrem em `/empresa` e `/painel`. O `web.config` também encaminha essas rotas, os perfis públicos em `/org` e as páginas `/legal` para `index.html`. O script de publicação preserva o `web.config` já instalado no IIS; quando a regra de rotas mudar no repositório, atualize esse arquivo no site separadamente.
 Os links de confirmação e recuperação usam `/verify-email` e `/reset-password`; essas rotas também precisam apontar para `index.html` no IIS.
+O IIS desabilita cache dos arquivos estáticos deste protótipo para que o navegador carregue imediatamente o JavaScript novo depois de cada publicação.
 
 ## API, serviço e logs
 

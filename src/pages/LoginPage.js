@@ -1,6 +1,6 @@
 // Login for company users and the program team.
 import { html, useState } from '../lib/html.js';
-import * as api from '../services/api.js';
+import * as api from '../services/api.js?v=20261014-auth1';
 import { useI18n } from '../lib/i18n.js';
 import { href, navigate } from '../lib/router.js';
 import { LangSwitch } from '../components/LangSwitch.js';

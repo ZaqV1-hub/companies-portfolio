@@ -1,14 +1,14 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js';
+import * as api from './services/api.js?v=20261014-auth1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-auth1';
 import { AppShell } from './components/AppShell.js';
 import { DirectoryPage } from './pages/public/DirectoryPage.js';
 import { ProfilePage } from './pages/public/ProfilePage.js';
-import { LoginPage } from './pages/LoginPage.js';
+import { LoginPage } from './pages/LoginPage.js?v=20261014-auth1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { ContactsListPage } from './pages/crm/ContactsListPage.js';
