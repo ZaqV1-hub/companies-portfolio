@@ -1,10 +1,11 @@
 // Entry point: loads translations and data, then mounts the app.
 import { html } from './lib/html.js';
 import { loadDictionaries } from './lib/i18n.js';
-import * as api from './services/api.js?v=20261014-public-access2';
-import { App } from './App.js?v=20261014-public-access2';
+import * as api from './services/api.js?v=20261014-api-recovery3';
+import { App } from './App.js?v=20261014-api-recovery3';
 
 async function start() {
+  document.getElementById('root').textContent = 'Conectando ao portfólio...';
   await Promise.all([loadDictionaries(), api.init()]);
   document.title = 'Companies Portfolio · Brazilian Pharma & Health';
   window.ReactDOM.createRoot(document.getElementById('root')).render(html`<${App} />`);
@@ -12,6 +13,5 @@ async function start() {
 
 start().catch((err) => {
   console.error(err);
-  document.getElementById('root').textContent = 'Could not start the app: ' + err.message
-    + ' — serve the folder over HTTP (see README).';
+  document.getElementById('root').textContent = 'Não foi possível carregar o portfólio. Atualize a página para tentar novamente.';
 });

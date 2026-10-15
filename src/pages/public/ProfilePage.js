@@ -1,9 +1,9 @@
 // Public profile page: loads the public organization and renders ProfileView.
 import { html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js';
+import * as api from '../../services/api.js?v=20261014-api-recovery3';
 import { useI18n } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261014-public-access2';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261014-api-recovery3';
 
 export function ProfilePage({ orgId, projectId, onRequestContact }) {
   const { t } = useI18n();

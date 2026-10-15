@@ -1,12 +1,26 @@
 // The single data gateway for the UI. Signatures and response shapes follow
 // docs/HANDOFF_CODEX.md; state and authorization live on the API server.
 async function request(path, { method = 'GET', body } = {}) {
-  const response = await fetch(`/api${path}`, {
-    method,
-    credentials: 'same-origin',
-    headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
-    body: body === undefined ? undefined : JSON.stringify(body),
-  });
+  let response;
+  while (true) {
+    try {
+      response = await fetch(`/api${path}`, {
+        method,
+        credentials: 'same-origin',
+        headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+    } catch (error) {
+      if (method !== 'GET') throw error;
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      continue;
+    }
+    if (method === 'GET' && [502, 503, 504].includes(response.status)) {
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      continue;
+    }
+    break;
+  }
   if (response.status === 204) return undefined;
   const result = await response.json().catch(() => null);
   if (!response.ok) {

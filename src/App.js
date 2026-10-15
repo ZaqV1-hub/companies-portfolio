@@ -1,21 +1,21 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261014-public-access2';
+import * as api from './services/api.js?v=20261014-api-recovery3';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261014-flags1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-public-access2';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-api-recovery3';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
-import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-public-access2';
-import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-public-access2';
+import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
+import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-api-recovery3';
 import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-public-access2';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-api-recovery3';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-public-access2';
-import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-public-access2';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-api-recovery3';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-api-recovery3';
 import { SettingsPage } from './pages/team/SettingsPage.js';
-import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-public-access2';
+import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
 
 function PublicFooter() {
   const { t } = useI18n();
