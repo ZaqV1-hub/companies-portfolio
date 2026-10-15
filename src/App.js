@@ -1,10 +1,10 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261014-legal1';
+import * as api from './services/api.js?v=20261014-investor-browse1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261014-flags1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-legal1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-investor-browse1';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-documents1';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-profile1';
@@ -12,8 +12,8 @@ import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-profile1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-crm-nobanner3';
-import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-crm-nobanner3';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-investor-browse1';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-investor-browse1';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-documents1';
 
@@ -109,13 +109,24 @@ function PublicSite({ route, user, setUser }) {
   const { t } = useI18n();
   const [first, second] = route.parts;
   const [auth, setAuth] = useState(null); // {mode, reason, pending: {org, projectId, resolve}}
+  const [browse, setBrowse] = useState(undefined);
   const investor = user && user.role === 'investor' ? user : null;
+  useEffect(() => { api.getInvestorBrowseStatus().then(setBrowse).catch(() => setBrowse({ valid:false })); }, []);
+  useEffect(() => {
+    if (!browse?.valid) return;
+    const remaining = browse.expires_at - Date.now();
+    if (remaining <= 0) { setBrowse({ valid:false }); return; }
+    const timer = setTimeout(() => setBrowse({ valid:false }), remaining);
+    return () => clearTimeout(timer);
+  }, [browse?.expires_at]);
+  const canBrowse = Boolean(investor || (browse?.valid && browse.expires_at > Date.now()));
+  const needsWelcome = first === 'org' && second && browse !== undefined && !canBrowse;
 
   // "Solicitar contato" only works for a logged-in investor; otherwise opens sign-up / login first.
   const requestContact = (org, projectId) => new Promise((resolve) => {
     const run = async () => resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null);
     if (investor && investor.email_verified) run();
-    else setAuth({ mode: 'welcome', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
+    else setAuth({ mode: 'login', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
   });
   const done = (u) => {
     setUser(u);
@@ -123,8 +134,9 @@ function PublicSite({ route, user, setUser }) {
     setAuth(null);
     if (pending) pending();
   };
-  const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); };
-  const logout = async () => { await api.logout(); setUser(null); };
+  const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); if (needsWelcome) navigate('/'); };
+  const browseDone = async (data) => { const access = await api.startInvestorBrowse(data); setBrowse(access); setAuth(null); };
+  const logout = async () => { await api.logout(); setUser(null); setBrowse({ valid:false }); };
   const [verifyError,setVerifyError] = useState(false);
   useEffect(() => {
     if (first !== 'verify-email') return;
@@ -135,16 +147,19 @@ function PublicSite({ route, user, setUser }) {
   }, [first,route.query.token]);
 
   let page;
-  if (first === 'org' && second) page = html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`;
+  if (first === 'org' && second) page = canBrowse
+    ? html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`
+    : html`<div class="section">${browse === undefined ? t('common.loading') : ''}</div>`;
   else if (first === 'verify-email') page = html`<div class="section"><h1 class="form-title">${t('investor.verify_title')}</h1><p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p></div>`;
   else if (first === 'reset-password') page = html`<${ResetPasswordPage} token=${route.query.token} />`;
   else if (first === 'legal') page = html`<${LegalPage} kind=${second === 'privacy' ? 'privacy' : 'terms'} />`;
   else page = html`<${DirectoryPage} />`;
   return html`<div class="page">
-    <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'welcome' })} onLogout=${logout} />
+    <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'login' })} onLogout=${logout} />
     ${page}
     <${PublicFooter} />
-    ${auth && html`<${InvestorAuthModal} initialMode=${auth.mode} reason=${auth.reason} prefill=${auth.prefill} onDone=${done} onClose=${close} />`}
+    ${(auth || needsWelcome) && html`<${InvestorAuthModal} key=${`${auth?.mode || 'welcome'}:${auth?.prefill?.email || ''}`}
+      initialMode=${auth?.mode || 'welcome'} reason=${auth?.reason} prefill=${auth?.prefill} onDone=${done} onGuest=${browseDone} onClose=${close} />`}
   </div>`;
 }
 

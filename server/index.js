@@ -19,6 +19,7 @@ const pool = createPool();
 const app = express();
 const port = Number(process.env.API_PORT || 4317);
 const investorSessionMs = 30 * 24 * 60 * 60 * 1000;
+const investorBrowseMs = 24 * 60 * 60 * 1000;
 const tokenHash = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
@@ -151,6 +152,24 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
 });
 app.post('/api/auth/logout', (req, res) => req.session.destroy((error) => error ? routeError(res, error) : res.status(204).end()));
 
+app.get('/api/investors/browse', (req, res) => {
+  const browse = req.session.investorBrowse;
+  res.json({ valid: Boolean(browse && browse.expiresAt > Date.now()), expires_at: browse?.expiresAt || null });
+});
+
+app.post('/api/investors/browse', signupLimiter, (req, res) => {
+  const name = String(req.body.name || '').trim();
+  const institution = String(req.body.institution || '').trim();
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (name.length < 2 || !institution || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    || !req.body.accept_terms || !req.body.accept_privacy) return res.status(400).json({ error:'invalid' });
+  const expiresAt = Date.now() + investorBrowseMs;
+  req.session.investorBrowse = { name, institution, email, expiresAt,
+    termsAcceptedAt: new Date().toISOString(), privacyAcceptedAt: new Date().toISOString() };
+  req.session.cookie.maxAge = investorBrowseMs;
+  req.session.save((error) => error ? routeError(res, error) : res.json({ valid:true, expires_at:expiresAt }));
+});
+
 app.post('/api/investors/email/start', signupLimiter, async (req, res) => {
   if (!mailAvailable()) return res.status(503).json({ ok: false, error: 'email_unavailable' });
   const email = String(req.body.email || '').trim().toLowerCase();
@@ -190,12 +209,14 @@ app.post('/api/investors', signupLimiter, async (req, res) => {
   const signup = req.session.investorSignup;
   if (!signup || Date.now() - signup.verifiedAt >= 24 * 60 * 60 * 1000 || String(data.email || '').trim().toLowerCase() !== signup.email)
     return res.status(403).json({ ok: false, error: 'email_not_verified' });
-  const required = ['name', 'institution', 'email', 'country', 'city', 'password'];
+  const required = ['name', 'institution', 'email', 'country', 'city', 'password', 'confirm_password'];
   const fields = required.filter((field) => !String(data[field] || '').trim());
   if (!data.accept_terms) fields.push('accept_terms');
   if (!data.accept_privacy) fields.push('accept_privacy');
   if (fields.length) return res.status(400).json({ ok: false, error: 'missing', fields });
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) || !/^[A-Za-z]{2}$/.test(data.country) || String(data.password).length < 10) return res.status(400).json({ ok: false, error: 'invalid' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email) || !/^[A-Za-z]{2}$/.test(data.country)
+    || String(data.password).length < 10 || data.password !== data.confirm_password)
+    return res.status(400).json({ ok: false, error: 'invalid' });
   const id = `u-${crypto.randomUUID()}`;
   const connection = await pool.getConnection();
   try {

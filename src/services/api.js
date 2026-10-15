@@ -54,6 +54,8 @@ export async function listOrganizationsForTeam() { return request('/team/organiz
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
 
 export async function registerInvestor(data) { return post('/investors', data); }
+export async function getInvestorBrowseStatus() { return request('/investors/browse'); }
+export async function startInvestorBrowse(data) { return post('/investors/browse', data); }
 export async function startInvestorEmail(data) { return post('/investors/email/start', data); }
 export async function confirmInvestorEmail(token) { return post('/investors/email/confirm', { token }); }
 export async function investorEmailStatus() { return request('/investors/email/status'); }
