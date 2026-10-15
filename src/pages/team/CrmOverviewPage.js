@@ -2,8 +2,8 @@ import { html, useEffect, useMemo, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { useI18n } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
-import { exportCrmPdf } from '../../lib/crmPdf.js?v=20261014-crm-pdf1';
-import { ContactTable, useContactRows } from '../crm/ContactsListPage.js?v=20261014-crm-pdf1';
+import { exportCrmPdf } from '../../lib/crmPdf.js?v=20261014-crm-chart2';
+import { ContactTable, useContactRows } from '../crm/ContactsListPage.js?v=20261014-crm-chart2';
 
 const date = (value) => value ? new Date(value).toISOString().slice(0, 10) : '';
 const today = () => date(new Date());
@@ -107,6 +107,12 @@ export function CrmOverviewPage({ team = true }) {
       site: activityFresh.filter((r) => r.relationship.origin === 'Portfólio' && within(date(r.relationship.created_at), first, last)).length });
   }
   const maxActivity = Math.max(1, ...activity.map((item) => item[metric]));
+  const activityName = { new:L('Novos contatos','New contacts'), inter:L('Interações','Interactions'),
+    meet:L('Reuniões','Meetings'), site:L('Pedidos pelo site','Website requests') }[metric];
+  const activityTotal = activity.reduce((sum, item) => sum + item[metric], 0);
+  const activityInterval = step === 1 ? L('dia','day') : step === 7 ? L('semana','week') : L('mês','month');
+  const activityCaption = L(`Cada coluna mostra ${activityName.toLowerCase()} por ${activityInterval}. Clique em uma coluna para filtrar o painel.`,
+    `Each column shows ${activityName.toLowerCase()} per ${activityInterval}. Click a column to filter the dashboard.`);
   const pick = (key) => (value) => setSelected((current) => ({ ...current, [key]: value }));
   const pickBucket = (item) => setSelected((current) => ({ ...current,
     bucket: current.bucket?.from === item.from ? null : { from: item.from, to: item.to } }));
@@ -121,7 +127,7 @@ export function CrmOverviewPage({ team = true }) {
       await exportCrmPdf({ lang, from: measureFrom, to: measureTo,
         company: companies.find(([id]) => id === filter.company)?.[1] || L('Todas as empresas','All companies'),
         demoCount: active.filter((r) => r.relationship.is_demo).length, metrics, activity, metric,
-        activityTitle: L('Atividade no período','Activity over time'),
+        activityTitle: L('Atividade no período','Activity over time'), activityName, activityInterval,
         chartTitles: { phases:L('Fases','Stages'), status:L('Situação','Status'), sla:L('Prazo de retorno','Response time'),
           origins:L('Origens','Sources'), types:L('Tipos de interação','Interaction types'),
           investors:L('Perfil do investidor','Investor profile'), companies:L('Contatos por empresa','Contacts by company') },
@@ -167,12 +173,26 @@ export function CrmOverviewPage({ team = true }) {
         <option value="all">${L('Todos','All')}</option><option value="real">${L('Somente reais','Real only')}</option><option value="demo">${L('Somente demo','Demo only')}</option></select></label></section>
     ${Object.values(selected).some(Boolean) && html`<div class="crm-cross">${L('Filtro de gráfico ativo','Chart filter active')} <button type="button" onClick=${() => setSelected({})}>${L('Limpar filtros','Clear filters')}</button></div>`}
     <section class="crm-viz-kpis">${metrics.map(([name, value]) => html`<div class="crm-viz-kpi" key=${name}><strong>${value}</strong><span>${name}</span></div>`)}</section>
-    <section class="crm-viz-card"><div class="crm-viz-head"><div><h2>${L('Atividade no período','Activity over time')}</h2><p>${L('Dados registrados no CRM, agrupados por dia, semana ou mês.','CRM activity grouped by day, week or month.')}</p></div>
+    <section class="crm-viz-card"><div class="crm-viz-head"><div><h2>${L('Atividade no período','Activity over time')}</h2><p>${activityCaption}</p></div>
       <div class="crm-periods">${[['new',L('Novos','New')],['inter',L('Interações','Interactions')],['meet',L('Reuniões','Meetings')],['site',L('Pedidos pelo site','Website requests')]]
         .map(([key, name]) => html`<button type="button" key=${key} class=${metric === key ? 'active' : ''} onClick=${() => setMetric(key)}>${name}</button>`)}</div></div>
-      <div class="crm-activity" role="group" aria-label=${L('Gráfico de atividade interativo','Interactive activity chart')}>${activity.map((item, index) => html`<button type="button" class=${selected.bucket?.from === item.from ? 'crm-activity-col selected' : 'crm-activity-col'} key=${index}
-        title=${`${item.label}: ${item[metric]}`} aria-label=${`${item.label}: ${item[metric]}`} aria-pressed=${selected.bucket?.from === item.from}
-        onClick=${() => pickBucket(item)}><span style=${{ height: `${Math.max(2, item[metric] / maxActivity * 100)}%` }}></span></button>`)}</div>
+      <div class="crm-activity-summary"><strong>${activityName}: ${activityTotal}</strong><span>${L('De','From')} ${from} ${L('até','to')} ${to} · ${L('Intervalo','Interval')}: ${activityInterval}</span></div>
+      ${activityTotal ? html`<div class="crm-activity-scroll"><div class="crm-activity-chart" style=${{minWidth:`${Math.max(480,activity.length * (step === 1 ? 40 : 76))}px`}}>
+        <div class="crm-activity-axis" aria-hidden="true"><span>${maxActivity}</span><span>${maxActivity / 2}</span><span>0</span></div>
+        <div class="crm-activity-plot" role="group" aria-label=${`${activityName} ${L('por','per')} ${activityInterval}`}>
+          <div class="crm-activity-grid" aria-hidden="true"><i></i><i></i><i></i></div>
+          ${activity.map((item, index) => { const barHeight = item[metric] / maxActivity * 136;
+            const showDate = activity.length <= (step === 1 ? 7 : 12) || index === 0 || index === activity.length - 1
+              || index % Math.ceil(activity.length / (step === 1 ? 7 : 12)) === 0;
+            return html`<button type="button" class=${selected.bucket?.from === item.from ? 'crm-activity-col selected' : 'crm-activity-col'} key=${index}
+              title=${`${item.from} – ${item.to}: ${item[metric]} ${activityName.toLowerCase()}`}
+              aria-label=${`${item.from} – ${item.to}: ${item[metric]} ${activityName.toLowerCase()}`}
+              aria-pressed=${selected.bucket?.from === item.from} onClick=${() => pickBucket(item)}>
+              <strong class="crm-activity-value" style=${{bottom:`${34 + barHeight}px`}}>${item[metric]}</strong>
+              ${item[metric] > 0 && html`<span class="crm-activity-fill" style=${{height:`${barHeight}px`}}></span>`}
+              <span class="crm-activity-date">${showDate ? item.label : ''}</span></button>`; })}
+        </div></div></div>` : html`<p class="crm-activity-empty">${L(`Nenhum registro de ${activityName.toLowerCase()} neste período.`,
+          `No ${activityName.toLowerCase()} recorded in this period.`)}</p>`}
       <details><summary>${L('Ver dados em tabela','View data as a table')}</summary><div class="crm-activity-table"><strong>${L('Período','Period')}</strong><strong>${L('Novos','New')}</strong><strong>${L('Interações','Interactions')}</strong><strong>${L('Reuniões','Meetings')}</strong><strong>${L('Pedidos','Requests')}</strong>
         ${activity.map((item, index) => html`<div key=${index}>${item.label}</div><div>${item.new}</div><div>${item.inter}</div><div>${item.meet}</div><div>${item.site}</div>`)}</div></details></section>
     <div class="crm-viz-grid two"><${BarChart} title=${L('Fases · classificação Apex','Stages · Apex classification')} description=${L('Contatos ativos no período. Clique para filtrar.','Active contacts in this period. Click to filter.')}

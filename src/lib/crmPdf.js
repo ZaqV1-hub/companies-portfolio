@@ -67,23 +67,36 @@ function pageHeader(doc, title, subtitle, page, demo) {
   text(doc, new Date().toLocaleDateString(), 283, 204, 8, muted, false, { align: 'right' });
 }
 
-function activityChart(doc, items, metric, title) {
+function activityChart(doc, items, metric, title, metricName, interval, lang) {
   const x = 14, y = 67, width = 269, height = 66;
   card(doc, x, y, width, height);
   text(doc, title, x + 5, y + 8, 11, ink, true);
   const values = items.map((item) => item[metric] || 0);
   const max = Math.max(1, ...values);
-  const plotX = x + 8, plotY = y + 16, plotWidth = width - 16, plotHeight = height - 28;
-  doc.setDrawColor(...edge); doc.line(plotX, plotY + plotHeight, plotX + plotWidth, plotY + plotHeight);
+  const total = values.reduce((sum, value) => sum + value, 0);
+  text(doc, `${metricName} / ${interval}  ·  Total: ${total}`, x + 5, y + 14, 8, muted);
+  const plotX = x + 16, plotY = y + 21, plotWidth = width - 23, plotHeight = 32;
+  [0, .5, 1].forEach((fraction) => {
+    const lineY = plotY + plotHeight * (1 - fraction);
+    doc.setDrawColor(...edge); doc.line(plotX, lineY, plotX + plotWidth, lineY);
+    text(doc, Number((max * fraction).toFixed(1)), plotX - 3, lineY + 1, 7, muted, false, { align: 'right' });
+  });
   const barWidth = Math.min(5, plotWidth / Math.max(1, items.length) * .65);
   items.forEach((item, index) => {
     const center = plotX + (index + .5) * plotWidth / items.length;
-    const h = Math.max(.5, (item[metric] || 0) / max * plotHeight);
-    doc.setFillColor(...blue); doc.rect(center - barWidth / 2, plotY + plotHeight - h, barWidth, h, 'F');
+    const value = item[metric] || 0;
+    const h = value / max * plotHeight;
+    if (value) { doc.setFillColor(...blue); doc.rect(center - barWidth / 2, plotY + plotHeight - h, barWidth, h, 'F'); }
+    if (items.length <= 12) text(doc, value, center, plotY + plotHeight - h - 2, 7, ink, true, { align: 'center' });
   });
   if (items.length) {
-    text(doc, items[0].label, plotX, y + height - 4, 7, muted);
-    text(doc, items[items.length - 1].label, plotX + plotWidth, y + height - 4, 7, muted, false, { align: 'right' });
+    if (items.length === 1) text(doc, items[0].label, plotX + plotWidth / 2, y + height - 5, 7, muted, false, { align: 'center' });
+    else {
+      text(doc, items[0].label, plotX, y + height - 5, 7, muted);
+      text(doc, items[items.length - 1].label, plotX + plotWidth, y + height - 5, 7, muted, false, { align: 'right' });
+    }
+  } else {
+    text(doc, lang === 'en' ? 'No activity in this period.' : 'Sem atividade neste período.', plotX + plotWidth / 2, plotY + 17, 9, muted, false, { align: 'center' });
   }
 }
 
@@ -101,7 +114,7 @@ export async function exportCrmPdf(report) {
     text(doc, value, x + 5, 44, 18, ink, true);
     text(doc, doc.splitTextToSize(name, width - 8).slice(0, 2), x + 5, 51, 7, muted);
   });
-  activityChart(doc, report.activity, report.metric, report.activityTitle);
+  activityChart(doc, report.activity, report.metric, report.activityTitle, report.activityName, report.activityInterval, report.lang);
   panel(doc, 14, 138, 86, 55, report.chartTitles.phases, report.charts.phases);
   panel(doc, 105, 138, 86, 55, report.chartTitles.status, report.charts.status);
   panel(doc, 196, 138, 87, 55, report.chartTitles.sla, report.charts.sla);
