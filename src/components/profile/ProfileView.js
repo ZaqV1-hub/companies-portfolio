@@ -48,7 +48,6 @@ function Header({ org, project, i18n, backHref }) {
             ${(org.segments || []).map((segment) => html`<span class="meta-chip" key=${segment}>${i18n.label('segments', segment)}</span>`)}
             ${place && html`<span>${place}</span>`}
             ${org.website && html`<a href=${org.website} target="_blank" rel="noopener">${org.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</a>`}
-            ${(org.public_state === 'provisional' || !org.last_approved_at) && html`<span class="badge-updating">${t('common.updating')}</span>`}
           </div>
           <${StageChart} project=${project} i18n=${i18n} />
         </div>

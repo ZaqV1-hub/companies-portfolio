@@ -1,9 +1,9 @@
 // Directory / home: program presentation, search and filters, documents, company cards.
 import { html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261014-documents1';
+import * as api from '../../services/api.js?v=20261014-public-access2';
 import { useI18n } from '../../lib/i18n.js';
 import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js';
-import { OrgCard } from '../../components/OrgCard.js?v=20261014-documents1';
+import { OrgCard } from '../../components/OrgCard.js?v=20261014-public-access2';
 import { EMPTY_FILTERS, FILTER_DEFS, activeFilterCount, matchesFilters, matchingProject } from '../../lib/directoryFilters.js';
 
 export function DirectoryPage() {

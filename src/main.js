@@ -1,8 +1,8 @@
 // Entry point: loads translations and data, then mounts the app.
 import { html } from './lib/html.js';
 import { loadDictionaries } from './lib/i18n.js';
-import * as api from './services/api.js?v=20261014-investor-browse1';
-import { App } from './App.js?v=20261014-investor-browse1';
+import * as api from './services/api.js?v=20261014-public-access2';
+import { App } from './App.js?v=20261014-public-access2';
 
 async function start() {
   await Promise.all([loadDictionaries(), api.init()]);

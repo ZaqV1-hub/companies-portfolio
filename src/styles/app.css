@@ -130,8 +130,6 @@ button { font-family: var(--font-body); }
 .card.featured .logo-plate img { max-height: 120px; max-width: 78%; }
 .wordmark { font-family: var(--font-display); font-size: 28px; line-height: 1.05; color: #fff; text-align: center; letter-spacing: -0.5px; }
 .card.featured .wordmark { font-size: 34px; letter-spacing: -1px; }
-.cover-badge { position: absolute; top: 12px; left: 12px; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.6px; color: var(--navy); background: var(--lime); padding: 5px 9px; border-radius: 20px; z-index: 3; }
-.cover-badge.updating { left: auto; right: 12px; background: #fdf3d6; color: #8a6d14; }
 .card-body { padding: 22px; display: flex; flex-direction: column; gap: 12px; flex: 1; }
 .card.featured .card-body { padding: 24px; }
 .card-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -166,7 +164,6 @@ button { font-family: var(--font-body); }
 .hero-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 18px; font-size: 13px; color: var(--on-navy); align-items: center; }
 .hero-meta a { color: var(--lime); font-weight: 700; }
 .hero-meta .meta-chip { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; background: rgba(255, 255, 255, 0.12); color: #fff; padding: 5px 10px; border-radius: 20px; }
-.badge-updating { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; background: #fdf3d6; color: #8a6d14; padding: 5px 10px; border-radius: 20px; }
 
 .profile-body { max-width: 1200px; margin: 0 auto; padding: 40px 32px 56px; display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); column-gap: 36px; row-gap: 40px;
   grid-template-areas: 'main side' 'lead lead' 'gal gal' 'foot foot'; align-items: start; }

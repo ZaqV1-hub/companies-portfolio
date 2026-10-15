@@ -1,21 +1,21 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261014-investor-browse1';
+import * as api from './services/api.js?v=20261014-public-access2';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261014-flags1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-investor-browse1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-public-access2';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
-import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-documents1';
-import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-profile1';
+import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-public-access2';
+import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-public-access2';
 import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-profile1';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-public-access2';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-investor-browse1';
-import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-investor-browse1';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-public-access2';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-public-access2';
 import { SettingsPage } from './pages/team/SettingsPage.js';
-import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-documents1';
+import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-public-access2';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -126,7 +126,7 @@ function PublicSite({ route, user, setUser }) {
   const requestContact = (org, projectId) => new Promise((resolve) => {
     const run = async () => resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null);
     if (investor && investor.email_verified) run();
-    else setAuth({ mode: 'login', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
+    else setAuth({ mode: 'account', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
   });
   const done = (u) => {
     setUser(u);
@@ -147,9 +147,9 @@ function PublicSite({ route, user, setUser }) {
   }, [first,route.query.token]);
 
   let page;
-  if (first === 'org' && second) page = canBrowse
-    ? html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`
-    : html`<div class="section">${browse === undefined ? t('common.loading') : ''}</div>`;
+  if (first === 'org' && second) page = browse === undefined && !investor
+    ? html`<div class="section">${t('common.loading')}</div>`
+    : html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`;
   else if (first === 'verify-email') page = html`<div class="section"><h1 class="form-title">${t('investor.verify_title')}</h1><p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p></div>`;
   else if (first === 'reset-password') page = html`<${ResetPasswordPage} token=${route.query.token} />`;
   else if (first === 'legal') page = html`<${LegalPage} kind=${second === 'privacy' ? 'privacy' : 'terms'} />`;
