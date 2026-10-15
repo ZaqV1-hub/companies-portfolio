@@ -64,7 +64,7 @@ button { font-family: var(--font-body); }
 .lang-switch { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
 .lang-switch button { border: none; background: #fff; color: var(--muted); font-weight: 800; font-size: 12px; padding: 9px 11px; cursor: pointer; letter-spacing: 0.4px; }
 .lang-switch button { display: inline-flex; align-items: center; gap: 6px; }
-.lang-switch img { width: 21px; height: 14px; object-fit: cover; border-radius: 2px; box-shadow: 0 0 0 1px rgba(20,27,52,.12); }
+.lang-switch svg { display: block; flex: none; width: 21px; height: 14px; border-radius: 2px; box-shadow: 0 0 0 1px rgba(20,27,52,.12); }
 .lang-switch button[aria-pressed='true'] { background: var(--navy); color: #fff; }
 .lang-switch.on-dark { border-color: rgba(255, 255, 255, 0.2); }
 .lang-switch.on-dark button { background: transparent; color: var(--on-navy); }
@@ -599,5 +599,20 @@ h3.section-label { margin-top: 18px; }
 .crm-company-summary{display:grid;gap:0}.crm-company-summary>.head,.crm-company-summary>button{display:grid;grid-template-columns:2fr repeat(4,1fr);gap:12px;align-items:center;padding:11px;border-bottom:1px solid #e4ecef}.crm-company-summary>.head{font-size:11px;text-transform:uppercase;font-weight:800;color:#557084}.crm-company-summary>button{border-left:0;border-right:0;border-top:0;background:white;text-align:left;font:inherit;color:#16394e;cursor:pointer}.crm-company-summary>button:hover{background:#f2f8f9}
 .crm-table-scroll{overflow-x:auto}.crm-table-scroll .trow{min-width:950px}.crm-cross{display:flex;gap:12px;align-items:center;color:#005b72;font-size:12px}.crm-cross button{border:0;background:transparent;text-decoration:underline;cursor:pointer;color:inherit}
 .crm-pending-row{display:grid;grid-template-columns:1fr 1fr auto;gap:12px;align-items:center;padding:10px;border-bottom:1px solid #e4ecef;color:#16394e;text-decoration:none}.crm-empty{font-size:12px;color:#60798a}
+.crm-demo-note{padding:12px 16px;border:1px solid #f1d68d;border-radius:10px;background:#fff8e8;color:#654c13;font-size:12px}.crm-demo-note strong,.crm-demo-tag{display:inline-block;margin-right:6px;padding:2px 6px;border-radius:4px;background:#f9e4a4;color:#694b00;font-size:10px;font-weight:800;letter-spacing:.04em}
+.crm-print-context{display:none}
+.crm-activity-col{padding:0;border:0;background:transparent;cursor:pointer}.crm-activity-col:hover span,.crm-activity-col:focus-visible span{background:#83a900}.crm-activity-col.selected span{background:#b2cf00}.crm-activity-col:focus-visible{outline:2px solid #005b72;outline-offset:2px}
+.crm-bar-row:not(:disabled):hover,.crm-bar-row:not(:disabled):focus-visible{background:#eaf4f6;border-radius:7px}.crm-bar-row:focus-visible{outline:2px solid #005b72;outline-offset:2px}
 @media(max-width:1000px){.crm-viz-kpis{grid-template-columns:repeat(3,1fr)}.crm-viz-grid.three{grid-template-columns:1fr 1fr}}
 @media(max-width:700px){.crm-viz-kpis{grid-template-columns:repeat(2,1fr)}.crm-viz-grid.two,.crm-viz-grid.three{grid-template-columns:1fr}.crm-viz-head{display:block}.crm-company-summary{overflow-x:auto}.crm-company-summary>.head,.crm-company-summary>button{min-width:580px}}
+@media print {
+  @page{size:A4 landscape;margin:10mm}
+  body,.shell,.shell-main{background:#fff!important;color:#092d46}
+  .sidebar,.crm-no-print,.crm-print-hide,.crm-dashboard .crm-viz-filters,.crm-dashboard .crm-cross,.crm-dashboard .crm-periods,.crm-dashboard .crm-viz-head input{display:none!important}
+  .shell{display:block;min-height:0}.shell-main{padding:0!important}.crm-dashboard{display:block;max-width:none}.crm-sticky{position:static!important;padding:0 0 8mm!important;box-shadow:none!important}
+  .crm-viz-kpis{grid-template-columns:repeat(6,1fr);gap:3mm;margin-bottom:4mm}.crm-viz-grid.two{grid-template-columns:repeat(2,1fr)}.crm-viz-grid.three{grid-template-columns:repeat(3,1fr)}
+  .crm-viz-card,.crm-viz-grid,.crm-viz-kpi,.crm-demo-note{break-inside:avoid;page-break-inside:avoid;margin-bottom:4mm}.crm-viz-card{padding:4mm}.crm-activity{height:45mm}
+  .crm-bar-track i,.crm-activity-col span,.crm-demo-note,.crm-viz-card,.crm-viz-kpi{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .crm-dashboard details{display:none}
+  .crm-print-context{display:block;font-size:10pt;color:#365369;margin:0 0 5mm}
+}

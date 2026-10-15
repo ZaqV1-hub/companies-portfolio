@@ -2,7 +2,7 @@
 import { html } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
 import { href } from '../lib/router.js';
-import { LangSwitch } from './LangSwitch.js?v=20261014-documents1';
+import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
 
 export function TopBar({ investor, onInvestorAccess, onLogout }) {
   const { t } = useI18n();

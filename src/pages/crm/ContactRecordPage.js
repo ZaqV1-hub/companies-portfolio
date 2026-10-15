@@ -144,7 +144,7 @@ export function ContactRecordPage({ relId, base, team }) {
     <a class="btn-link" href=${href(base)}>${t('crm.back')}</a>
     <header class="record-head">
       <div>
-        <h1 class="page-title">${rec.contact.name}</h1>
+        <h1 class="page-title">${rec.contact.name} ${rel.is_demo && html`<span class="crm-demo-tag">DEMO</span>`}</h1>
         <div class="page-subtitle">${[rec.contact.role, rec.institution.name, [rec.contact.city, countryName(rec.contact.country, lang)].filter(Boolean).join(', ')].filter(Boolean).join(' · ')}</div>
         ${team && html`<div class="page-subtitle">${t('crm.col_company')}: <strong>${rec.organization_name}</strong></div>`}
       </div>

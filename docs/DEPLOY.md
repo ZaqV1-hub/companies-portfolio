@@ -53,6 +53,8 @@ Os PDFs publicados pela equipe ficam em `C:\CompaniesPortfolioData\documents` (o
 
 Os usuários, sessões, perfis e registros do CRM ficam no banco MySQL da VM. As imagens enviadas ficam na pasta de uploads da VM, e o banco guarda os caminhos usados pelos perfis. As áreas de empresa e equipe exigem login por e-mail e senha; a antiga entrada de demonstração sem senha foi removida.
 
+A migração `004_crm_dashboard_demo.sql` adiciona contatos e interações fictícios ao banco de teste para preencher os gráficos do CRM. Seus IDs começam com `demo-crm-`, seus e-mails usam `example.com` e a interface os identifica como `DEMO`. Os registros antigos do seed com ID `rel-<número>` também são tratados como demonstração. O filtro “Dados” do painel separa os contatos reais desses exemplos; as exportações CSV e PDF indicam quando incluem dados fictícios. A publicação normal executa essa migração uma única vez e não roda o seed.
+
 ## Backup da versão estática anterior
 
 Antes da troca, a versão estática original foi copiada para `C:\Sites\AzureIIS\backups\companiesportfolio-static-20261005-084359`. Preserve esse backup até que o cliente aprove a versão nova. Faça outro backup da pasta do site antes de cada publicação futura.

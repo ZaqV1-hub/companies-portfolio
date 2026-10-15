@@ -1,7 +1,7 @@
 // Logged-in layout (company area and team panel): navy sidebar + content.
 import { html } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
-import { LangSwitch } from './LangSwitch.js?v=20261014-documents1';
+import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
 
 /**
  * @param {{roleLabel: string, userLabel: string, nav: {key: string, label: string, href: string, current?: boolean}[], onLogout: Function}} props

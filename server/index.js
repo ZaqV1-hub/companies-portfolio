@@ -325,7 +325,7 @@ app.get('/api/contacts', requireRole('company_user', 'team'), async (req, res) =
     const [allInteractions] = ids.length ? await pool.query(`SELECT relationship_id,date,description,type,apex_product,event,auto FROM interactions WHERE relationship_id IN (${ids.map(() => '?').join(',')}) ORDER BY date DESC`,ids) : [[]];
     const [settings] = await pool.execute('SELECT deadlines,origins,holidays FROM settings WHERE id=?', ['settings']);
     const rowsOut = rows.map((row) => {
-      const relationship = { ...row };
+      const relationship = { ...row, is_demo: /^demo-crm-|^rel-\d+$/.test(row.id) };
       for (const key of ['c_id','c_name','c_email','c_country','c_city','c_role','c_linkedin','c_phone','i_id','i_name','investor_type','niche','ticket_min_musd','ticket_max_musd','interest_type','sectors','description_original','description_pt','website']) delete relationship[key];
       if (company) delete relationship.apex_control;
       const contact = { id: row.c_id,name: row.c_name,email: row.c_email,country: row.c_country,city: row.c_city,role: row.c_role,linkedin: row.c_linkedin,phone: row.c_phone };
@@ -349,7 +349,7 @@ app.get('/api/contacts/:id', requireRole('company_user', 'team'), async (req, re
     const row = rows[0];
     const [interactions] = await pool.execute('SELECT x.*,u.name AS created_by_name FROM interactions x LEFT JOIN users u ON u.id=x.created_by WHERE x.relationship_id=? ORDER BY x.date DESC,x.created_at DESC', [row.id]);
     const [settings] = await pool.execute('SELECT deadlines,origins,apex_strategic_categories,holidays FROM settings WHERE id=?', ['settings']);
-    const relationship = { ...row };
+    const relationship = { ...row, is_demo: /^demo-crm-|^rel-\d+$/.test(row.id) };
     for (const key of ['c_id','c_name','c_email','c_country','c_city','c_role','c_linkedin','c_phone','i_id','i_name','investor_type','niche','ticket_min_musd','ticket_max_musd','interest_type','sectors','description_original','description_pt','website','hq_country','hq_city','owner_name']) delete relationship[key];
     if (company) delete relationship.apex_control;
     const contact = { id:row.c_id,name:row.c_name,email:row.c_email,country:row.c_country,city:row.c_city,role:row.c_role,linkedin:row.c_linkedin,phone:row.c_phone };

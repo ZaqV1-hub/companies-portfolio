@@ -67,7 +67,7 @@ export function ContactTable({ rows, base, team }) {
     </div>
     ${rows.length === 0 && html`<div class="empty-row">${t('crm.empty')}</div>`}
     ${rows.map((r) => html`<a class="trow link-row" key=${r.relationship.id} style=${cols} href=${href(base + '/' + r.relationship.id)}>
-      <div><strong>${r.contact.name}</strong><div class="cell-sub">${r.contact.role || ''}</div></div>
+      <div><strong>${r.contact.name}</strong>${r.relationship.is_demo && html` <span class="crm-demo-tag">DEMO</span>`}<div class="cell-sub">${r.contact.role || ''}</div></div>
       <div>${r.institution.name}</div>
       ${team && html`<div>${r.organization_name}</div>`}
       <div>${countryName(r.contact.country, lang)}</div>
