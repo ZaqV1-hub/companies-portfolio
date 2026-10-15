@@ -12,8 +12,8 @@ import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-profile1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-crm-chart2';
-import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-crm-chart2';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-crm-nobanner3';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-crm-nobanner3';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-documents1';
 

@@ -2,8 +2,8 @@ import { html, useEffect, useMemo, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { useI18n } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
-import { exportCrmPdf } from '../../lib/crmPdf.js?v=20261014-crm-chart2';
-import { ContactTable, useContactRows } from '../crm/ContactsListPage.js?v=20261014-crm-chart2';
+import { exportCrmPdf } from '../../lib/crmPdf.js?v=20261014-crm-nobanner3';
+import { ContactTable, useContactRows } from '../crm/ContactsListPage.js?v=20261014-crm-nobanner3';
 
 const date = (value) => value ? new Date(value).toISOString().slice(0, 10) : '';
 const today = () => date(new Date());
@@ -126,7 +126,7 @@ export function CrmOverviewPage({ team = true }) {
     try {
       await exportCrmPdf({ lang, from: measureFrom, to: measureTo,
         company: companies.find(([id]) => id === filter.company)?.[1] || L('Todas as empresas','All companies'),
-        demoCount: active.filter((r) => r.relationship.is_demo).length, metrics, activity, metric,
+        metrics, activity, metric,
         activityTitle: L('Atividade no período','Activity over time'), activityName, activityInterval,
         chartTitles: { phases:L('Fases','Stages'), status:L('Situação','Status'), sla:L('Prazo de retorno','Response time'),
           origins:L('Origens','Sources'), types:L('Tipos de interação','Interaction types'),
@@ -158,7 +158,6 @@ export function CrmOverviewPage({ team = true }) {
         <a class="btn btn-lime btn-lg" href=${href(team ? '/team/crm/new' : '/company/contacts/new')}>+ ${L('Adicionar contato','Add contact')}</a></div></div>
     ${error && html`<div class="notice">${error}</div>`}
     <p class="crm-print-context">${L('Período','Period')}: ${selected.bucket?.from || from} – ${selected.bucket?.to || to} · ${L('Empresa','Company')}: ${companies.find(([id]) => id === filter.company)?.[1] || L('Todas','All')} · ${L('Dados','Data')}: ${filter.demo === 'demo' ? 'DEMO' : filter.demo === 'real' ? L('Reais','Real') : L('Todos','All')}</p>
-    ${rows.some((r) => r.relationship.is_demo) && html`<div class="crm-demo-note"><strong>DEMO</strong> ${L('Este painel inclui registros fictícios de demonstração. Use o filtro abaixo para separar os dados reais.','This dashboard includes fictional demonstration records. Use the filter below to see real data separately.')}</div>`}
     <section class="crm-viz-filters"><div class="crm-periods">${[['today',L('Hoje','Today')],['7',L('7 dias','7 days')],['30',L('30 dias','30 days')],['90',L('90 dias','90 days')],['year',L('Este ano','This year')],['custom',L('Personalizado','Custom')]]
       .map(([key, name]) => html`<button type="button" key=${key} class=${period === key ? 'active' : ''} onClick=${() => { setPeriod(key); pick('bucket')(null); }}>${name}</button>`)}</div>
       ${period === 'custom' && html`<label>${L('De','From')} <input type="date" value=${custom.from} onChange=${(e) => setCustom({ ...custom, from: e.target.value })} /></label>

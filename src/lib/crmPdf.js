@@ -16,7 +16,6 @@ function loadLibrary() {
 
 const ink = [10, 42, 66];
 const blue = [0, 99, 124];
-const lime = [190, 217, 15];
 const muted = [86, 112, 132];
 const pale = [237, 244, 247];
 const edge = [216, 227, 232];
@@ -53,15 +52,11 @@ function panel(doc, x, y, width, height, title, items) {
   });
 }
 
-function pageHeader(doc, title, subtitle, page, demo) {
+function pageHeader(doc, title, subtitle, page) {
   doc.setFillColor(...ink);
   doc.rect(0, 0, 297, 24, 'F');
   text(doc, title, 14, 11, 16, [255, 255, 255], true);
   text(doc, subtitle, 14, 19, 8, [214, 229, 237]);
-  if (demo) {
-    doc.setFillColor(...lime); doc.roundedRect(264, 7, 18, 8, 1.5, 1.5, 'F');
-    text(doc, 'DEMO', 273, 12.5, 8, ink, true, { align: 'center' });
-  }
   doc.setDrawColor(...edge); doc.line(14, 198, 283, 198);
   text(doc, `Companies Portfolio  ·  ${page}`, 14, 204, 8, muted);
   text(doc, new Date().toLocaleDateString(), 283, 204, 8, muted, false, { align: 'right' });
@@ -105,7 +100,7 @@ export async function exportCrmPdf(report) {
   const doc = new JsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4', compress: true });
   const title = report.lang === 'en' ? 'CRM dashboard' : 'Painel do CRM';
   const subtitle = `${report.from} – ${report.to}  ·  ${report.company}`;
-  pageHeader(doc, title, subtitle, '1 / 2', report.demoCount > 0);
+  pageHeader(doc, title, subtitle, '1 / 2');
   const labels = report.metrics;
   const width = (269 - 5 * 3) / 6;
   labels.forEach(([name, value], index) => {
@@ -119,7 +114,7 @@ export async function exportCrmPdf(report) {
   panel(doc, 105, 138, 86, 55, report.chartTitles.status, report.charts.status);
   panel(doc, 196, 138, 87, 55, report.chartTitles.sla, report.charts.sla);
   doc.addPage();
-  pageHeader(doc, title, subtitle, '2 / 2', report.demoCount > 0);
+  pageHeader(doc, title, subtitle, '2 / 2');
   panel(doc, 14, 31, 86, 72, report.chartTitles.origins, report.charts.origins);
   panel(doc, 105, 31, 86, 72, report.chartTitles.types, report.charts.types);
   panel(doc, 196, 31, 87, 72, report.chartTitles.investors, report.charts.investors);
@@ -134,6 +129,5 @@ export async function exportCrmPdf(report) {
     doc.setFillColor(...blue); doc.roundedRect(109, y - 3, Math.max(1, 151 * value / max), 3.5, 1, 1, 'F');
     text(doc, value, 277, y, 8, ink, true, { align: 'right' });
   });
-  if (report.demoCount) text(doc, report.lang === 'en' ? 'Includes fictional demonstration records.' : 'Inclui registros fictícios de demonstração.', 19, 186, 8, muted);
   doc.save(`companies-portfolio-crm-${report.from}-${report.to}.pdf`);
 }
