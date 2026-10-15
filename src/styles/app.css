@@ -173,7 +173,7 @@ button { font-family: var(--font-body); }
 .project-selector-wrap { width: 100%; }
 .profile-cta-mobile { display: none; }
 .profile-main { grid-area: main; display: flex; flex-direction: column; gap: 40px; min-width: 0; }
-.profile-side { grid-area: side; display: flex; flex-direction: column; gap: 20px; position: sticky; top: 80px; min-width: 0; }
+.profile-side { grid-area: side; display: flex; flex-direction: column; gap: 20px; min-width: 0; }
 #leadership { grid-area: lead; }
 #gallery { grid-area: gal; }
 .profile-footer { grid-area: foot; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
