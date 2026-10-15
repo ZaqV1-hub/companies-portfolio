@@ -8,7 +8,7 @@ import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.
 import { AppShell } from './components/AppShell.js?v=20261014-documents1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-documents1';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-profile1';
-import { LoginPage } from './pages/LoginPage.js?v=20261014-documents1';
+import { LoginPage } from './pages/LoginPage.js?v=20261014-crm-home1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-profile1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
@@ -31,10 +31,10 @@ function NotFound() {
 
 function CompanyArea({ user, route, onLogout }) {
   const { t } = useI18n();
-  const section = route.parts[1] || 'profile';
+  const section = route.parts[1] || 'contacts';
   const nav = [
+    { key: 'contacts', label: 'CRM', href: href('/company/contacts') },
     { key: 'profile', label: t('app.nav_profile'), href: href('/company/profile') },
-    { key: 'contacts', label: t('app.nav_contacts'), href: href('/company/contacts') },
     { key: 'public', label: t('app.nav_view_public'), href: href('/org/' + user.organization_id) },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
@@ -54,13 +54,13 @@ function CompanyArea({ user, route, onLogout }) {
 
 function TeamArea({ user, route, onLogout }) {
   const { t } = useI18n();
-  const section = route.parts[1] || 'review';
+  const section = route.parts[1] || 'crm';
   const [queue, setQueue] = useState(0);
   useEffect(() => { api.listReviewQueue().then((q) => setQueue(q.length)); }, [route.path]);
   const nav = [
+    { key: 'crm', label: 'CRM', href: href('/team/crm') },
     { key: 'review', label: t('app.nav_review'), badge: queue || null, href: href('/team/review') },
     { key: 'orgs', label: t('app.nav_orgs'), href: href('/team/orgs') },
-    { key: 'crm', label: t('app.nav_crm'), href: href('/team/crm') },
     { key: 'settings', label: t('app.nav_settings'), href: href('/team/settings') },
     { key: 'documents', label: t('app.nav_documents'), href: href('/team/documents') },
   ].map((n) => ({ ...n, current: n.key === section }));

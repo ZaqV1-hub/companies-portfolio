@@ -28,7 +28,7 @@ export function LoginPage({ role, onLoggedIn }) {
       const res = await api.login(email, password, isTeam ? 'team' : 'company_user');
       if (!res.ok) { setError(t('login.invalid')); return; }
       onLoggedIn(res.user);
-      navigate(isTeam ? '/team' : '/company');
+      navigate(isTeam ? '/team/crm' : '/company/contacts');
     } catch (err) {
       setError(forgot && err.data?.error === 'email_unavailable' ? t('investor.email_unavailable') : forgot ? t('investor.try_again') : t('login.invalid'));
     } finally {
