@@ -82,10 +82,10 @@ export function interactionErrors(fields, t) {
 export function NewContactPage({ team, base }) {
   const { t, lang } = useI18n();
   const [owners, setOwners] = useState([]);
-  const [orgId, setOrgId] = useState('');
+  const [orgId, setOrgId] = useState(team ? 'program' : '');
   const [contact, setContact] = useState({ name: '', email: '', country: '', city: '', role: '', linkedin: '', phone: '' });
   const [inst, setInst] = useState({ name: '', investor_type: null, niche: null, ticket_min_musd: null, ticket_max_musd: null, interest_type: null, sectors: [], description_original: '', description_pt: '', website: '' });
-  const [rel, setRel] = useState({ origin: null, status: 'in_progress', deal_expectation: null });
+  const [rel, setRel] = useState({ origin: team ? 'Contato direto' : null, status: 'in_progress', deal_expectation: null });
   const [it, setIt] = useState({ date: todayISO(), description: '', type: null, apex_product: null, event: null });
   const [origins, setOrigins] = useState([]);
   const [found, setFound] = useState(null);

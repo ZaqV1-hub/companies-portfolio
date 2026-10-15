@@ -320,7 +320,7 @@ app.get('/api/contacts', requireRole('company_user', 'team'), async (req, res) =
     const company = req.user.role === 'company_user';
     const where = company ? 'WHERE r.organization_id=?' : '';
     const params = company ? [req.user.organization_id] : [];
-    const [rows] = await pool.execute(`SELECT r.*, o.name AS organization_name, c.id AS c_id,c.name AS c_name,c.email AS c_email,c.country AS c_country,c.city AS c_city,c.role AS c_role,c.linkedin AS c_linkedin,c.phone AS c_phone, i.id AS i_id,i.name AS i_name,i.investor_type,i.niche, i.ticket_min_musd,i.ticket_max_musd,i.interest_type,i.sectors,i.description_original,i.description_pt,i.website, (SELECT COUNT(*) FROM interactions x WHERE x.relationship_id=r.id) AS interaction_count,(SELECT JSON_OBJECT('date',x.date,'description',x.description,'type',x.type,'apex_product',x.apex_product,'event',x.event) FROM interactions x WHERE x.relationship_id=r.id ORDER BY x.date DESC LIMIT 1) AS last_interaction FROM relationships r JOIN organizations o ON o.id=r.organization_id JOIN contacts c ON c.id=r.contact_id JOIN institutions i ON i.id=c.institution_id ${where} ORDER BY r.created_at DESC`, params);
+    const [rows] = await pool.execute(`SELECT r.*, COALESCE(o.name,'Programa Abiquifi') AS organization_name, c.id AS c_id,c.name AS c_name,c.email AS c_email,c.country AS c_country,c.city AS c_city,c.role AS c_role,c.linkedin AS c_linkedin,c.phone AS c_phone, i.id AS i_id,i.name AS i_name,i.investor_type,i.niche, i.ticket_min_musd,i.ticket_max_musd,i.interest_type,i.sectors,i.description_original,i.description_pt,i.website, (SELECT COUNT(*) FROM interactions x WHERE x.relationship_id=r.id) AS interaction_count,(SELECT JSON_OBJECT('date',x.date,'description',x.description,'type',x.type,'apex_product',x.apex_product,'event',x.event) FROM interactions x WHERE x.relationship_id=r.id ORDER BY x.date DESC LIMIT 1) AS last_interaction FROM relationships r LEFT JOIN organizations o ON o.id=r.organization_id JOIN contacts c ON c.id=r.contact_id JOIN institutions i ON i.id=c.institution_id ${where} ORDER BY r.created_at DESC`, params);
     const ids = rows.map((row) => row.id);
     const [allInteractions] = ids.length ? await pool.query(`SELECT relationship_id,date,description,type,apex_product,event,auto FROM interactions WHERE relationship_id IN (${ids.map(() => '?').join(',')}) ORDER BY date DESC`,ids) : [[]];
     const [settings] = await pool.execute('SELECT deadlines,origins,holidays FROM settings WHERE id=?', ['settings']);
@@ -333,9 +333,9 @@ app.get('/api/contacts', requireRole('company_user', 'team'), async (req, res) =
       const interactions = allInteractions.filter((item) => item.relationship_id === row.id);
       return { relationship, organization_name: row.organization_name, contact, institution,
         last_interaction: interactions[0]?.date || null,interaction_count:interactions.length,events:Array.from(new Set(interactions.map((item) => item.event).filter(Boolean))),
-        interaction_dates:interactions.map((item) => String(item.date).slice(0,10)),completeness:completenessFor(contact,institution,relationship),pending_request:requestStateFor(relationship,interactions,settings[0]?.holidays) };
+        interaction_dates:interactions.map((item) => new Date(item.date).toISOString().slice(0,10)),interactions:interactions.map(({date,type,apex_product,event}) => ({date:new Date(date).toISOString().slice(0,10),type,apex_product,event})),completeness:completenessFor(contact,institution,relationship),pending_request:requestStateFor(relationship,interactions,settings[0]?.holidays) };
     });
-    res.json({ rows: rowsOut, deadlines: settings[0]?.deadlines || {}, origins: settings[0]?.origins || [] });
+    res.json({ rows: rowsOut, deadlines: settings[0]?.deadlines || {}, origins: Array.from(new Set([...(settings[0]?.origins || []),'Contato direto'])) });
   } catch (error) { routeError(res, error); }
 });
 
@@ -343,7 +343,7 @@ app.get('/api/contacts/:id', requireRole('company_user', 'team'), async (req, re
   if (req.params.id === 'lookup') return next();
   try {
     const company = req.user.role === 'company_user';
-    const [rows] = await pool.execute(`SELECT r.*,o.name AS organization_name,c.id AS c_id,c.name AS c_name,c.email AS c_email,c.country AS c_country,c.city AS c_city,c.role AS c_role,c.linkedin AS c_linkedin,c.phone AS c_phone,i.id AS i_id,i.name AS i_name,i.investor_type,i.niche,i.ticket_min_musd,i.ticket_max_musd,i.interest_type,i.sectors,i.description_original,i.description_pt,i.website,i.hq_country,i.hq_city,u.name AS owner_name FROM relationships r JOIN organizations o ON o.id=r.organization_id JOIN contacts c ON c.id=r.contact_id JOIN institutions i ON i.id=c.institution_id LEFT JOIN users u ON u.id=r.owner_user_id WHERE r.id=? ${company ? 'AND r.organization_id=?' : ''}`,
+    const [rows] = await pool.execute(`SELECT r.*,COALESCE(o.name,'Programa Abiquifi') AS organization_name,c.id AS c_id,c.name AS c_name,c.email AS c_email,c.country AS c_country,c.city AS c_city,c.role AS c_role,c.linkedin AS c_linkedin,c.phone AS c_phone,i.id AS i_id,i.name AS i_name,i.investor_type,i.niche,i.ticket_min_musd,i.ticket_max_musd,i.interest_type,i.sectors,i.description_original,i.description_pt,i.website,i.hq_country,i.hq_city,u.name AS owner_name FROM relationships r LEFT JOIN organizations o ON o.id=r.organization_id JOIN contacts c ON c.id=r.contact_id JOIN institutions i ON i.id=c.institution_id LEFT JOIN users u ON u.id=r.owner_user_id WHERE r.id=? ${company ? 'AND r.organization_id=?' : ''}`,
       company ? [req.params.id, req.user.organization_id] : [req.params.id]);
     if (!rows.length) return res.status(404).json({ error: 'not_found' });
     const row = rows[0];
@@ -356,7 +356,7 @@ app.get('/api/contacts/:id', requireRole('company_user', 'team'), async (req, re
     const institution = { id:row.i_id,name:row.i_name,investor_type:row.investor_type,niche:row.niche,ticket_min_musd:row.ticket_min_musd,ticket_max_musd:row.ticket_max_musd,interest_type:row.interest_type,sectors:row.sectors,description_original:row.description_original,description_pt:row.description_pt,website:row.website,hq_country:row.hq_country,hq_city:row.hq_city };
     res.json({ relationship,organization_name:row.organization_name,owner_name:row.owner_name,contact,institution,interactions,
       completeness:completenessFor(contact,institution,relationship),pending_request:requestStateFor(relationship,interactions,settings[0]?.holidays),
-      origins:settings[0]?.origins || [],deadlines:settings[0]?.deadlines || {},...(company ? {} : { apex_categories:settings[0]?.apex_strategic_categories || [] }) });
+      origins:Array.from(new Set([...(settings[0]?.origins || []),'Contato direto'])),deadlines:settings[0]?.deadlines || {},...(company ? {} : { apex_categories:settings[0]?.apex_strategic_categories || [] }) });
   } catch (error) { routeError(res, error); }
 });
 app.get('/api/contacts/lookup', requireRole('company_user', 'team'), async (req, res) => {
@@ -408,7 +408,7 @@ app.post('/api/contacts', requireRole('company_user','team'), async (req, res) =
     if (organizationId !== 'program') { const [organizations] = await db.execute('SELECT id FROM organizations WHERE id=?',[organizationId]); if(!organizations.length){await db.rollback();return res.json({ok:false,error:'invalid',fields:['organization_id']});} }
     const [settings] = await db.execute('SELECT origins FROM settings WHERE id=?',['settings']);
     const allowedOrigins = settings[0]?.origins || [];
-    if ((relationship.origin && relationship.origin !== 'Portfólio' && !allowedOrigins.includes(relationship.origin)) || (interaction.event && !allowedOrigins.includes(interaction.event))) { await db.rollback(); return res.json({ok:false,error:'invalid',fields:['relationship.origin','interaction.event']}); }
+    if ((relationship.origin && !['Portfólio','Contato direto'].includes(relationship.origin) && !allowedOrigins.includes(relationship.origin)) || (interaction.event && !allowedOrigins.includes(interaction.event))) { await db.rollback(); return res.json({ok:false,error:'invalid',fields:['relationship.origin','interaction.event']}); }
     if (interaction.project_id) { const [project] = await db.execute('SELECT id FROM projects WHERE id=? AND organization_id=?',[interaction.project_id,organizationId]); if(!project.length){await db.rollback();return res.json({ok:false,error:'invalid',fields:['interaction.project_id']});} }
     const [contacts] = await db.execute('SELECT id,institution_id FROM contacts WHERE email_normalized=? FOR UPDATE', [String(contact.email).trim().toLowerCase()]);
     let institutionId = contacts[0]?.institution_id;
@@ -486,7 +486,7 @@ app.patch('/api/contacts/:id', requireRole('company_user','team'), async (req,re
     if (relationship.status && !relationshipStatuses.has(relationship.status)) { await db.rollback(); return res.json({ok:false,error:'invalid'}); }
     if (relationship.deal_expectation && (!validUsdTree(relationship.deal_expectation) || relationship.deal_expectation.type && !dealTypes.has(relationship.deal_expectation.type))) { await db.rollback(); return res.json({ok:false,error:'invalid'}); }
     await db.beginTransaction();
-    if(relationship.origin){const [settings]=await db.execute('SELECT origins FROM settings WHERE id=?',['settings']);if(relationship.origin!=='Portfólio'&&!(settings[0]?.origins||[]).includes(relationship.origin)){await db.rollback();return res.json({ok:false,error:'invalid'});}}
+    if(relationship.origin){const [settings]=await db.execute('SELECT origins FROM settings WHERE id=?',['settings']);if(!['Portfólio','Contato direto'].includes(relationship.origin)&&!(settings[0]?.origins||[]).includes(relationship.origin)){await db.rollback();return res.json({ok:false,error:'invalid'});}}
     if (cSet.length) await db.execute(`UPDATE contacts SET ${cSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...cSet.map((key) => key === 'country' ? String(contact[key]).toUpperCase() : contact[key]),rels[0].contact_id]);
     if (iSet.length) await db.execute(`UPDATE institutions SET ${iSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...iSet.map((key) => ['sectors'].includes(key) ? jsonColumn(institution[key]) : institution[key]),rels[0].institution_id]);
     if (rSet.length) await db.execute(`UPDATE relationships SET ${rSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...rSet.map((key) => key === 'deal_expectation' ? jsonColumn(relationship[key]) : relationship[key]),req.params.id]);

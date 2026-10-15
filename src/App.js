@@ -11,10 +11,9 @@ import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-profile1';
 import { LoginPage } from './pages/LoginPage.js?v=20261014-documents1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-profile1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
-import { ContactsListPage } from './pages/crm/ContactsListPage.js';
-import { NewContactPage } from './pages/crm/NewContactPage.js';
+import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js';
-import { CrmDashboardPage } from './pages/team/CrmDashboardPage.js';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-crm1';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-documents1';
 
@@ -46,7 +45,7 @@ function CompanyArea({ user, route, onLogout }) {
   } else if (section === 'contacts' && route.parts[2]) {
     content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/company/contacts" />`;
   } else if (section === 'contacts') {
-    content = html`<${ContactsListPage} />`;
+    content = html`<${CrmOverviewPage} team=${false} />`;
   } else {
     content = html`<${NotFound} />`;
   }
@@ -71,7 +70,7 @@ function TeamArea({ user, route, onLogout }) {
   else if (section === 'orgs') content = html`<${OrganizationsPage} />`;
   else if (section === 'crm' && route.parts[2] === 'new') content = html`<${NewContactPage} base="/team/crm" team=${true} />`;
   else if (section === 'crm' && route.parts[2]) content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/team/crm" team=${true} />`;
-  else if (section === 'crm') content = html`<${CrmDashboardPage} />`;
+  else if (section === 'crm') content = html`<${CrmOverviewPage} />`;
   else if (section === 'settings') content = html`<${SettingsPage} />`;
   else if (section === 'documents') content = html`<${DocumentsPage} />`;
   else content = html`<${NotFound} />`;
