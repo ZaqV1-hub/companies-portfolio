@@ -8,7 +8,7 @@ import { LangSwitch } from '../components/LangSwitch.js?v=20261014-flags1';
 export function LoginPage({ role, onLoggedIn }) {
   const { t } = useI18n();
   const isTeam = role === 'team';
-  const [email, setEmail] = useState(isTeam ? 'teste@abiquifi' : 'teste@imunotera');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -52,15 +52,15 @@ export function LoginPage({ role, onLoggedIn }) {
       <div class="fine">${t('login.brand_fine')}</div>
     </div>
     <div class="split-form">
-      <form class="split-form-inner" onSubmit=${submit}>
+      <form class="split-form-inner" autoComplete="off" onSubmit=${submit}>
         <div class="kicker">${t('login.' + k + '_kicker')}</div>
         <h1 class="form-title">${forgot ? t('investor.forgot_password') : t('login.' + k + '_title')}</h1>
         <p class="form-subtitle">${forgot ? t('investor.reset_intro') : t('login.' + k + '_subtitle')}</p>
         <div class="stack">
           <label><span class="field-label">${t('common.email')}</span>
-            <input class="input input-sm" type="email" value=${email} onInput=${(e) => setEmail(e.target.value)} placeholder="name@company.com" /></label>
+            <input class="input input-sm" type="text" inputmode="email" autoComplete="off" required value=${email} onInput=${(e) => setEmail(e.target.value)} placeholder="name@company.com" /></label>
           ${!forgot && html`<label><span class="field-label">${t('common.password')}</span>
-            <input class="input input-sm" type="password" value=${password} onInput=${(e) => setPassword(e.target.value)} placeholder="••••••••" /></label>
+            <input class="input input-sm" type="password" autoComplete="off" required value=${password} onInput=${(e) => setPassword(e.target.value)} placeholder="••••••••" /></label>
           `}
           ${error && html`<div class="form-error" role="alert">${error}</div>`}
           ${sent && html`<p class="section-note" role="status">${t('investor.reset_sent')}</p>`}

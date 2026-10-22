@@ -2,7 +2,7 @@
 import { html } from './lib/html.js';
 import { loadDictionaries } from './lib/i18n.js';
 import * as api from './services/api.js?v=20261022-session-cache1';
-import { App } from './App.js?v=20261022-phone1';
+import { App } from './App.js?v=20261022-empty-logins1';
 
 async function start() {
   document.getElementById('root').textContent = 'Conectando ao portfólio...';

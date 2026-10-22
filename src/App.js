@@ -8,7 +8,7 @@ import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
-import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
+import { LoginPage } from './pages/LoginPage.js?v=20261022-empty-logins1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261022-company-crm1';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261022-company-preview1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261022-company-crm1';
