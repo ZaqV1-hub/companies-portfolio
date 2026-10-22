@@ -7,6 +7,7 @@ async function request(path, { method = 'GET', body } = {}) {
       response = await fetch(`/api${path}`, {
         method,
         credentials: 'same-origin',
+        cache: method === 'GET' ? 'no-store' : 'default',
         headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
         body: body === undefined ? undefined : JSON.stringify(body),
       });
@@ -51,7 +52,7 @@ export async function getPublicOrganization(id) { try { return await request(`/p
 export async function getPublicSettings() { return request('/public/settings'); }
 export async function listPublicDocuments() { return request('/public/documents'); }
 
-export async function getCurrentUser() { try { return await request('/me'); } catch (error) { if (error.status === 401) return null; throw error; } }
+export async function getCurrentUser() { try { return await request(`/me?fresh=${Date.now()}`); } catch (error) { if (error.status === 401) return null; throw error; } }
 export async function login(email, password, role) { return post('/auth/login', { email, password, role }); }
 export async function logout() { return post('/auth/logout'); }
 
@@ -68,7 +69,7 @@ export async function listOrganizationsForTeam() { return request('/team/organiz
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
 
 export async function registerInvestor(data) { return post('/investors', data); }
-export async function getInvestorBrowseStatus() { return request('/investors/browse'); }
+export async function getInvestorBrowseStatus() { return request(`/investors/browse?fresh=${Date.now()}`); }
 export async function startInvestorBrowse(data) { return post('/investors/browse', data); }
 export async function startInvestorEmail(data) { return post('/investors/email/start', data); }
 export async function confirmInvestorEmail(token) { return post('/investors/email/confirm', { token }); }

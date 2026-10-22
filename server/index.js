@@ -39,6 +39,7 @@ app.use((req, _res, next) => {
 });
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(express.json({ limit: '2mb' }));
+app.use('/api', (_req, res, next) => { res.set('Cache-Control', 'private, no-store'); next(); });
 app.use(session({
   name: 'cp.sid',
   secret: process.env.SESSION_SECRET,
