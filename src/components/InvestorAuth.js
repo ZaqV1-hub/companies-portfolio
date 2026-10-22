@@ -1,6 +1,6 @@
 // Investor welcome, verified sign-up, login and password recovery.
 import { html, useEffect, useState } from '../lib/html.js';
-import * as api from '../services/api.js?v=20261014-investor-browse1';
+import * as api from '../services/api.js?v=20261021-investor1';
 import { useI18n } from '../lib/i18n.js';
 import { countryOptions } from '../lib/countries.js';
 
@@ -149,7 +149,7 @@ function Forgot({ switchTo }) {
   </form>`;
 }
 
-export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, onDone, onGuest, onClose }) {
+export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, onDone, onGuest, onClose, required = false }) {
   const { t } = useI18n();
   const [mode,setMode] = useState(initialMode);
   const [verified,setVerified] = useState(prefill || null);
@@ -157,10 +157,11 @@ export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, on
   const [resent,setResent] = useState(false);
   const [resendError,setResendError] = useState(false);
   const [legal,setLegal] = useState(null);
+  const dismiss = () => { if (required) setMode('welcome'); else onClose(); };
   useEffect(() => { if (!prefill && initialMode === 'account') api.investorEmailStatus().then((result) => { if (result.verified) { setVerified(result.data); setMode('signup'); } }).catch(() => {}); }, []);
-  return html`<div class="modal-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) onClose(); }}>
+  return html`<div class="modal-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) dismiss(); }}>
     <div class="modal" role="dialog" aria-modal="true" aria-label=${t('investor.title')}>
-      <button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${onClose}>×</button>
+      ${(!required || mode !== 'welcome') && html`<button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${dismiss}>×</button>`}
       <div class="kicker">${t('investor.kicker')}</div>
       <h2 class="form-title">${t('investor.' + (mode === 'signup' || mode === 'account' ? 'signup_title' : mode === 'login' ? 'login_title' : mode === 'forgot' ? 'forgot_password' : 'welcome_title'))}</h2>
       ${reason && html`<p class="form-subtitle">${reason}</p>`}

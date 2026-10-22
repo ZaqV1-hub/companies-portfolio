@@ -16,7 +16,7 @@ export function TopBar({ investor, onInvestorAccess, onLogout }) {
       <nav class="topbar-actions">
         <${LangSwitch} />
         ${investor
-          ? html`<span class="investor-chip">${investor.name}</span><button class="btn btn-outline" onClick=${onLogout}>${t('common.log_out')}</button>`
+          ? html`<a class="investor-chip" href=${href('/investidor')}>${t('investor.hello', { name:investor.name.split(' ')[0] })}</a><button class="btn btn-outline" onClick=${onLogout}>${t('common.log_out')}</button>`
           : html`<button class="btn btn-lime" onClick=${onInvestorAccess}>${t('topbar.investor_access')}</button>`}
       </nav>
     </header>`;

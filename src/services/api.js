@@ -79,6 +79,10 @@ export async function loginInvestor(email, password) { return login(email, passw
 export async function requestPasswordReset(email) { return post('/auth/password-reset/request', { email }); }
 export async function confirmPasswordReset(token, password) { return post('/auth/password-reset/confirm', { token,password }); }
 export async function requestContact(organizationId, projectId) { return post(`/organizations/${q(organizationId)}/contact-requests`, { project_id: projectId }); }
+export async function getInvestorAccount() { return request('/investors/me'); }
+export async function updateInvestorAccount(data) { return request('/investors/me', { method:'PATCH', body:data }); }
+export async function addInvestorFavorite(organizationId) { return post(`/investors/favorites/${q(organizationId)}`, {}); }
+export async function removeInvestorFavorite(organizationId) { return request(`/investors/favorites/${q(organizationId)}`, { method:'DELETE' }); }
 
 export async function listContactRows() { return request('/contacts'); }
 export async function getContactRecord(relationshipId) { try { return await request(`/contacts/${q(relationshipId)}`); } catch (error) { if (error.status === 404) return null; throw error; } }

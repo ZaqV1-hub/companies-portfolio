@@ -1,13 +1,13 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261014-api-recovery3';
+import * as api from './services/api.js?v=20261021-investor1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
-import { TopBar } from './components/TopBar.js?v=20261014-flags1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261014-api-recovery3';
+import { TopBar } from './components/TopBar.js?v=20261021-investor1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261021-investor1';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
-import { ProfilePage } from './pages/public/ProfilePage.js?v=20261014-api-recovery3';
+import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
 import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-api-recovery3';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
@@ -16,6 +16,7 @@ import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-a
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-api-recovery3';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
+import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261021-investor1';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -110,8 +111,13 @@ function PublicSite({ route, user, setUser }) {
   const [first, second] = route.parts;
   const [auth, setAuth] = useState(null); // {mode, reason, pending: {org, projectId, resolve}}
   const [browse, setBrowse] = useState(undefined);
+  const [favoriteIds, setFavoriteIds] = useState([]);
   const investor = user && user.role === 'investor' ? user : null;
   useEffect(() => { api.getInvestorBrowseStatus().then(setBrowse).catch(() => setBrowse({ valid:false })); }, []);
+  useEffect(() => {
+    if (!investor) { setFavoriteIds([]); return; }
+    api.getInvestorAccount().then((account) => setFavoriteIds(account.favorites.map((item) => item.id))).catch(() => {});
+  }, [investor?.id]);
   useEffect(() => {
     if (!browse?.valid) return;
     const remaining = browse.expires_at - Date.now();
@@ -119,24 +125,40 @@ function PublicSite({ route, user, setUser }) {
     const timer = setTimeout(() => setBrowse({ valid:false }), remaining);
     return () => clearTimeout(timer);
   }, [browse?.expires_at]);
-  const canBrowse = Boolean(investor || (browse?.valid && browse.expires_at > Date.now()));
-  const needsWelcome = first === 'org' && second && browse !== undefined && !canBrowse;
+  const canBrowse = Boolean(user || (browse?.valid && browse.expires_at > Date.now()));
+  const needsWelcome = browse !== undefined && !canBrowse && (!first || first === 'org');
+  const needsAccountLogin = first === 'investidor' && !investor;
 
   // "Solicitar contato" only works for a logged-in investor; otherwise opens sign-up / login first.
   const requestContact = (org, projectId) => new Promise((resolve) => {
-    const run = async () => resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null);
+    const run = async () => { try { resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null); } catch { resolve(null); } };
     if (investor && investor.email_verified) run();
     else setAuth({ mode: 'account', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
   });
+  const toggleFavorite = (org) => {
+    const run = async () => {
+      try {
+        if (favoriteIds.includes(org.id)) {
+          await api.removeInvestorFavorite(org.id);
+          setFavoriteIds((current) => current.filter((id) => id !== org.id));
+        } else {
+          await api.addInvestorFavorite(org.id);
+          setFavoriteIds((current) => current.includes(org.id) ? current : [...current, org.id]);
+        }
+      } catch { /* Keep the previous state if the request fails. */ }
+    };
+    if (investor && investor.email_verified) run();
+    else setAuth({ mode:'account', reason:t('investor.login_to_favorite', { org:org.name }), pending:run });
+  };
   const done = (u) => {
     setUser(u);
     const pending = auth && auth.pending;
     setAuth(null);
     if (pending) pending();
   };
-  const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); if (needsWelcome) navigate('/'); };
+  const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); if (needsAccountLogin) navigate('/'); };
   const browseDone = async (data) => { const access = await api.startInvestorBrowse(data); setBrowse(access); setAuth(null); };
-  const logout = async () => { await api.logout(); setUser(null); setBrowse({ valid:false }); };
+  const logout = async () => { await api.logout(); setUser(null); setBrowse({ valid:false }); navigate('/'); };
   const [verifyError,setVerifyError] = useState(false);
   useEffect(() => {
     if (first !== 'verify-email') return;
@@ -147,9 +169,13 @@ function PublicSite({ route, user, setUser }) {
   }, [first,route.query.token]);
 
   let page;
-  if (first === 'org' && second) page = browse === undefined && !investor
+  if (first === 'org' && second) page = browse === undefined && !user
     ? html`<div class="section">${t('common.loading')}</div>`
-    : html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact} />`;
+    : html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact}
+        onToggleFavorite=${toggleFavorite} isFavorite=${favoriteIds.includes(second)} />`;
+  else if (first === 'investidor') page = investor
+    ? html`<${InvestorAccountPage} onUserUpdated=${setUser} />`
+    : html`<div class="section">${t('common.loading')}</div>`;
   else if (first === 'verify-email') page = html`<div class="section"><h1 class="form-title">${t('investor.verify_title')}</h1><p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p></div>`;
   else if (first === 'reset-password') page = html`<${ResetPasswordPage} token=${route.query.token} />`;
   else if (first === 'legal') page = html`<${LegalPage} kind=${second === 'privacy' ? 'privacy' : 'terms'} />`;
@@ -158,8 +184,9 @@ function PublicSite({ route, user, setUser }) {
     <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'login' })} onLogout=${logout} />
     ${page}
     <${PublicFooter} />
-    ${(auth || needsWelcome) && html`<${InvestorAuthModal} key=${`${auth?.mode || 'welcome'}:${auth?.prefill?.email || ''}`}
-      initialMode=${auth?.mode || 'welcome'} reason=${auth?.reason} prefill=${auth?.prefill} onDone=${done} onGuest=${browseDone} onClose=${close} />`}
+    ${(auth || needsWelcome || needsAccountLogin) && html`<${InvestorAuthModal} key=${`${auth?.mode || (needsAccountLogin ? 'login' : 'welcome')}:${auth?.prefill?.email || ''}`}
+      initialMode=${auth?.mode || (needsAccountLogin ? 'login' : 'welcome')} reason=${auth?.reason} prefill=${auth?.prefill}
+      onDone=${done} onGuest=${browseDone} onClose=${close} required=${needsWelcome} />`}
   </div>`;
 }
 

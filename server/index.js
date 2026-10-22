@@ -18,7 +18,7 @@ import { businessDaysBetween } from '../src/lib/crm.js';
 const pool = createPool();
 const app = express();
 const port = Number(process.env.API_PORT || 4317);
-const investorSessionMs = 30 * 24 * 60 * 60 * 1000;
+const investorSessionMs = 7 * 24 * 60 * 60 * 1000;
 const investorBrowseMs = 24 * 60 * 60 * 1000;
 const tokenHash = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
@@ -102,6 +102,12 @@ function requestStateFor(relationship, interactions, holidays) {
 }
 async function sessionUser(req) {
   if (!req.session.user?.id) return null;
+  if (req.session.user.role === 'investor' && (!req.session.investorAuthenticatedAt
+    || Date.now() - req.session.investorAuthenticatedAt >= investorSessionMs)) {
+    delete req.session.user;
+    delete req.session.investorAuthenticatedAt;
+    return null;
+  }
   const [rows] = await pool.execute('SELECT u.*, o.name AS organization_name FROM users u LEFT JOIN organizations o ON o.id=u.organization_id WHERE u.id=?', [req.session.user.id]);
   return rows[0] || null;
 }
@@ -146,7 +152,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     if (user.role === 'investor' && !user.email_verified_at) return res.json({ ok: false, error: 'not_verified', user_id: user.id });
     await new Promise((resolve, reject) => req.session.regenerate((err) => err ? reject(err) : resolve()));
     req.session.user = { id: user.id, role: user.role };
-    if (user.role === 'investor') req.session.cookie.maxAge = investorSessionMs;
+    if (user.role === 'investor') { req.session.investorAuthenticatedAt = Date.now(); req.session.cookie.maxAge = investorSessionMs; }
     res.json({ ok: true, user: safeUser(user,user.organization_name) });
   } catch (error) { routeError(res, error); }
 });
@@ -231,6 +237,7 @@ app.post('/api/investors', signupLimiter, async (req, res) => {
     await connection.commit();
     await new Promise((resolve,reject) => req.session.regenerate((error) => error ? reject(error) : resolve()));
     req.session.user = { id, role:'investor' };
+    req.session.investorAuthenticatedAt = Date.now();
     req.session.cookie.maxAge = investorSessionMs;
     res.status(201).json({ ok:true, user:{ id,role:'investor',name:signup.name,email,organization_id:null,organization_name:null,email_verified:true } });
   } catch (error) { await connection.rollback(); if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ ok: false, error: 'email_taken' }); routeError(res, error); }
@@ -243,6 +250,7 @@ app.post('/api/investors/verify', async (req, res) => {
     await pool.execute('UPDATE users SET email_verified_at=UTC_TIMESTAMP(), verification_token_hash=NULL, verification_expires_at=NULL WHERE id=?', [rows[0].id]);
     await new Promise((resolve,reject)=>req.session.regenerate((err)=>err?reject(err):resolve()));
     req.session.user = { id: rows[0].id, role: 'investor' };
+    req.session.investorAuthenticatedAt = Date.now();
     req.session.cookie.maxAge = investorSessionMs;
     res.json({ ok: true, user: safeUser({ ...rows[0], email_verified_at: new Date() }) });
   } catch (error) { routeError(res, error); }
@@ -257,6 +265,59 @@ app.post('/api/investors/verify/resend', loginLimiter, async (req, res) => {
     await sendAuthMail(rows[0].email, 'verify', token);
     res.json({ ok: true });
   } catch (error) { routeError(res, error); }
+});
+
+app.get('/api/investors/me', requireRole('investor'), async (req, res) => {
+  try {
+    const profile = typeof req.user.investor_profile === 'string' ? JSON.parse(req.user.investor_profile) : (req.user.investor_profile || {});
+    const [favorites] = await pool.execute(`SELECT o.id,o.name,o.logo_url,f.created_at
+      FROM investor_favorites f JOIN organizations o ON o.id=f.organization_id
+      WHERE f.user_id=? AND o.public_state IN ('published','provisional') ORDER BY f.created_at DESC`, [req.user.id]);
+    const [contacts] = await pool.execute(`SELECT r.id AS relationship_id,r.organization_id,o.name AS organization_name,
+      r.status,r.classification,r.contact_request_at,r.created_at,
+      (SELECT MAX(i.date) FROM interactions i WHERE i.relationship_id=r.id) AS last_activity_at
+      FROM relationships r JOIN organizations o ON o.id=r.organization_id JOIN contacts c ON c.id=r.contact_id
+      WHERE (r.contact_id=? OR c.email_normalized=?) AND r.contact_request_at IS NOT NULL
+      ORDER BY r.contact_request_at DESC,r.created_at DESC`, [req.user.contact_id || '', req.user.email.toLowerCase()]);
+    res.json({ user:safeUser(req.user), profile, favorites, contacts });
+  } catch (error) { routeError(res, error); }
+});
+
+app.patch('/api/investors/me', requireRole('investor'), async (req, res) => {
+  const data = req.body || {};
+  const name = String(data.name || '').trim();
+  const profile = {
+    institution:String(data.institution || '').trim(), country:String(data.country || '').trim().toUpperCase(),
+    city:String(data.city || '').trim(), role:String(data.role || '').trim(),
+    investor_type:String(data.investor_type || '').trim(), phone:String(data.phone || '').trim(),
+    linkedin:String(data.linkedin || '').trim(),
+  };
+  if (name.length < 2 || name.length > 200 || !profile.institution || profile.institution.length > 300
+    || !/^[A-Z]{2}$/.test(profile.country) || !profile.city || profile.city.length > 200
+    || profile.role.length > 200 || profile.phone.length > 64 || profile.linkedin.length > 2048
+    || profile.investor_type.length > 64 || (profile.linkedin && !/^https?:\/\//i.test(profile.linkedin)))
+    return res.status(400).json({ error:'invalid' });
+  try {
+    await pool.execute('UPDATE users SET name=?,investor_profile=?,lang=? WHERE id=?',
+      [name,jsonColumn(profile),data.lang === 'pt' ? 'pt' : 'en',req.user.id]);
+    if (req.user.contact_id) await pool.execute('UPDATE contacts SET name=?,country=?,city=?,role=?,phone=?,linkedin=? WHERE id=?',
+      [name,profile.country,profile.city,profile.role || null,profile.phone || null,profile.linkedin || null,req.user.contact_id]);
+    res.json({ ok:true, user:safeUser({ ...req.user,name }), profile });
+  } catch (error) { routeError(res, error); }
+});
+
+app.post('/api/investors/favorites/:id', requireRole('investor'), async (req, res) => {
+  try {
+    const [orgs] = await pool.execute("SELECT id FROM organizations WHERE id=? AND public_state IN ('published','provisional')", [req.params.id]);
+    if (!orgs.length) return res.status(404).json({ error:'not_found' });
+    await pool.execute('INSERT IGNORE INTO investor_favorites (user_id,organization_id) VALUES (?,?)', [req.user.id,req.params.id]);
+    res.json({ ok:true, favorite:true });
+  } catch (error) { routeError(res, error); }
+});
+
+app.delete('/api/investors/favorites/:id', requireRole('investor'), async (req, res) => {
+  try { await pool.execute('DELETE FROM investor_favorites WHERE user_id=? AND organization_id=?', [req.user.id,req.params.id]); res.json({ ok:true, favorite:false }); }
+  catch (error) { routeError(res, error); }
 });
 
 app.post('/api/auth/password-reset/request', loginLimiter, async (req, res) => {
@@ -316,7 +377,11 @@ app.post('/api/organizations/:id/contact-requests', requireRole('investor'), con
       await db.execute('UPDATE users SET contact_id=? WHERE id=?', [contactId, investor.id]);
     }
     const [existing] = await db.execute('SELECT id FROM relationships WHERE contact_id=? AND organization_id=?', [contactId, req.params.id]);
-    if (existing.length) { await db.commit(); return res.json({ ok: true, relationship_id: existing[0].id, reused: true }); }
+    if (existing.length) {
+      await db.execute('UPDATE relationships SET contact_request_at=COALESCE(contact_request_at,?) WHERE id=?', [localDate(),existing[0].id]);
+      await db.commit();
+      return res.json({ ok: true, relationship_id: existing[0].id, reused: true });
+    }
     const relationshipId = `r-${crypto.randomUUID()}`;
     await db.execute('INSERT INTO relationships (id,contact_id,organization_id,origin,status,classification,classification_state,contact_request_at,created_at) VALUES (?,?,?,?,?,?,?,?,UTC_TIMESTAMP())',
       [relationshipId, contactId, req.params.id, 'Portfólio', 'in_progress', 'lead', 'validated', localDate()]);

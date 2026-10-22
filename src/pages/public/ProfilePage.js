@@ -1,11 +1,11 @@
 // Public profile page: loads the public organization and renders ProfileView.
 import { html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261014-api-recovery3';
+import * as api from '../../services/api.js?v=20261021-investor1';
 import { useI18n } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261014-api-recovery3';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261021-investor1';
 
-export function ProfilePage({ orgId, projectId, onRequestContact }) {
+export function ProfilePage({ orgId, projectId, onRequestContact, onToggleFavorite, isFavorite }) {
   const { t } = useI18n();
   const [org, setOrg] = useState(undefined);
   const [sent, setSent] = useState({});
@@ -22,5 +22,6 @@ export function ProfilePage({ orgId, projectId, onRequestContact }) {
   };
   return html`<${ProfileView} org=${org} projectId=${current} backHref=${href('/')}
     onSelectProject=${(pid) => navigate('/org/' + org.id + '?project=' + pid, { keepScroll: true })}
-    onRequestContact=${request} contactState=${sent[current] ? 'sent' : null} />`;
+    onRequestContact=${request} contactState=${sent[current] ? 'sent' : null}
+    onFavorite=${() => onToggleFavorite(org)} isFavorite=${isFavorite} />`;
 }

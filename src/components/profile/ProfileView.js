@@ -28,14 +28,18 @@ function stageChip(project, i18n) {
   return s.trl ? label + ' · ' + i18n.t('profile.trl', { n: s.trl }) : label;
 }
 
-function Header({ org, project, i18n, backHref }) {
+function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
   const t = i18n.t;
   const sub = subtitle(project, i18n);
   const chip = stageChip(project, i18n);
   const place = [org.city, org.state].filter(Boolean).join(' / ');
   return html`<div class="profile-hero" style=${org.cover_url ? { backgroundImage: "url('" + org.cover_url + "')" } : null}>
     <div class="profile-hero-inner">
-      ${backHref && html`<a class="btn btn-ghost-light" href=${backHref}>${t('common.back_to_directory')}</a>`}
+      <div class="profile-hero-actions">
+        ${backHref && html`<a class="btn btn-ghost-light" href=${backHref}>${t('common.back_to_directory')}</a>`}
+        ${onFavorite && html`<button type="button" class="btn btn-ghost-light" aria-pressed=${isFavorite} onClick=${onFavorite}>
+          ${isFavorite ? t('investor.favorited') : t('investor.favorite')}</button>`}
+      </div>
       <div class="profile-hero-row">
         <${LogoPlate} org=${org} className="hero-plate" />
         <div style=${{ flex: '1 1 340px', minWidth: 0 }}>
@@ -110,7 +114,7 @@ function Gallery({ org, i18n }) {
  * @param {string} [props.contactState] 'sent' after a request
  * @param {string} [props.backHref]
  */
-export function ProfileView({ org, projectId, onSelectProject, onRequestContact, contactState, backHref }) {
+export function ProfileView({ org, projectId, onSelectProject, onRequestContact, contactState, backHref, onFavorite, isFavorite }) {
   const i18n = useI18n();
   const project = org.projects.find((p) => p.id === projectId) || org.projects[0];
   if (!project) return null;
@@ -119,7 +123,7 @@ export function ProfileView({ org, projectId, onSelectProject, onRequestContact,
   const side = otherSideCards(org, project, i18n);
   const blocks = mainBlocks(org, project, i18n);
   return html`<div class="profile">
-    <${Header} org=${org} project=${project} i18n=${i18n} backHref=${backHref} />
+    <${Header} org=${org} project=${project} i18n=${i18n} backHref=${backHref} onFavorite=${onFavorite} isFavorite=${isFavorite} />
     <div class="profile-body">
       <div class="profile-cta-mobile">${cta}</div>
       <main class="profile-main">
