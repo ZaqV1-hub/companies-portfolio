@@ -7,7 +7,7 @@ import { href } from '../../lib/router.js';
 
 const investorTypes = ['accelerator','angel','angel_network','asset_wealth_management','cvc','dfi','endowment','family_office','foundation','fund_of_funds','hnwi','non_profit','organization','pe_firm','pension_fund','service_provider','vc'];
 
-export function InvestorAccountPage({ onUserUpdated }) {
+export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
   const { t, lang, label } = useI18n();
   const [data, setData] = useState(null);
   const [form, setForm] = useState(null);
@@ -37,6 +37,7 @@ export function InvestorAccountPage({ onUserUpdated }) {
     try {
       await api.removeInvestorFavorite(id);
       setData((current) => ({ ...current, favorites:current.favorites.filter((item) => item.id !== id) }));
+      onFavoritesChanged((current) => current.filter((item) => item !== id));
     } catch { setMessage(t('investor.try_again')); }
   };
   return html`<div class="investor-account section">

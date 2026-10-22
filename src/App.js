@@ -16,7 +16,7 @@ import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-a
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-api-recovery3';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
-import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261021-investor1';
+import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261021-investor2';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -174,7 +174,7 @@ function PublicSite({ route, user, setUser }) {
     : html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact}
         onToggleFavorite=${toggleFavorite} isFavorite=${favoriteIds.includes(second)} />`;
   else if (first === 'investidor') page = investor
-    ? html`<${InvestorAccountPage} onUserUpdated=${setUser} />`
+    ? html`<${InvestorAccountPage} onUserUpdated=${setUser} onFavoritesChanged=${setFavoriteIds} />`
     : html`<div class="section">${t('common.loading')}</div>`;
   else if (first === 'verify-email') page = html`<div class="section"><h1 class="form-title">${t('investor.verify_title')}</h1><p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p></div>`;
   else if (first === 'reset-password') page = html`<${ResetPasswordPage} token=${route.query.token} />`;
