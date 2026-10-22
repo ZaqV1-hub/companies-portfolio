@@ -165,29 +165,55 @@ app.get('/api/investors/browse', (req, res) => {
 
 app.post('/api/investors/browse', signupLimiter, (req, res) => {
   const name = String(req.body.name || '').trim();
-  const institution = String(req.body.institution || '').trim();
-  const email = String(req.body.email || '').trim().toLowerCase();
-  if (name.length < 2 || !institution || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    || !req.body.accept_terms || !req.body.accept_privacy) return res.status(400).json({ error:'invalid' });
+  if (name.length < 2 || name.length > 200) return res.status(400).json({ error:'invalid' });
   const expiresAt = Date.now() + investorBrowseMs;
-  req.session.investorBrowse = { name, institution, email, expiresAt,
-    termsAcceptedAt: new Date().toISOString(), privacyAcceptedAt: new Date().toISOString() };
+  req.session.investorBrowse = { name, expiresAt };
   req.session.cookie.maxAge = investorBrowseMs;
   req.session.save((error) => error ? routeError(res, error) : res.json({ valid:true, expires_at:expiresAt }));
 });
 
 app.post('/api/investors/email/start', signupLimiter, async (req, res) => {
   if (!mailAvailable()) return res.status(503).json({ ok: false, error: 'email_unavailable' });
-  const email = String(req.body.email || '').trim().toLowerCase();
-  const name = String(req.body.name || '').trim();
-  const institution = String(req.body.institution || '').trim();
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || name.length < 2 || !institution || !req.body.accept_terms || !req.body.accept_privacy)
+  const data = req.body || {};
+  const firstName = String(data.first_name || '').trim();
+  const lastName = String(data.last_name || '').trim();
+  const name = `${firstName} ${lastName}`;
+  const email = String(data.email || '').trim().toLowerCase();
+  const institution = String(data.institution || '').trim();
+  const password = String(data.password || '');
+  const country = String(data.country || '').trim().toUpperCase();
+  const city = String(data.city || '').trim();
+  const role = String(data.role || '').trim();
+  const investorType = String(data.investor_type || '').trim();
+  const phone = String(data.phone || '').trim();
+  const linkedin = String(data.linkedin || '').trim();
+  if (!firstName || !lastName || name.length > 200 || !institution || institution.length > 300
+    || email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    || password.length < 10 || password.length > 128 || password !== data.confirm_password
+    || !/^[A-Z]{2}$/.test(country) || !city || city.length > 200
+    || role.length > 200 || investorType.length > 64 || phone.length > 64
+    || linkedin.length > 2048 || (linkedin && !/^https?:\/\//i.test(linkedin))
+    || !data.accept_terms || !data.accept_privacy)
     return res.status(400).json({ ok: false, error: 'invalid' });
   try {
-    const [dupes] = await pool.execute('SELECT id FROM users WHERE email_normalized=?', [email]);
-    if (dupes.length) return res.status(409).json({ ok: false, error: 'email_taken' });
+    const [dupes] = await pool.execute('SELECT id,role,email_verified_at FROM users WHERE email_normalized=?', [email]);
+    if (dupes.length && (dupes[0].role !== 'investor' || dupes[0].email_verified_at)) return res.status(409).json({ ok: false, error: 'email_taken' });
     const token = crypto.randomBytes(32).toString('base64url');
-    await pool.execute('INSERT INTO investor_email_challenges (email,name,institution,token_hash,expires_at,created_at) VALUES (?,?,?,?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR),UTC_TIMESTAMP()) ON DUPLICATE KEY UPDATE name=VALUES(name),institution=VALUES(institution),token_hash=VALUES(token_hash),expires_at=VALUES(expires_at),created_at=VALUES(created_at)', [email,name,institution,tokenHash(token)]);
+    const profile = jsonColumn({ first_name:firstName,last_name:lastName,institution,country,city,
+      role:role || null,investor_type:investorType || null,
+      phone:phone || null,linkedin:linkedin || null });
+    const passwordHash = await bcrypt.hash(password, 12);
+    const userId = dupes[0]?.id || `u-${crypto.randomUUID()}`;
+    if (dupes.length) await pool.execute(`UPDATE users SET name=?,password_hash=?,lang=?,investor_profile=?,
+      verification_token_hash=?,verification_expires_at=DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR),
+      terms_accepted_at=UTC_TIMESTAMP(),privacy_accepted_at=UTC_TIMESTAMP() WHERE id=?`,
+      [name,passwordHash,data.lang === 'pt' ? 'pt' : 'en',profile,tokenHash(token),userId]);
+    else await pool.execute(`INSERT INTO users (id,role,name,email,password_hash,lang,investor_profile,
+      terms_accepted_at,privacy_accepted_at,verification_token_hash,verification_expires_at,created_at)
+      VALUES (?,?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP(),?,DATE_ADD(UTC_TIMESTAMP(), INTERVAL 24 HOUR),UTC_TIMESTAMP())`,
+      [userId,'investor',name,email,passwordHash,data.lang === 'pt' ? 'pt' : 'en',profile,tokenHash(token)]);
+    await pool.execute('INSERT INTO consents (id,user_id,terms_version,privacy_version,accepted_at) VALUES (?,?,?,?,UTC_TIMESTAMP())',
+      [`c-${crypto.randomUUID()}`,userId,'2026-10-draft','2026-10-draft']);
     try { await sendAuthMail(email, 'verify', token); res.json({ ok: true }); }
     catch (mailError) { console.error('Investor email delivery failed:', mailError.message); res.status(503).json({ ok: false, error: 'email_delivery_failed' }); }
   } catch (error) { routeError(res,error); }
@@ -285,14 +311,17 @@ app.get('/api/investors/me', requireRole('investor'), async (req, res) => {
 
 app.patch('/api/investors/me', requireRole('investor'), async (req, res) => {
   const data = req.body || {};
-  const name = String(data.name || '').trim();
+  const firstName = String(data.first_name || '').trim();
+  const lastName = String(data.last_name || '').trim();
+  const name = `${firstName} ${lastName}`;
   const profile = {
+    first_name:firstName, last_name:lastName,
     institution:String(data.institution || '').trim(), country:String(data.country || '').trim().toUpperCase(),
     city:String(data.city || '').trim(), role:String(data.role || '').trim(),
     investor_type:String(data.investor_type || '').trim(), phone:String(data.phone || '').trim(),
     linkedin:String(data.linkedin || '').trim(),
   };
-  if (name.length < 2 || name.length > 200 || !profile.institution || profile.institution.length > 300
+  if (!firstName || !lastName || name.length > 200 || !profile.institution || profile.institution.length > 300
     || !/^[A-Z]{2}$/.test(profile.country) || !profile.city || profile.city.length > 200
     || profile.role.length > 200 || profile.phone.length > 64 || profile.linkedin.length > 2048
     || profile.investor_type.length > 64 || (profile.linkedin && !/^https?:\/\//i.test(profile.linkedin)))

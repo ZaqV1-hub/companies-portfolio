@@ -4,7 +4,7 @@ import * as api from './services/api.js?v=20261021-investor1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261021-investor1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261021-investor1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261021-investor3';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
@@ -16,7 +16,7 @@ import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-a
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-api-recovery3';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
-import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261021-investor2';
+import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261021-investor3';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -133,7 +133,7 @@ function PublicSite({ route, user, setUser }) {
   const requestContact = (org, projectId) => new Promise((resolve) => {
     const run = async () => { try { resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null); } catch { resolve(null); } };
     if (investor && investor.email_verified) run();
-    else setAuth({ mode: 'account', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
+    else setAuth({ mode: 'login', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
   });
   const toggleFavorite = (org) => {
     const run = async () => {
@@ -148,7 +148,7 @@ function PublicSite({ route, user, setUser }) {
       } catch { /* Keep the previous state if the request fails. */ }
     };
     if (investor && investor.email_verified) run();
-    else setAuth({ mode:'account', reason:t('investor.login_to_favorite', { org:org.name }), pending:run });
+    else setAuth({ mode:'login', reason:t('investor.login_to_favorite', { org:org.name }), pending:run });
   };
   const done = (u) => {
     setUser(u);
@@ -162,9 +162,10 @@ function PublicSite({ route, user, setUser }) {
   const [verifyError,setVerifyError] = useState(false);
   useEffect(() => {
     if (first !== 'verify-email') return;
-    api.confirmInvestorEmail(route.query.token).then((result) => {
-      setAuth({ mode:'signup', prefill:result.data });
-      navigate('/');
+    api.verifyInvestorEmail(route.query.token).then((result) => {
+      setUser(result.user);
+      setAuth(null);
+      navigate('/investidor');
     }).catch(() => setVerifyError(true));
   }, [first,route.query.token]);
 

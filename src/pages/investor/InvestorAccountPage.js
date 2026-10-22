@@ -18,7 +18,9 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
     api.getInvestorAccount().then((result) => {
       if (!active) return;
       setData(result);
-      setForm({ name:result.user.name, ...result.profile });
+      const parts = result.user.name.trim().split(/\s+/);
+      setForm({ ...result.profile,first_name:result.profile.first_name || parts[0] || '',
+        last_name:result.profile.last_name || parts.slice(1).join(' ') });
     }).catch(() => { if (active) setMessage(t('investor.account_load_error')); });
     return () => { active = false; };
   }, []);
@@ -58,7 +60,8 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
       </section>
       <section class="investor-account-card"><h2>${t('investor.account_details')}</h2><p>${data.user.email}</p>
         <form class="investor-account-form" onSubmit=${save}>
-          <label>${t('investor.name')}<input class="input" required minlength="2" value=${form.name || ''} onInput=${update('name')} /></label>
+          <label>${t('investor.first_name')}<input class="input" required value=${form.first_name || ''} onInput=${update('first_name')} /></label>
+          <label>${t('investor.last_name')}<input class="input" required value=${form.last_name || ''} onInput=${update('last_name')} /></label>
           <label>${t('investor.institution')}<input class="input" required value=${form.institution || ''} onInput=${update('institution')} /></label>
           <label>${t('investor.country')}<select class="input" required value=${form.country || ''} onChange=${update('country')}><option value="">${t('form.choose')}</option>${countryOptions(lang).map((country) => html`<option key=${country.code} value=${country.code}>${country.name}</option>`)}</select></label>
           <label>${t('investor.city')}<input class="input" required value=${form.city || ''} onInput=${update('city')} /></label>
