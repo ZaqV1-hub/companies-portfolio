@@ -3,6 +3,7 @@ import * as api from '../../services/api.js?v=20261021-investor1';
 import { useI18n } from '../../lib/i18n.js';
 import { CountryControl, StateControl } from '../../components/InvestorLocationFields.js?v=20261022-investor-form1';
 import { formatDate } from '../../lib/format.js';
+import { formatPhoneInput } from '../../lib/phone.js?v=20261022-phone1';
 import { href } from '../../lib/router.js';
 
 const investorTypes = ['accelerator','angel','angel_network','asset_wealth_management','cvc','dfi','endowment','family_office','foundation','fund_of_funds','hnwi','non_profit','organization','pe_firm','pension_fund','service_provider','vc'];
@@ -24,8 +25,9 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
     }).catch(() => { if (active) setMessage(t('investor.account_load_error')); });
     return () => { active = false; };
   }, []);
-  const update = (key) => (event) => setForm((current) => ({ ...current, [key]:event.target.value,
-    ...(key === 'country' ? { state:'',city:'' } : {}) }));
+  const update = (key) => (event) => setForm((current) => ({ ...current,
+    [key]:key === 'phone' ? formatPhoneInput(event.target.value, current.country) : event.target.value,
+    ...(key === 'country' ? { state:'',city:'',phone:formatPhoneInput(current.phone, event.target.value) } : {}) }));
   const save = async (event) => {
     event.preventDefault(); setBusy(true); setMessage('');
     try {
@@ -69,7 +71,7 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
           <label>${t('investor.city')}<input class="input" required value=${form.city || ''} onInput=${update('city')} /></label>
           <label>${t('investor.role')}<input class="input" value=${form.role || ''} onInput=${update('role')} /></label>
           <label>${t('investor.investor_type')}<select class="input" value=${form.investor_type || ''} onChange=${update('investor_type')}><option value="">${t('form.choose')}</option>${investorTypes.map((type) => html`<option key=${type} value=${type}>${t('enum.investor_types.' + type)}</option>`)}</select></label>
-          <label>${t('investor.phone')}<input class="input" type="tel" required value=${form.phone || ''} onInput=${update('phone')} /></label>
+          <label>${t('investor.phone')}<input class="input" type="tel" inputmode="tel" autocomplete="tel" required placeholder=${form.country === 'BR' ? '(11) 91234-5678' : '+1 415 555 2671'} value=${formatPhoneInput(form.phone, form.country)} onInput=${update('phone')} /></label>
           <button class="btn btn-lime" type="submit" disabled=${busy}>${t('investor.save_account')}</button>
         </form>
       </section>`}

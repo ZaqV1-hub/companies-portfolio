@@ -3,6 +3,7 @@ import { html, useState } from '../lib/html.js';
 import * as api from '../services/api.js?v=20261021-investor1';
 import { useI18n } from '../lib/i18n.js';
 import { CountryControl, StateControl } from './InvestorLocationFields.js?v=20261022-investor-form1';
+import { formatPhoneInput } from '../lib/phone.js?v=20261022-phone1';
 
 const INVESTOR_TYPES = ['accelerator','angel','angel_network','asset_wealth_management','cvc','dfi','endowment','family_office','foundation','fund_of_funds','hnwi','non_profit','organization','pe_firm','pension_fund','service_provider','vc'];
 
@@ -35,7 +36,8 @@ function AccountStart({ switchTo, onStarted, openLegal }) {
   const [busy, setBusy] = useState(false);
   const set = (key) => (event) => {
     const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
-    setData((current) => ({ ...current, [key]:value, ...(key === 'country' ? { state:'',city:'' } : {}) }));
+    setData((current) => ({ ...current, [key]:key === 'phone' ? formatPhoneInput(value, current.country) : value,
+      ...(key === 'country' ? { state:'',city:'',phone:formatPhoneInput(current.phone, value) } : {}) }));
     setError('');
     if (key === 'email') setEmailTaken(false);
     if (key === 'confirm_password') setTouched((current) => ({ ...current, confirm_password:true }));
@@ -95,7 +97,7 @@ function AccountStart({ switchTo, onStarted, openLegal }) {
       <${Input} label=${t('investor.city')} required=${true} error=${fieldError('city')} valid=${fieldValid('city')}><input class="input input-sm" aria-invalid=${Boolean(fieldError('city'))} autocomplete="address-level2" value=${data.city} onInput=${set('city')} onBlur=${blur('city')} /><//>
       <${Input} label=${t('investor.role')}><input class="input input-sm" autocomplete="organization-title" value=${data.role} onInput=${set('role')} /><//>
       <${Input} label=${t('investor.investor_type')}><select class="input input-sm" value=${data.investor_type} onChange=${set('investor_type')}><option value="">${t('form.choose')}</option>${INVESTOR_TYPES.map((type) => html`<option key=${type} value=${type}>${t('enum.investor_types.' + type)}</option>`)}</select><//>
-      <${Input} label=${t('investor.phone')} required=${true} error=${fieldError('phone')} valid=${fieldValid('phone')}><input class="input input-sm" type="tel" autocomplete="tel" aria-invalid=${Boolean(fieldError('phone'))} value=${data.phone} onInput=${set('phone')} onBlur=${blur('phone')} /><//>
+      <${Input} label=${t('investor.phone')} required=${true} error=${fieldError('phone')} valid=${fieldValid('phone')}><input class="input input-sm" type="tel" inputmode="tel" autocomplete="tel" placeholder=${data.country === 'BR' ? '(11) 91234-5678' : '+1 415 555 2671'} aria-invalid=${Boolean(fieldError('phone'))} value=${data.phone} onInput=${set('phone')} onBlur=${blur('phone')} /><//>
     </div>
     <${TermsChecks} terms=${data.accept_terms} privacy=${data.accept_privacy} onTerms=${set('accept_terms')} onPrivacy=${set('accept_privacy')} openLegal=${openLegal}
       termsError=${submitted && errors.accept_terms} privacyError=${submitted && errors.accept_privacy} />
