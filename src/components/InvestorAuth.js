@@ -60,7 +60,7 @@ function AccountStart({ switchTo, onStarted, openLegal }) {
 
 function Welcome({ switchTo, onGuest }) {
   const { t } = useI18n();
-  const [data, setData] = useState({ name:'' });
+  const [data, setData] = useState({ name:'',company:'',email:'' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (key) => (event) => setData({ ...data, [key]:event.target.type === 'checkbox' ? event.target.checked : event.target.value });
@@ -73,6 +73,8 @@ function Welcome({ switchTo, onGuest }) {
   return html`<form class="auth-form" onSubmit=${submit}>
     <p class="section-note">${t('investor.welcome_intro')}</p>
     <${Input} label=${t('investor.first_name')} required=${true}><input class="input input-sm" required minlength="2" autocomplete="given-name" value=${data.name} onInput=${set('name')} /><//>
+    <${Input} label=${t('investor.welcome_company')} required=${true}><input class="input input-sm" required autocomplete="organization" value=${data.company} onInput=${set('company')} /><//>
+    <${Input} label=${t('investor.email')} required=${true}><input class="input input-sm" type="email" required autocomplete="email" value=${data.email} onInput=${set('email')} /><//>
     ${error && html`<div class="form-error" role="alert">${error}</div>`}
     <button class="btn btn-lime btn-xl" type="submit" disabled=${busy}>${t('investor.browse_24h')}</button>
     <p class="auth-switch">${t('investor.have_account')} <button type="button" class="btn-link link-accent" onClick=${() => switchTo('login')}>${t('investor.log_in')}</button></p>

@@ -165,9 +165,13 @@ app.get('/api/investors/browse', (req, res) => {
 
 app.post('/api/investors/browse', signupLimiter, (req, res) => {
   const name = String(req.body.name || '').trim();
-  if (name.length < 2 || name.length > 200) return res.status(400).json({ error:'invalid' });
+  const company = String(req.body.company || '').trim();
+  const email = String(req.body.email || '').trim().toLowerCase();
+  if (name.length < 2 || name.length > 200 || !company || company.length > 300
+    || email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ error:'invalid' });
   const expiresAt = Date.now() + investorBrowseMs;
-  req.session.investorBrowse = { name, expiresAt };
+  req.session.investorBrowse = { name, company, email, expiresAt };
   req.session.cookie.maxAge = investorBrowseMs;
   req.session.save((error) => error ? routeError(res, error) : res.json({ valid:true, expires_at:expiresAt }));
 });
