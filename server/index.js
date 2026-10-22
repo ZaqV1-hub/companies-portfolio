@@ -90,10 +90,10 @@ function localDate() {
   return `${p.year}-${p.month}-${p.day}`;
 }
 function completenessFor(contact, institution, relationship) {
-  const fields = [contact.role,contact.linkedin,institution.investor_type,institution.niche,
+  const fields = [contact.role,institution.investor_type,institution.niche,
     institution.ticket_min_musd != null || institution.ticket_max_musd != null ? 'x' : null,
     institution.interest_type,institution.sectors,institution.description_original || institution.description_pt,institution.website,relationship.origin,relationship.status];
-  const names = ['role','linkedin','investor_type','niche','ticket','interest_type','sectors','description','website','origin','status'];
+  const names = ['role','investor_type','niche','ticket','interest_type','sectors','description','website','origin','status'];
   const missing = names.filter((_,i) => fields[i] == null || fields[i] === '' || Array.isArray(fields[i]) && !fields[i].length);
   return { filled:names.length-missing.length,total:names.length,missing,pct:Math.round((names.length-missing.length)*100/names.length) };
 }
@@ -197,7 +197,8 @@ app.post('/api/investors/email/start', signupLimiter, async (req, res) => {
     || password.length < 10 || password.length > 128 || !/\p{Lu}/u.test(password)
     || !/\p{Ll}/u.test(password) || !/\d/.test(password) || password !== data.confirm_password
     || !/^[A-Z]{2}$/.test(country) || !state || state.length > 200 || !city || city.length > 200
-    || role.length > 200 || investorType.length > 64 || phone.length > 64
+    || role.length > 200 || investorType.length > 64 || !/^\+?[\d\s().-]{10,24}$/.test(phone)
+    || (phone.match(/\d/g) || []).length < 10 || (phone.match(/\d/g) || []).length > 15
     || !data.accept_terms || !data.accept_privacy)
     return res.status(400).json({ ok: false, error: 'invalid' });
   try {
@@ -328,7 +329,9 @@ app.patch('/api/investors/me', requireRole('investor'), async (req, res) => {
   if (!firstName || !lastName || name.length > 200 || !profile.institution || profile.institution.length > 300
     || !/^[A-Z]{2}$/.test(profile.country) || !profile.state || profile.state.length > 200
     || !profile.city || profile.city.length > 200 || profile.role.length > 200
-    || profile.phone.length > 64 || profile.investor_type.length > 64)
+    || !/^\+?[\d\s().-]{10,24}$/.test(profile.phone)
+    || (profile.phone.match(/\d/g) || []).length < 10 || (profile.phone.match(/\d/g) || []).length > 15
+    || profile.investor_type.length > 64)
     return res.status(400).json({ error:'invalid' });
   try {
     await pool.execute('UPDATE users SET name=?,investor_profile=?,lang=? WHERE id=?',

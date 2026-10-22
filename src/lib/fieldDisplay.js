@@ -9,7 +9,9 @@ export function displayLines(field, value, i18n) {
   const usd = (n) => (n == null || n === '' ? '' : formatUSD(n, 'pt'));
   if (value == null) return [];
   switch (field.type) {
-    case 'text': return pt(value) ? [pt(value)] : [];
+    case 'text': return value && typeof value === 'object'
+      ? [value.pt && 'PT: ' + value.pt, value.en && 'EN: ' + value.en].filter(Boolean)
+      : value ? ['PT: ' + value] : [];
     case 'plain': case 'url': return value ? [String(value)] : [];
     case 'select': return value ? [L(field.list, value)] : [];
     case 'trl': return value ? ['TRL ' + value] : [];
@@ -38,13 +40,13 @@ export function displayLines(field, value, i18n) {
   }
 }
 
-/** Compares two values ignoring the English texts (the team edits those). */
+/** Compares all stored values, including both language versions. */
 export function sameValue(a, b) {
   const strip = (v) => {
     if (v == null) return null;
     if (Array.isArray(v)) return v.map(strip);
     if (typeof v === 'object') {
-      if ('pt' in v && 'en' in v && Object.keys(v).length <= 2) return v.pt || '';
+      if ('pt' in v && 'en' in v && Object.keys(v).length <= 2) return v.en ? { pt:v.pt || '', en:v.en } : v.pt || '';
       const out = {};
       Object.keys(v).sort().forEach((k) => { const s = strip(v[k]); if (s != null && s !== '' && !(Array.isArray(s) && !s.length)) out[k] = s; });
       return Object.keys(out).length ? out : null;

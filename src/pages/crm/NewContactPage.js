@@ -23,12 +23,10 @@ export const LISTS = {
     'investment_portfolio', 'investment_matchmaking', 'pitch_training'],
 };
 
-/** One field with its level: req (*), rec ("usado no relatório Apex") or opt. */
+/** One field with its required marker and inline error. */
 export function F({ label, level, error, id, children, wide }) {
-  const { t } = useI18n();
   return html`<label class=${cx('crm-field', wide && 'wide', error && 'has-error')} id=${id}>
-    <span class="field-label">${label}${level === 'req' && html`<span class="req"> *</span>`}
-      ${level === 'rec' && html` <span class="apex-mark">${t('crm.apex_mark')}</span>`}</span>
+    <span class="field-label">${label}${level === 'req' && html`<span class="req"> *</span>`}</span>
     ${children}
     ${error && html`<span class="field-error">${error}</span>`}
   </label>`;
@@ -83,7 +81,7 @@ export function NewContactPage({ team, base }) {
   const { t, lang } = useI18n();
   const [owners, setOwners] = useState([]);
   const [orgId, setOrgId] = useState(team ? 'program' : '');
-  const [contact, setContact] = useState({ name: '', email: '', country: '', city: '', role: '', linkedin: '', phone: '' });
+  const [contact, setContact] = useState({ name: '', email: '', country: '', city: '', role: '', phone: '' });
   const [inst, setInst] = useState({ name: '', investor_type: null, niche: null, ticket_min_musd: null, ticket_max_musd: null, interest_type: null, sectors: [], description_original: '', description_pt: '', website: '' });
   const [rel, setRel] = useState({ origin: team ? 'Contato direto' : null, status: 'in_progress', deal_expectation: null });
   const [it, setIt] = useState({ date: todayISO(), description: '', type: null, apex_product: null, event: null });
@@ -105,7 +103,7 @@ export function NewContactPage({ team, base }) {
     const res = await api.lookupContactByEmail(contact.email, orgId);
     setFound(res);
     if (res) {
-      setContact({ ...contact, ...Object.fromEntries(Object.entries(res.contact).filter(([k, v]) => ['name', 'country', 'city', 'role', 'linkedin', 'phone'].includes(k) && v)) });
+      setContact({ ...contact, ...Object.fromEntries(Object.entries(res.contact).filter(([k, v]) => ['name', 'country', 'city', 'role', 'phone'].includes(k) && v)) });
       if (res.institution) { setInst({ ...inst, ...res.institution }); setInstFound(true); }
     }
   };
@@ -156,7 +154,6 @@ export function NewContactPage({ team, base }) {
             ${countryOptions(lang).map((c) => html`<option key=${c.code} value=${c.code}>${c.name}</option>`)}</select><//>
         <${F} label=${t('crm.f_city')} level="req" error=${errors.city}><input class="input input-sm" value=${contact.city} onInput=${sc('city')} /><//>
         <${F} label=${t('crm.f_role')} level="rec"><input class="input input-sm" value=${contact.role || ''} onInput=${sc('role')} /><//>
-        <${F} label=${t('crm.f_linkedin')} level="rec"><input class="input input-sm" type="url" value=${contact.linkedin || ''} onInput=${sc('linkedin')} /><//>
         <${F} label=${t('crm.f_phone')} level="opt"><input class="input input-sm" type="tel" value=${contact.phone || ''} onInput=${sc('phone')} /><//>
       </div>
     </section>

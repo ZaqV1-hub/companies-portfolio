@@ -4,13 +4,14 @@ import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
-import { href } from '../../lib/router.js';
+import { navigate } from '../../lib/router.js';
+import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js';
 import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261014-profile1';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261014-profile1';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261014-profile1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261022-company-crm1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261022-company-crm1';
 
 function problemText(i18n, p) {
   return i18n.t('form.errors.' + p.code, p);
@@ -77,7 +78,10 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
   const [toast, setToast] = useState(null);
   const [showErrors, setShowErrors] = useState(false);
 
-  const load = () => api.getMyProfileForm().then((d) => { setData(d); setContent(d.draft.content); setReviewed(d.draft.reviewed_steps || {}); });
+  const load = () => api.getMyProfileForm().then((d) => {
+    const preview = getCompanyPreview();
+    setData(d); setContent(preview?.content || d.draft.content); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
+  });
   useEffect(() => { load(); }, []);
 
   const steps = useMemo(() => (content ? formSteps(content) : []), [content]);
@@ -109,12 +113,16 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
     const res = await api.saveMyProfileDraft(content, reviewed);
     setToast(res.ok ? t('form.saved') : res.error);
     setTimeout(() => setToast(null), 2500);
-    if (res.ok) setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } });
+    if (res.ok) { clearCompanyPreview(); setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } }); }
+  };
+  const openPreview = () => {
+    setCompanyPreview(content, reviewed);
+    navigate('/company/preview');
   };
   const submit = async () => {
     setShowErrors(true);
     const res = await api.submitMyProfileForReview(content, reviewed);
-    if (res.ok) { await load(); setToast(t('form.submitted')); }
+    if (res.ok) { clearCompanyPreview(); await load(); setToast(t('form.submitted')); }
   };
 
   const renderFields = (fields, container, onChange, projectId) => fields.map((f) => html`<${Field} key=${f.key} field=${f} stepId=${step.id}
@@ -159,7 +167,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
         <h1 class="page-title">${org.name}</h1>
         <div class="page-subtitle">
           ${t('form.status')}: <span class=${'status-pill s-' + status}>${i18n.label('org_status', status)}</span>
-          ${org.public_state !== 'hidden' && html` · <a href=${href('/org/' + org.id)} target="_blank">${t('form.view_public')} ↗</a>`}
+          · <button type="button" class="btn-link" onClick=${openPreview}>${t('form.view_public')} ↗</button>
           ${org.public_state === 'provisional' && html` · ${t('form.updating_public')}`}
         </div>
       </div>

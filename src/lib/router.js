@@ -2,10 +2,12 @@
 import { useEffect, useState } from './html.js';
 
 function appPath(pathname) {
-  return pathname.replace(/^\/empresa(?=\/|$)/, '/company').replace(/^\/painel(?=\/|$)/, '/team');
+  return pathname.replace(/^\/empresa(?=\/|$)/, '/company').replace(/^\/(painel|panel)(?=\/|$)/, '/team');
 }
 
 function publicPath(path) {
+  const englishArea = /^\/(company|panel|team)(?=\/|$)/.test(location.pathname);
+  if (englishArea) return path.replace(/^\/empresa(?=\/|$)/, '/company').replace(/^\/(painel|team)(?=\/|$)/, '/panel');
   return path.replace(/^\/company(?=\/|$)/, '/empresa').replace(/^\/team(?=\/|$)/, '/painel');
 }
 
@@ -15,7 +17,9 @@ function parse() {
   const path = appPath(url.pathname);
   const query = {};
   url.searchParams.forEach((v, k) => { query[k] = v; });
-  return { path, parts: path.split('/').filter(Boolean), query };
+  const areaLang = /^\/(empresa|painel)(?=\/|$)/.test(url.pathname) ? 'pt'
+    : /^\/(company|panel|team)(?=\/|$)/.test(url.pathname) ? 'en' : null;
+  return { path, parts: path.split('/').filter(Boolean), query, areaLang };
 }
 
 export function useRoute() {

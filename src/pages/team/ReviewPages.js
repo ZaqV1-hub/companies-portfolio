@@ -51,16 +51,23 @@ function CompareRow({ field, before, after, onChange, i18n, reference, onlyChang
   if (onlyChanges && !changed && !isNew) return null;
   const prev = displayLines(field, before, i18n);
   const next = displayLines(field, after, i18n);
+  const extraEnglish = (value) => field.type === 'text' ? [] : collectTexts(value).filter((entry) => entry.en)
+    .map((entry) => `EN${entry.path.length ? ' ' + entry.path.map((part) => typeof part === 'number' ? part + 1 : part).join(' · ') : ''}: ${entry.en}`);
   return html`<div class=${cx('cmp-row', changed && 'changed')}>
     <div class="cmp-label">${i18n.t('fields.' + field.key + '.label')}${field.internal && html` 🔒`}
       ${changed && html`<span class="changed-chip">${i18n.t('review.changed')}</span>`}</div>
     <div class="cmp-col">
       ${prev.length ? prev.map((l, i) => html`<div key=${i} class="cmp-line">${l}</div>`) : html`<div class="cmp-empty">—</div>`}
+      ${field.type === 'image' && before && html`<div class="image-preview" style=${{ backgroundImage: "url('" + before + "')" }}></div>`}
+      ${field.type === 'gallery' && (before || []).map((item, i) => html`<div class="image-preview" key=${i} style=${{ backgroundImage: "url('" + item.url + "')" }}></div>`)}
+      ${extraEnglish(before).map((line, i) => html`<div class="cmp-line cmp-english" key=${'en' + i}>${line}</div>`)}
       ${reference && html`<div class="previous-answer">${i18n.t('review.forms_answer')}: ${reference}</div>`}
     </div>
     <div class="cmp-col">
       ${next.length ? next.map((l, i) => html`<div key=${i} class="cmp-line">${l}</div>`) : html`<div class="cmp-empty">—</div>`}
+      ${extraEnglish(after).map((line, i) => html`<div class="cmp-line cmp-english" key=${'en' + i}>${line}</div>`)}
       ${field.type === 'image' && after && html`<div class="image-preview" style=${{ backgroundImage: "url('" + after + "')" }}></div>`}
+      ${field.type === 'gallery' && (after || []).map((item, i) => html`<div class="image-preview" key=${i} style=${{ backgroundImage: "url('" + item.url + "')" }}></div>`)}
       <${TextEditors} value=${after} onChange=${onChange} i18n=${i18n} />
     </div>
   </div>`;

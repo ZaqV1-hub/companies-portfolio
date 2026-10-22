@@ -69,7 +69,7 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
           <label>${t('investor.city')}<input class="input" required value=${form.city || ''} onInput=${update('city')} /></label>
           <label>${t('investor.role')}<input class="input" value=${form.role || ''} onInput=${update('role')} /></label>
           <label>${t('investor.investor_type')}<select class="input" value=${form.investor_type || ''} onChange=${update('investor_type')}><option value="">${t('form.choose')}</option>${investorTypes.map((type) => html`<option key=${type} value=${type}>${t('enum.investor_types.' + type)}</option>`)}</select></label>
-          <label>${t('investor.phone')}<input class="input" type="tel" value=${form.phone || ''} onInput=${update('phone')} /></label>
+          <label>${t('investor.phone')}<input class="input" type="tel" required value=${form.phone || ''} onInput=${update('phone')} /></label>
           <button class="btn btn-lime" type="submit" disabled=${busy}>${t('investor.save_account')}</button>
         </form>
       </section>`}

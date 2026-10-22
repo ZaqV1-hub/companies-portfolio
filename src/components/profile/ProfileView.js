@@ -114,25 +114,25 @@ function Gallery({ org, i18n }) {
  * @param {string} [props.contactState] 'sent' after a request
  * @param {string} [props.backHref]
  */
-export function ProfileView({ org, projectId, onSelectProject, onRequestContact, contactState, backHref, onFavorite, isFavorite }) {
+export function ProfileView({ org, projectId, onSelectProject, onRequestContact, contactState, backHref, onFavorite, isFavorite, preview = false }) {
   const i18n = useI18n();
   const project = org.projects.find((p) => p.id === projectId) || org.projects[0];
   if (!project) return null;
-  const cta = html`<${LookingForCard} org=${org} project=${project} i18n=${i18n}
+  const cta = preview ? null : html`<${LookingForCard} org=${org} project=${project} i18n=${i18n}
     onRequestContact=${() => onRequestContact(project.id)} contactState=${contactState} />`;
   const side = otherSideCards(org, project, i18n);
   const blocks = mainBlocks(org, project, i18n);
   return html`<div class="profile">
     <${Header} org=${org} project=${project} i18n=${i18n} backHref=${backHref} onFavorite=${onFavorite} isFavorite=${isFavorite} />
     <div class="profile-body">
-      <div class="profile-cta-mobile">${cta}</div>
+      ${cta && html`<div class="profile-cta-mobile">${cta}</div>`}
       <main class="profile-main">
         ${blocks[0]}
         <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
         ${blocks.slice(1)}
       </main>
       <aside class="profile-side">
-        <div class="profile-cta-desktop">${cta}</div>
+        ${cta && html`<div class="profile-cta-desktop">${cta}</div>`}
         ${side}
         ${org.last_approved_at && org.public_state === 'published' && html`<div class="side-card profile-updated"><div class="side-label">${i18n.t('profile.updated_label')}</div><p>${formatDate(org.last_approved_at, i18n.lang)}</p></div>`}
       </aside>

@@ -11,7 +11,7 @@ import { UsdInput } from '../../components/form/inputs.js';
 import { ClassificationBadge, HelpBlock } from '../../components/crm/common.js';
 import { F, InteractionFields, MultiList, SelectList, interactionErrors } from './NewContactPage.js';
 
-const ANCHOR = { role: 'fld-role', linkedin: 'fld-linkedin', investor_type: 'fld-investor_type', niche: 'fld-niche', ticket: 'fld-ticket',
+const ANCHOR = { role: 'fld-role', investor_type: 'fld-investor_type', niche: 'fld-niche', ticket: 'fld-ticket',
   interest_type: 'fld-interest_type', sectors: 'fld-sectors', description: 'fld-description', website: 'fld-website', origin: 'fld-origin', status: 'fld-status' };
 
 function goTo(id) {
@@ -207,7 +207,6 @@ export function ContactRecordPage({ relId, base, team }) {
           ${countryOptions(lang).map((o) => html`<option key=${o.code} value=${o.code}>${o.name}</option>`)}</select><//>
         <${F} label=${t('crm.f_city')} level="req"><input class="input input-sm" value=${c.city || ''} onInput=${(e) => setC('city', e.target.value)} /><//>
         <${F} label=${t('crm.f_role')} level="rec" id="fld-role"><input class="input input-sm" value=${c.role || ''} onInput=${(e) => setC('role', e.target.value)} /><//>
-        <${F} label=${t('crm.f_linkedin')} level="rec" id="fld-linkedin"><input class="input input-sm" value=${c.linkedin || ''} onInput=${(e) => setC('linkedin', e.target.value)} /><//>
         <${F} label=${t('crm.f_phone')} level="opt"><input class="input input-sm" value=${c.phone || ''} onInput=${(e) => setC('phone', e.target.value)} /><//>
       </div>
       <h3 class="section-label">${t('crm.block_institution')}</h3>

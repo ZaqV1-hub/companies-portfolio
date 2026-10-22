@@ -2,7 +2,7 @@ import { html, useEffect, useMemo, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { useI18n } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
-import { exportCrmPdf } from '../../lib/crmPdf.js?v=20261014-crm-nobanner3';
+import { FilterSelect } from '../../components/FilterSelect.js?v=20261022-crm-report1';
 import { ContactTable, useContactRows } from '../crm/ContactsListPage.js?v=20261014-crm-nobanner3';
 
 const date = (value) => value ? new Date(value).toISOString().slice(0, 10) : '';
@@ -54,7 +54,6 @@ export function CrmOverviewPage({ team = true }) {
   const [metric, setMetric] = useState('new');
   const [limit, setLimit] = useState(25);
   const [error, setError] = useState('');
-  const [pdfBusy, setPdfBusy] = useState(false);
   const refresh = () => (team ? Promise.all([api.getCrmDashboard(new Date().getFullYear()), api.listDuplicateCandidates(), reloadRows()])
     : Promise.all([Promise.resolve({ queue: [] }), Promise.resolve([]), reloadRows()]))
     .then(([dashboard, found]) => { setSummary(dashboard); setDuplicates(found); setError(''); })
@@ -121,29 +120,7 @@ export function CrmOverviewPage({ team = true }) {
     [L('Reuniões','Meetings'),interactions.filter((i) => meetings.has(i.type)).length],
     [L('Pedidos pelo site','Website requests'),fresh.filter((r) => r.relationship.origin === 'Portfólio').length],
     [L('Em atenção','Needs attention'),warning],[L('Atrasados','Overdue'),overdue]];
-  const generatePdf = async () => {
-    setPdfBusy(true);
-    try {
-      await exportCrmPdf({ lang, from: measureFrom, to: measureTo,
-        company: companies.find(([id]) => id === filter.company)?.[1] || L('Todas as empresas','All companies'),
-        metrics, activity, metric,
-        activityTitle: L('Atividade no período','Activity over time'), activityName, activityInterval,
-        chartTitles: { phases:L('Fases','Stages'), status:L('Situação','Status'), sla:L('Prazo de retorno','Response time'),
-          origins:L('Origens','Sources'), types:L('Tipos de interação','Interaction types'),
-          investors:L('Perfil do investidor','Investor profile'), companies:L('Contatos por empresa','Contacts by company') },
-        charts: {
-          phases:phases.map((phase) => [label('classification',phase),active.filter((r) => r.relationship.classification === phase).length]),
-          status:totals(active.map((r) => r.relationship.status)).map(([key,value]) => [label('rel_status',key),value]),
-          sla:[[L('Em dia','On time'),pending.length-warning-overdue],[L('Em atenção','Needs attention'),warning],[L('Atrasado','Overdue'),overdue]],
-          origins:totals(fresh.map((r) => r.relationship.origin)),
-          types:totals(interactions.map((i) => i.type)).map(([key,value]) => [key === 'Não informado' ? L('Não informado','Not provided') : label('interaction_types',key),value]),
-          investors:totals(active.map((r) => r.institution.investor_type)).map(([key,value]) => [key === 'Não informado' ? L('Não informado','Not provided') : label('investor_types',key),value]),
-        },
-        companies:companies.map(([id,name]) => [name,active.filter((r) => r.relationship.organization_id === id).length]),
-      });
-    } catch { setError(L('Não foi possível gerar o PDF. Tente novamente.','Could not create the PDF. Please try again.')); }
-    finally { setPdfBusy(false); }
-  };
+  const generatePdf = () => window.print();
   const merge = async (item) => {
     try { if (item.kind === 'contact') await api.mergeContacts(item.a.id, item.b.id);
       else await api.mergeInstitutions(item.a.id, item.b.id); refresh(); }
@@ -153,7 +130,7 @@ export function CrmOverviewPage({ team = true }) {
 
   return html`<div class="crm-page crm-dashboard">
     <div class="crm-sticky"><div><h1 class="page-title">CRM · Dashboard</h1><div class="page-subtitle">${team ? L('Contatos, atividades e oportunidades do programa','Program contacts, activities and opportunities') : L('Contatos e atividades da empresa','Company contacts and activities')}</div></div>
-      <div class="review-actions"><button type="button" class="btn btn-outline crm-no-print" disabled=${pdfBusy} onClick=${generatePdf}>${pdfBusy ? L('Gerando PDF...','Creating PDF...') : L('Exportar PDF','Export PDF')}</button>
+      <div class="review-actions"><button type="button" class="btn btn-outline crm-no-print" onClick=${generatePdf}>${L('Exportar PDF','Export PDF')}</button>
         <button type="button" class="btn btn-outline crm-no-print" onClick=${() => exportCsv(found, lang)}>${L('Exportar CSV','Export CSV')}</button>
         <a class="btn btn-lime btn-lg" href=${href(team ? '/team/crm/new' : '/company/contacts/new')}>+ ${L('Adicionar contato','Add contact')}</a></div></div>
     ${error && html`<div class="notice">${error}</div>`}
@@ -162,14 +139,14 @@ export function CrmOverviewPage({ team = true }) {
       .map(([key, name]) => html`<button type="button" key=${key} class=${period === key ? 'active' : ''} onClick=${() => { setPeriod(key); pick('bucket')(null); }}>${name}</button>`)}</div>
       ${period === 'custom' && html`<label>${L('De','From')} <input type="date" value=${custom.from} onChange=${(e) => setCustom({ ...custom, from: e.target.value })} /></label>
         <label>${L('Até','To')} <input type="date" value=${custom.to} onChange=${(e) => setCustom({ ...custom, to: e.target.value })} /></label>`}
-      ${team && html`<label>${L('Empresa','Company')} <select value=${filter.company} onChange=${(e) => change('company', e.target.value)}><option value="">${L('Todas','All')}</option>
-        ${companies.map(([id, name]) => html`<option key=${id} value=${id}>${name}</option>`)}</select></label>`}
-      <label>${L('Origem','Source')} <select value=${filter.origin} onChange=${(e) => change('origin', e.target.value)}><option value="">${L('Todas','All')}</option>
-        ${origins.map((origin) => html`<option key=${origin} value=${origin}>${origin}</option>`)}</select></label>
-      <label>${L('Fase','Stage')} <select value=${filter.phase} onChange=${(e) => change('phase', e.target.value)}><option value="">${L('Todas','All')}</option>
-        ${phases.map((phase) => html`<option key=${phase} value=${phase}>${label('classification', phase)}</option>`)}</select></label>
-      <label>${L('Dados','Data')} <select value=${filter.demo} onChange=${(e) => change('demo', e.target.value)}>
-        <option value="all">${L('Todos','All')}</option><option value="real">${L('Somente reais','Real only')}</option><option value="demo">${L('Somente demo','Demo only')}</option></select></label></section>
+      ${team && html`<${FilterSelect} label=${L('Empresa','Company')} value=${filter.company} onChange=${(value) => change('company', value)}
+        options=${[{value:'',name:L('Todas','All')}, ...companies.map(([value,name]) => ({value,name}))]} />`}
+      <${FilterSelect} label=${L('Origem','Source')} value=${filter.origin} onChange=${(value) => change('origin', value)}
+        options=${[{value:'',name:L('Todas','All')}, ...origins.map((value) => ({value,name:value}))]} />
+      <${FilterSelect} label=${L('Fase','Stage')} value=${filter.phase} onChange=${(value) => change('phase', value)}
+        options=${[{value:'',name:L('Todas','All')}, ...phases.map((value) => ({value,name:label('classification',value)}))]} />
+      <${FilterSelect} label=${L('Dados','Data')} value=${filter.demo} onChange=${(value) => change('demo', value)}
+        options=${[{value:'all',name:L('Todos','All')},{value:'real',name:L('Somente reais','Real only')},{value:'demo',name:L('Somente demo','Demo only')}]} /></section>
     ${Object.values(selected).some(Boolean) && html`<div class="crm-cross">${L('Filtro de gráfico ativo','Chart filter active')} <button type="button" onClick=${() => setSelected({})}>${L('Limpar filtros','Clear filters')}</button></div>`}
     <section class="crm-viz-kpis">${metrics.map(([name, value]) => html`<div class="crm-viz-kpi" key=${name}><strong>${value}</strong><span>${name}</span></div>`)}</section>
     <section class="crm-viz-card"><div class="crm-viz-head"><div><h2>${L('Atividade no período','Activity over time')}</h2><p>${activityCaption}</p></div>
@@ -185,6 +162,7 @@ export function CrmOverviewPage({ team = true }) {
               || index % Math.ceil(activity.length / (step === 1 ? 7 : 12)) === 0;
             return html`<button type="button" class=${selected.bucket?.from === item.from ? 'crm-activity-col selected' : 'crm-activity-col'} key=${index}
               title=${`${item.from} – ${item.to}: ${item[metric]} ${activityName.toLowerCase()}`}
+              data-tip=${`${item.from} – ${item.to} · ${item[metric]} ${activityName.toLowerCase()}`}
               aria-label=${`${item.from} – ${item.to}: ${item[metric]} ${activityName.toLowerCase()}`}
               aria-pressed=${selected.bucket?.from === item.from} onClick=${() => pickBucket(item)}>
               <strong class="crm-activity-value" style=${{bottom:`${34 + barHeight}px`}}>${item[metric]}</strong>

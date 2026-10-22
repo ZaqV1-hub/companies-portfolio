@@ -61,6 +61,8 @@ function AccountStart({ switchTo, onStarted, openLegal }) {
     country: data.country ? '' : required,
     state: data.state.trim() ? '' : required,
     city: data.city.trim() ? '' : required,
+    phone: /^\+?[\d\s().-]{10,24}$/.test(data.phone.trim()) && (data.phone.match(/\d/g) || []).length >= 10
+      && (data.phone.match(/\d/g) || []).length <= 15 ? '' : t('investor.phone_invalid'),
     accept_terms: data.accept_terms ? '' : t('investor.terms_required'),
     accept_privacy: data.accept_privacy ? '' : t('investor.privacy_required'),
   };
@@ -93,7 +95,7 @@ function AccountStart({ switchTo, onStarted, openLegal }) {
       <${Input} label=${t('investor.city')} required=${true} error=${fieldError('city')} valid=${fieldValid('city')}><input class="input input-sm" aria-invalid=${Boolean(fieldError('city'))} autocomplete="address-level2" value=${data.city} onInput=${set('city')} onBlur=${blur('city')} /><//>
       <${Input} label=${t('investor.role')}><input class="input input-sm" autocomplete="organization-title" value=${data.role} onInput=${set('role')} /><//>
       <${Input} label=${t('investor.investor_type')}><select class="input input-sm" value=${data.investor_type} onChange=${set('investor_type')}><option value="">${t('form.choose')}</option>${INVESTOR_TYPES.map((type) => html`<option key=${type} value=${type}>${t('enum.investor_types.' + type)}</option>`)}</select><//>
-      <${Input} label=${t('investor.phone')}><input class="input input-sm" type="tel" autocomplete="tel" value=${data.phone} onInput=${set('phone')} /><//>
+      <${Input} label=${t('investor.phone')} required=${true} error=${fieldError('phone')} valid=${fieldValid('phone')}><input class="input input-sm" type="tel" autocomplete="tel" aria-invalid=${Boolean(fieldError('phone'))} value=${data.phone} onInput=${set('phone')} onBlur=${blur('phone')} /><//>
     </div>
     <${TermsChecks} terms=${data.accept_terms} privacy=${data.accept_privacy} onTerms=${set('accept_terms')} onPrivacy=${set('accept_privacy')} openLegal=${openLegal}
       termsError=${submitted && errors.accept_terms} privacyError=${submitted && errors.accept_privacy} />

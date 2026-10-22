@@ -4,19 +4,20 @@ import * as api from './services/api.js?v=20261022-session-cache1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261021-investor1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-investor-form1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-company-crm1';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
 import { LoginPage } from './pages/LoginPage.js?v=20261014-flags1';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261014-api-recovery3';
-import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js';
-import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261014-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-api-recovery3';
-import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-api-recovery3';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261022-company-crm1';
+import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261022-company-preview1';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261022-company-crm1';
+import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261022-company-crm1';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261022-company-crm1';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
-import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-investor-form1';
+import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-company-crm1';
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -36,7 +37,7 @@ function CompanyArea({ user, route, onLogout }) {
   const nav = [
     { key: 'contacts', label: 'CRM', href: href('/company/contacts') },
     { key: 'profile', label: t('app.nav_profile'), href: href('/company/profile') },
-    { key: 'public', label: t('app.nav_view_public'), href: href('/org/' + user.organization_id) },
+    { key: 'public', label: t('app.nav_view_public'), href: href('/company/preview') },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
   if (section === 'profile') {
@@ -80,6 +81,8 @@ function TeamArea({ user, route, onLogout }) {
 
 function Routes() {
   const route = useRoute();
+  const { setLang } = useI18n();
+  useEffect(() => { if (route.areaLang) setLang(route.areaLang); }, [route.areaLang]);
   const [user, setUser] = useState(undefined);
   useEffect(() => { api.getCurrentUser().then(setUser); }, []);
   if (user === undefined) return null;
@@ -92,6 +95,7 @@ function Routes() {
     if (second === 'login' || !user || user.role !== role) {
       return html`<${LoginPage} key=${first} role=${role === 'team' ? 'team' : 'company'} onLoggedIn=${setUser} />`;
     }
+    if (first === 'company' && second === 'preview') return html`<${CompanyPreviewPage} />`;
     return first === 'company'
       ? html`<${CompanyArea} user=${user} route=${route} onLogout=${logout} />`
       : html`<${TeamArea} user=${user} route=${route} onLogout=${logout} />`;

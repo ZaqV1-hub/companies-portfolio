@@ -55,17 +55,18 @@ function Counter({ n, max }) {
   return html`<span class=${cx('counter', n > max && 'over')}>${n}/${max}</span>`;
 }
 
-/** Translatable text: edits the Portuguese version (the English one is reviewed by the team). */
-export function TextInput({ field, value, onChange, disabled, editLang = 'pt', id }) {
+/** Both language versions are edited together and kept in the same draft. */
+export function TextInput({ field, value, onChange, disabled, id }) {
   const v = value && typeof value === 'object' ? value : { pt: value || '', en: '' };
-  const text = v[editLang] || '';
   const multiline = !field.max || field.max > 100;
-  const props = { id, class: 'input input-sm', value: text, disabled, maxLength: field.max ? field.max + 50 : undefined,
-    onInput: (e) => onChange({ ...v, [editLang]: e.target.value }) };
-  return html`<div class="text-wrap">
-    ${multiline ? html`<textarea rows=${Math.min(6, Math.max(2, Math.ceil((field.max || 200) / 120)))} ...${props}></textarea>` : html`<input ...${props} />`}
-    <${Counter} n=${text.length} max=${field.max} />
-  </div>`;
+  return html`<div class="bilingual-input">${['pt', 'en'].map((language) => {
+    const text = v[language] || '';
+    const props = { id: language === 'pt' ? id : undefined, class: 'input input-sm', value: text, disabled,
+      maxLength: field.max ? field.max + 50 : undefined, onInput: (e) => onChange({ ...v, [language]: e.target.value }) };
+    return html`<div class="text-wrap" key=${language}><span class="language-label">${language.toUpperCase()}</span>
+      ${multiline ? html`<textarea rows=${Math.min(6, Math.max(2, Math.ceil((field.max || 200) / 120)))} ...${props}></textarea>` : html`<input ...${props} />`}
+      <${Counter} n=${text.length} max=${field.max} /></div>`;
+  })}</div>`;
 }
 
 function PlainInput({ field, value, onChange, disabled, type, id }) {
@@ -165,8 +166,10 @@ function Mini({ label, children, grow }) {
 
 function TextMini({ value, onChange, max, disabled }) {
   const v = tPt(value);
-  return html`<div class="text-wrap"><input class="input input-sm" value=${v.pt} disabled=${disabled} onInput=${(e) => onChange({ ...v, pt: e.target.value })} />
-    ${max && html`<${Counter} n=${v.pt.length} max=${max} />`}</div>`;
+  return html`<div class="bilingual-input">${['pt','en'].map((language) => html`<div class="text-wrap" key=${language}>
+    <span class="language-label">${language.toUpperCase()}</span>
+    <input class="input input-sm" value=${v[language] || ''} disabled=${disabled} onInput=${(e) => onChange({ ...v, [language]:e.target.value })} />
+    ${max && html`<${Counter} n=${(v[language] || '').length} max=${max} />`}</div>`)}</div>`;
 }
 
 // ---------------------------------------------------------------- images (validated locally and saved on the API server)
