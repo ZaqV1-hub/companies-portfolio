@@ -1,9 +1,9 @@
 // Interface translations (i18n/en.json, i18n/pt.json) and the current language.
-// The public site opens in English (spec 1, section 2); the choice is remembered per browser.
+// First visit follows the browser language: Portuguese variants use PT, all others use EN.
 import { createContext, html, useContext, useEffect, useMemo, useState } from './html.js';
 
 export const LANGS = ['en', 'pt'];
-const LANG_KEY = 'cp.lang';
+const LANG_KEY = 'cp.lang.v2';
 const dictionaries = {};
 
 export async function loadDictionaries() {
@@ -41,7 +41,8 @@ function initialLang() {
     const saved = localStorage.getItem(LANG_KEY);
     if (LANGS.includes(saved)) return saved;
   } catch (err) { /* storage blocked */ }
-  return 'en';
+  const preferred = navigator.languages?.[0] || navigator.language || 'en';
+  return /^pt(?:-|$)/i.test(preferred) ? 'pt' : 'en';
 }
 
 const LangContext = createContext(null);

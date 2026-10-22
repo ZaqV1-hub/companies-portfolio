@@ -1,7 +1,7 @@
 import { html, useEffect, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js?v=20261021-investor1';
 import { useI18n } from '../../lib/i18n.js';
-import { countryOptions } from '../../lib/countries.js';
+import { CountryControl, StateControl } from '../../components/InvestorLocationFields.js?v=20261022-investor-form1';
 import { formatDate } from '../../lib/format.js';
 import { href } from '../../lib/router.js';
 
@@ -24,7 +24,8 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
     }).catch(() => { if (active) setMessage(t('investor.account_load_error')); });
     return () => { active = false; };
   }, []);
-  const update = (key) => (event) => setForm({ ...form, [key]:event.target.value });
+  const update = (key) => (event) => setForm((current) => ({ ...current, [key]:event.target.value,
+    ...(key === 'country' ? { state:'',city:'' } : {}) }));
   const save = async (event) => {
     event.preventDefault(); setBusy(true); setMessage('');
     try {
@@ -63,12 +64,12 @@ export function InvestorAccountPage({ onUserUpdated, onFavoritesChanged }) {
           <label>${t('investor.first_name')}<input class="input" required value=${form.first_name || ''} onInput=${update('first_name')} /></label>
           <label>${t('investor.last_name')}<input class="input" required value=${form.last_name || ''} onInput=${update('last_name')} /></label>
           <label>${t('investor.institution')}<input class="input" required value=${form.institution || ''} onInput=${update('institution')} /></label>
-          <label>${t('investor.country')}<select class="input" required value=${form.country || ''} onChange=${update('country')}><option value="">${t('form.choose')}</option>${countryOptions(lang).map((country) => html`<option key=${country.code} value=${country.code}>${country.name}</option>`)}</select></label>
+          <label>${t('investor.country')}<${CountryControl} required=${true} value=${form.country || ''} onChange=${update('country')} /></label>
+          <label>${t('investor.state')}<${StateControl} required=${true} country=${form.country} value=${form.state || ''} onChange=${update('state')} /></label>
           <label>${t('investor.city')}<input class="input" required value=${form.city || ''} onInput=${update('city')} /></label>
           <label>${t('investor.role')}<input class="input" value=${form.role || ''} onInput=${update('role')} /></label>
           <label>${t('investor.investor_type')}<select class="input" value=${form.investor_type || ''} onChange=${update('investor_type')}><option value="">${t('form.choose')}</option>${investorTypes.map((type) => html`<option key=${type} value=${type}>${t('enum.investor_types.' + type)}</option>`)}</select></label>
           <label>${t('investor.phone')}<input class="input" type="tel" value=${form.phone || ''} onInput=${update('phone')} /></label>
-          <label>LinkedIn<input class="input" type="url" value=${form.linkedin || ''} onInput=${update('linkedin')} /></label>
           <button class="btn btn-lime" type="submit" disabled=${busy}>${t('investor.save_account')}</button>
         </form>
       </section>`}

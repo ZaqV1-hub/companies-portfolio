@@ -511,6 +511,17 @@ button { font-family: var(--font-body); }
 .auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 14px; }
 .auth-field { display: flex; flex-direction: column; }
 .auth-field.has-error .input { border-color: #b42318; }
+.auth-field.is-valid .input { border-color: #13804a; box-shadow: 0 0 0 1px #13804a inset; }
+.auth-field .field-error { margin-top: 5px; }
+.auth-password-rules { list-style: none; padding: 0; margin: 7px 0 0; display: grid; gap: 3px; color: var(--muted); font-size: 11px; }
+.auth-password-rules li::before { content: '• '; }
+.auth-password-rules li.met { color: #13804a; }
+.auth-password-rules li.unmet { color: #b42318; }
+.country-control { position: relative; display: block; }
+.country-control img { position: absolute; z-index: 1; left: 12px; top: 50%; transform: translateY(-50%); width: 22px; height: 16px; object-fit: cover; border-radius: 2px; pointer-events: none; }
+.country-control img:not([hidden]) + select { padding-left: 42px; }
+.auth-consents .check-line.has-error { color: #b42318; }
+.auth-consents .field-error { margin: -7px 0 5px 26px; }
 .level-tag { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; color: var(--accent); }
 .level-tag.muted { color: var(--muted); }
 .check-line.has-error { color: #b42318; }

@@ -187,26 +187,26 @@ app.post('/api/investors/email/start', signupLimiter, async (req, res) => {
   const institution = String(data.institution || '').trim();
   const password = String(data.password || '');
   const country = String(data.country || '').trim().toUpperCase();
+  const state = String(data.state || '').trim();
   const city = String(data.city || '').trim();
   const role = String(data.role || '').trim();
   const investorType = String(data.investor_type || '').trim();
   const phone = String(data.phone || '').trim();
-  const linkedin = String(data.linkedin || '').trim();
   if (!firstName || !lastName || name.length > 200 || !institution || institution.length > 300
     || email.length > 320 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
-    || password.length < 10 || password.length > 128 || password !== data.confirm_password
-    || !/^[A-Z]{2}$/.test(country) || !city || city.length > 200
+    || password.length < 10 || password.length > 128 || !/\p{Lu}/u.test(password)
+    || !/\p{Ll}/u.test(password) || !/\d/.test(password) || password !== data.confirm_password
+    || !/^[A-Z]{2}$/.test(country) || !state || state.length > 200 || !city || city.length > 200
     || role.length > 200 || investorType.length > 64 || phone.length > 64
-    || linkedin.length > 2048 || (linkedin && !/^https?:\/\//i.test(linkedin))
     || !data.accept_terms || !data.accept_privacy)
     return res.status(400).json({ ok: false, error: 'invalid' });
   try {
     const [dupes] = await pool.execute('SELECT id,role,email_verified_at FROM users WHERE email_normalized=?', [email]);
     if (dupes.length && (dupes[0].role !== 'investor' || dupes[0].email_verified_at)) return res.status(409).json({ ok: false, error: 'email_taken' });
     const token = crypto.randomBytes(32).toString('base64url');
-    const profile = jsonColumn({ first_name:firstName,last_name:lastName,institution,country,city,
+    const profile = jsonColumn({ first_name:firstName,last_name:lastName,institution,country,state,city,
       role:role || null,investor_type:investorType || null,
-      phone:phone || null,linkedin:linkedin || null });
+      phone:phone || null });
     const passwordHash = await bcrypt.hash(password, 12);
     const userId = dupes[0]?.id || `u-${crypto.randomUUID()}`;
     if (dupes.length) await pool.execute(`UPDATE users SET name=?,password_hash=?,lang=?,investor_profile=?,
@@ -322,20 +322,19 @@ app.patch('/api/investors/me', requireRole('investor'), async (req, res) => {
   const profile = {
     first_name:firstName, last_name:lastName,
     institution:String(data.institution || '').trim(), country:String(data.country || '').trim().toUpperCase(),
-    city:String(data.city || '').trim(), role:String(data.role || '').trim(),
+    state:String(data.state || '').trim(), city:String(data.city || '').trim(), role:String(data.role || '').trim(),
     investor_type:String(data.investor_type || '').trim(), phone:String(data.phone || '').trim(),
-    linkedin:String(data.linkedin || '').trim(),
   };
   if (!firstName || !lastName || name.length > 200 || !profile.institution || profile.institution.length > 300
-    || !/^[A-Z]{2}$/.test(profile.country) || !profile.city || profile.city.length > 200
-    || profile.role.length > 200 || profile.phone.length > 64 || profile.linkedin.length > 2048
-    || profile.investor_type.length > 64 || (profile.linkedin && !/^https?:\/\//i.test(profile.linkedin)))
+    || !/^[A-Z]{2}$/.test(profile.country) || !profile.state || profile.state.length > 200
+    || !profile.city || profile.city.length > 200 || profile.role.length > 200
+    || profile.phone.length > 64 || profile.investor_type.length > 64)
     return res.status(400).json({ error:'invalid' });
   try {
     await pool.execute('UPDATE users SET name=?,investor_profile=?,lang=? WHERE id=?',
       [name,jsonColumn(profile),data.lang === 'pt' ? 'pt' : 'en',req.user.id]);
-    if (req.user.contact_id) await pool.execute('UPDATE contacts SET name=?,country=?,city=?,role=?,phone=?,linkedin=? WHERE id=?',
-      [name,profile.country,profile.city,profile.role || null,profile.phone || null,profile.linkedin || null,req.user.contact_id]);
+    if (req.user.contact_id) await pool.execute('UPDATE contacts SET name=?,country=?,city=?,role=?,phone=? WHERE id=?',
+      [name,profile.country,profile.city,profile.role || null,profile.phone || null,req.user.contact_id]);
     res.json({ ok:true, user:safeUser({ ...req.user,name }), profile });
   } catch (error) { routeError(res, error); }
 });

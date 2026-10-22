@@ -4,7 +4,7 @@ import * as api from './services/api.js?v=20261022-session-cache1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261021-investor1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261021-investor4';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-investor-form1';
 import { AppShell } from './components/AppShell.js?v=20261014-flags1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
@@ -16,7 +16,7 @@ import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261014-a
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261014-api-recovery3';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
-import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261021-investor3';
+import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-investor-form1';
 
 function PublicFooter() {
   const { t } = useI18n();

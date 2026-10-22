@@ -2,56 +2,101 @@
 import { html, useState } from '../lib/html.js';
 import * as api from '../services/api.js?v=20261021-investor1';
 import { useI18n } from '../lib/i18n.js';
-import { countryOptions } from '../lib/countries.js';
+import { CountryControl, StateControl } from './InvestorLocationFields.js?v=20261022-investor-form1';
 
 const INVESTOR_TYPES = ['accelerator','angel','angel_network','asset_wealth_management','cvc','dfi','endowment','family_office','foundation','fund_of_funds','hnwi','non_profit','organization','pe_firm','pension_fund','service_provider','vc'];
 
-function Input({ label, required, children }) {
-  return html`<label class="auth-field"><span class="field-label">${label}${required && html`<span class="req"> *</span>`}</span>${children}</label>`;
+function Input({ label, required, children, error, valid }) {
+  return html`<label class=${`auth-field${error ? ' has-error' : ''}${valid ? ' is-valid' : ''}`}>
+    <span class="field-label">${label}${required && html`<span class="req"> *</span>`}</span>
+    ${children}${error && html`<small class="field-error" role="status">${error}</small>`}
+  </label>`;
 }
 
-function TermsChecks({ terms, privacy, onTerms, onPrivacy, openLegal }) {
+function TermsChecks({ terms, privacy, onTerms, onPrivacy, openLegal, termsError, privacyError }) {
   const { t } = useI18n();
   return html`<div class="auth-consents">
-    <label class="check-line"><input type="checkbox" checked=${terms} onChange=${onTerms} />
+    <label class=${`check-line${termsError ? ' has-error' : ''}`}><input type="checkbox" checked=${terms} onChange=${onTerms} />
       <span>${t('investor.accept_terms_pre')} <button type="button" class="btn-link link-accent" onClick=${() => openLegal('terms')}>${t('investor.terms')}</button> *</span></label>
-    <label class="check-line"><input type="checkbox" checked=${privacy} onChange=${onPrivacy} />
+    ${termsError && html`<small class="field-error">${termsError}</small>`}
+    <label class=${`check-line${privacyError ? ' has-error' : ''}`}><input type="checkbox" checked=${privacy} onChange=${onPrivacy} />
       <span>${t('investor.accept_privacy_pre')} <button type="button" class="btn-link link-accent" onClick=${() => openLegal('privacy')}>${t('investor.privacy')}</button> *</span></label>
+    ${privacyError && html`<small class="field-error">${privacyError}</small>`}
   </div>`;
 }
 
 function AccountStart({ switchTo, onStarted, openLegal }) {
   const { t, lang } = useI18n();
-  const [data, setData] = useState({ first_name:'',last_name:'',institution:'',email:'',password:'',confirm_password:'',country:'',city:'',role:'',investor_type:'',phone:'',linkedin:'',accept_terms:false,accept_privacy:false });
+  const [data, setData] = useState({ first_name:'',last_name:'',institution:'',email:'',password:'',confirm_password:'',country:'',state:'',city:'',role:'',investor_type:'',phone:'',accept_terms:false,accept_privacy:false });
+  const [touched, setTouched] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+  const [emailTaken, setEmailTaken] = useState(false);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
-  const set = (key) => (e) => setData({ ...data,[key]:e.target.type === 'checkbox' ? e.target.checked : e.target.value });
+  const set = (key) => (event) => {
+    const value = event.target.type === 'checkbox' ? event.target.checked : event.target.value;
+    setData((current) => ({ ...current, [key]:value, ...(key === 'country' ? { state:'',city:'' } : {}) }));
+    setError('');
+    if (key === 'email') setEmailTaken(false);
+    if (key === 'confirm_password') setTouched((current) => ({ ...current, confirm_password:true }));
+    if (key === 'country') setTouched((current) => ({ ...current, state:false,city:false }));
+  };
+  const blur = (key) => () => setTouched((current) => ({ ...current, [key]:true }));
+  const passwordRules = [
+    ['password_rule_length', data.password.length >= 10 && data.password.length <= 128],
+    ['password_rule_upper', /\p{Lu}/u.test(data.password)],
+    ['password_rule_lower', /\p{Ll}/u.test(data.password)],
+    ['password_rule_number', /\d/.test(data.password)],
+  ];
+  const required = t('investor.field_required');
+  const errors = {
+    first_name: data.first_name.trim() ? '' : required,
+    last_name: data.last_name.trim() ? '' : required,
+    institution: data.institution.trim() ? '' : required,
+    email: emailTaken ? t('investor.email_taken') : !data.email.trim() ? t('investor.email_invalid')
+      : /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email.trim()) ? '' : t('investor.email_invalid'),
+    password: passwordRules.every(([,met]) => met) ? '' : t('investor.password_requirements'),
+    confirm_password: !data.confirm_password ? required
+      : data.confirm_password === data.password ? '' : t('investor.password_mismatch'),
+    country: data.country ? '' : required,
+    state: data.state.trim() ? '' : required,
+    city: data.city.trim() ? '' : required,
+    accept_terms: data.accept_terms ? '' : t('investor.terms_required'),
+    accept_privacy: data.accept_privacy ? '' : t('investor.privacy_required'),
+  };
+  const fieldError = (key) => (touched[key] || submitted) ? errors[key] : '';
+  const fieldValid = (key) => Boolean((touched[key] || submitted) && !errors[key] && data[key]);
   const submit = async (e) => {
     e.preventDefault();
-    if (!data.accept_terms || !data.accept_privacy) { setError(t('investor.accept_required')); return; }
-    if (data.password.length < 10) { setError(t('investor.password_length')); return; }
-    if (data.password !== data.confirm_password) { setError(t('investor.password_mismatch')); return; }
+    setSubmitted(true);
+    if (Object.values(errors).some(Boolean)) return;
     setBusy(true); setError('');
     try { await api.startInvestorEmail({ ...data,lang }); onStarted({ email:data.email }); }
-    catch (err) { setError(err.data?.error === 'email_taken' ? t('investor.email_taken') : err.data?.error === 'email_unavailable' || err.data?.error === 'email_delivery_failed' ? t('investor.email_unavailable') : t('investor.fix_errors')); }
+    catch (err) {
+      if (err.data?.error === 'email_taken') { setEmailTaken(true); setTouched((current) => ({ ...current,email:true })); }
+      else setError(err.data?.error === 'email_unavailable' || err.data?.error === 'email_delivery_failed'
+        ? t('investor.email_unavailable') : t('investor.try_again'));
+    }
     finally { setBusy(false); }
   };
-  return html`<form class="auth-form" onSubmit=${submit}>
+  return html`<form class="auth-form" noValidate=${true} onSubmit=${submit}>
     <div class="auth-grid">
-      <${Input} label=${t('investor.first_name')} required=${true}><input class="input input-sm" required autocomplete="given-name" value=${data.first_name} onInput=${set('first_name')} /><//>
-      <${Input} label=${t('investor.last_name')} required=${true}><input class="input input-sm" required autocomplete="family-name" value=${data.last_name} onInput=${set('last_name')} /><//>
-      <${Input} label=${t('investor.institution')} required=${true}><input class="input input-sm" required autocomplete="organization" value=${data.institution} onInput=${set('institution')} /><//>
-      <${Input} label=${t('investor.email')} required=${true}><input class="input input-sm" type="email" required autocomplete="email" value=${data.email} onInput=${set('email')} /><//>
-      <${Input} label=${t('common.password')} required=${true}><input class="input input-sm" type="password" required minlength="10" autocomplete="new-password" value=${data.password} onInput=${set('password')} /><//>
-      <${Input} label=${t('investor.confirm_password')} required=${true}><input class="input input-sm" type="password" required minlength="10" autocomplete="new-password" value=${data.confirm_password} onInput=${set('confirm_password')} /><//>
-      <${Input} label=${t('investor.country')} required=${true}><select class="input input-sm" required value=${data.country} onChange=${set('country')}><option value="">${t('form.choose')}</option>${countryOptions(lang).map((c) => html`<option key=${c.code} value=${c.code}>${c.name}</option>`)}</select><//>
-      <${Input} label=${t('investor.city')} required=${true}><input class="input input-sm" required value=${data.city} onInput=${set('city')} /><//>
+      <${Input} label=${t('investor.first_name')} required=${true} error=${fieldError('first_name')} valid=${fieldValid('first_name')}><input class="input input-sm" aria-invalid=${Boolean(fieldError('first_name'))} autocomplete="given-name" value=${data.first_name} onInput=${set('first_name')} onBlur=${blur('first_name')} /><//>
+      <${Input} label=${t('investor.last_name')} required=${true} error=${fieldError('last_name')} valid=${fieldValid('last_name')}><input class="input input-sm" aria-invalid=${Boolean(fieldError('last_name'))} autocomplete="family-name" value=${data.last_name} onInput=${set('last_name')} onBlur=${blur('last_name')} /><//>
+      <${Input} label=${t('investor.institution')} required=${true} error=${fieldError('institution')} valid=${fieldValid('institution')}><input class="input input-sm" aria-invalid=${Boolean(fieldError('institution'))} autocomplete="organization" value=${data.institution} onInput=${set('institution')} onBlur=${blur('institution')} /><//>
+      <${Input} label=${t('investor.email')} required=${true} error=${fieldError('email')} valid=${fieldValid('email')}><input class="input input-sm" type="email" aria-invalid=${Boolean(fieldError('email'))} autocomplete="email" value=${data.email} onInput=${set('email')} onBlur=${blur('email')} /><//>
+      <${Input} label=${t('common.password')} required=${true} error=${fieldError('password')} valid=${fieldValid('password')}><input class="input input-sm" type="password" aria-invalid=${Boolean(fieldError('password'))} autocomplete="new-password" value=${data.password} onInput=${set('password')} onFocus=${blur('password')} />
+        <ul class="auth-password-rules">${passwordRules.map(([key,met]) => html`<li key=${key} class=${met ? 'met' : touched.password || submitted ? 'unmet' : ''}>${t('investor.' + key)}</li>`)}</ul><//>
+      <${Input} label=${t('investor.confirm_password')} required=${true} error=${fieldError('confirm_password')} valid=${fieldValid('confirm_password')}><input class="input input-sm" type="password" aria-invalid=${Boolean(fieldError('confirm_password'))} autocomplete="new-password" value=${data.confirm_password} onInput=${set('confirm_password')} onBlur=${blur('confirm_password')} /><//>
+      <${Input} label=${t('investor.country')} required=${true} error=${fieldError('country')} valid=${fieldValid('country')}><${CountryControl} value=${data.country} invalid=${Boolean(fieldError('country'))} onChange=${set('country')} onBlur=${blur('country')} /><//>
+      <${Input} label=${t('investor.state')} required=${true} error=${fieldError('state')} valid=${fieldValid('state')}><${StateControl} country=${data.country} value=${data.state} invalid=${Boolean(fieldError('state'))} onChange=${set('state')} onBlur=${blur('state')} /><//>
+      <${Input} label=${t('investor.city')} required=${true} error=${fieldError('city')} valid=${fieldValid('city')}><input class="input input-sm" aria-invalid=${Boolean(fieldError('city'))} autocomplete="address-level2" value=${data.city} onInput=${set('city')} onBlur=${blur('city')} /><//>
       <${Input} label=${t('investor.role')}><input class="input input-sm" autocomplete="organization-title" value=${data.role} onInput=${set('role')} /><//>
       <${Input} label=${t('investor.investor_type')}><select class="input input-sm" value=${data.investor_type} onChange=${set('investor_type')}><option value="">${t('form.choose')}</option>${INVESTOR_TYPES.map((type) => html`<option key=${type} value=${type}>${t('enum.investor_types.' + type)}</option>`)}</select><//>
       <${Input} label=${t('investor.phone')}><input class="input input-sm" type="tel" autocomplete="tel" value=${data.phone} onInput=${set('phone')} /><//>
-      <${Input} label="LinkedIn"><input class="input input-sm" type="url" value=${data.linkedin} onInput=${set('linkedin')} /><//>
     </div>
-    <${TermsChecks} terms=${data.accept_terms} privacy=${data.accept_privacy} onTerms=${set('accept_terms')} onPrivacy=${set('accept_privacy')} openLegal=${openLegal} />
+    <${TermsChecks} terms=${data.accept_terms} privacy=${data.accept_privacy} onTerms=${set('accept_terms')} onPrivacy=${set('accept_privacy')} openLegal=${openLegal}
+      termsError=${submitted && errors.accept_terms} privacyError=${submitted && errors.accept_privacy} />
     ${error && html`<div class="form-error" role="alert">${error}</div>`}
     <button class="btn btn-lime btn-xl" type="submit" disabled=${busy}>${t('investor.create_account')}</button>
     <p class="auth-switch">${t('investor.have_account')} <button type="button" class="btn-link link-accent" onClick=${() => switchTo('login')}>${t('investor.log_in')}</button></p>
@@ -134,7 +179,7 @@ export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, on
   const [resendError,setResendError] = useState(false);
   const [legal,setLegal] = useState(null);
   const dismiss = () => { if (required) setMode('welcome'); else onClose(); };
-  return html`<div class="modal-backdrop" onClick=${(e) => { if (e.target === e.currentTarget) dismiss(); }}>
+  return html`<div class="modal-backdrop">
     <div class="modal" role="dialog" aria-modal="true" aria-label=${t('investor.title')}>
       ${(!required || mode !== 'welcome') && html`<button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${dismiss}>×</button>`}
       <div class="kicker">${t('investor.kicker')}</div>
