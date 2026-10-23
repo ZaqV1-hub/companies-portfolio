@@ -13,8 +13,8 @@ import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261022-c
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261022-company-preview1';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261022-review-login2';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261022-review-login2';
-import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261022-company-crm1';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
+import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
 import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-phone1';

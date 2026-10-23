@@ -127,7 +127,7 @@ export function ContactRecordPage({ relId, base, team }) {
   const [saved, setSaved] = useState(false);
   const load = () => api.getContactRecord(relId).then((r) => {
     setRec(r);
-    if (r) setEdit({ contact: { ...r.contact }, institution: { ...r.institution }, relationship: { origin: r.relationship.origin, status: r.relationship.status, deal_expectation: r.relationship.deal_expectation } });
+    if (r) setEdit({ contact: { ...r.contact }, institution: { ...r.institution }, relationship: { origin: r.relationship.origin, status: r.relationship.status, deal_expectation: r.relationship.deal_expectation, owner_user_id: r.relationship.owner_user_id } });
   });
   useEffect(() => { load(); }, [relId]);
   if (rec === undefined) return html`<div>${t('common.loading')}</div>`;
@@ -139,7 +139,8 @@ export function ContactRecordPage({ relId, base, team }) {
   const setC = (k, v) => setEdit({ ...edit, contact: { ...c, [k]: v } });
   const setI = (k, v) => setEdit({ ...edit, institution: { ...ins, [k]: v } });
   const setR = (k, v) => setEdit({ ...edit, relationship: { ...r, [k]: v } });
-  const saveData = async () => { await api.updateContactRecord(rel.id, edit); setSaved(true); setTimeout(() => setSaved(false), 2000); load(); };
+  const saveData = async () => { const result = await api.updateContactRecord(rel.id, edit); if (!result.ok) return;
+    setSaved(true); setTimeout(() => setSaved(false), 2000); load(); };
   const days = rec.pending_request;
 
   return html`<div class="crm-page">
@@ -195,7 +196,9 @@ export function ContactRecordPage({ relId, base, team }) {
           <${UsdInput} value=${r.deal_expectation && r.deal_expectation.min_usd} i18n=${{ t, lang }} placeholder=${t('form.min_usd')} onChange=${(n) => setR('deal_expectation', { ...(r.deal_expectation || {}), min_usd: n })} />
           <${UsdInput} value=${r.deal_expectation && r.deal_expectation.max_usd} i18n=${{ t, lang }} placeholder=${t('form.max_usd')} onChange=${(n) => setR('deal_expectation', { ...(r.deal_expectation || {}), max_usd: n })} />
           <${SelectList} list="deal_types" value=${r.deal_expectation && r.deal_expectation.type} onChange=${(v) => setR('deal_expectation', { ...(r.deal_expectation || {}), type: v })} /></div><//>
-        <${F} label=${t('crm.f_responsible')}><input class="input input-sm" disabled value=${rec.owner_name || '—'} /><//>
+        <${F} label=${t('crm.f_responsible')}><select class="input input-sm" value=${r.owner_user_id || ''} onChange=${(e) => setR('owner_user_id', e.target.value || null)}>
+          <option value="">${lang === 'en' ? 'Unassigned' : 'Não atribuído'}</option>
+          ${(rec.owners || []).map((owner) => html`<option key=${owner.id} value=${owner.id}>${owner.name}${team && owner.role === 'company_user' ? ` · ${rec.organization_name}` : ''}</option>`)}</select><//>
       </div>
     </section>
 

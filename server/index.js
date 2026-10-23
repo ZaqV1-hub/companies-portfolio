@@ -442,7 +442,7 @@ app.get('/api/contacts', requireRole('company_user', 'team'), async (req, res) =
     const company = req.user.role === 'company_user';
     const where = company ? 'WHERE r.organization_id=?' : '';
     const params = company ? [req.user.organization_id] : [];
-    const [rows] = await pool.execute(`SELECT r.*, COALESCE(o.name,'Programa Abiquifi') AS organization_name, c.id AS c_id,c.name AS c_name,c.email AS c_email,c.country AS c_country,c.city AS c_city,c.role AS c_role,c.linkedin AS c_linkedin,c.phone AS c_phone, i.id AS i_id,i.name AS i_name,i.investor_type,i.niche, i.ticket_min_musd,i.ticket_max_musd,i.interest_type,i.sectors,i.description_original,i.description_pt,i.website, (SELECT COUNT(*) FROM interactions x WHERE x.relationship_id=r.id) AS interaction_count,(SELECT JSON_OBJECT('date',x.date,'description',x.description,'type',x.type,'apex_product',x.apex_product,'event',x.event) FROM interactions x WHERE x.relationship_id=r.id ORDER BY x.date DESC LIMIT 1) AS last_interaction FROM relationships r LEFT JOIN organizations o ON o.id=r.organization_id JOIN contacts c ON c.id=r.contact_id JOIN institutions i ON i.id=c.institution_id ${where} ORDER BY r.created_at DESC`, params);
+    const [rows] = await pool.execute(`SELECT r.*, COALESCE(o.name,'Programa Abiquifi') AS organization_name,owner.name AS owner_name, c.id AS c_id,c.name AS c_name,c.email AS c_email,c.country AS c_country,c.city AS c_city,c.role AS c_role,c.linkedin AS c_linkedin,c.phone AS c_phone, i.id AS i_id,i.name AS i_name,i.investor_type,i.niche, i.ticket_min_musd,i.ticket_max_musd,i.interest_type,i.sectors,i.description_original,i.description_pt,i.website, (SELECT COUNT(*) FROM interactions x WHERE x.relationship_id=r.id) AS interaction_count,(SELECT JSON_OBJECT('date',x.date,'description',x.description,'type',x.type,'apex_product',x.apex_product,'event',x.event) FROM interactions x WHERE x.relationship_id=r.id ORDER BY x.date DESC LIMIT 1) AS last_interaction FROM relationships r LEFT JOIN organizations o ON o.id=r.organization_id LEFT JOIN users owner ON owner.id=r.owner_user_id JOIN contacts c ON c.id=r.contact_id JOIN institutions i ON i.id=c.institution_id ${where} ORDER BY r.created_at DESC`, params);
     const ids = rows.map((row) => row.id);
     const [allInteractions] = ids.length ? await pool.query(`SELECT relationship_id,date,description,type,apex_product,event,auto FROM interactions WHERE relationship_id IN (${ids.map(() => '?').join(',')}) ORDER BY date DESC`,ids) : [[]];
     const [settings] = await pool.execute('SELECT deadlines,origins,holidays FROM settings WHERE id=?', ['settings']);
@@ -470,13 +470,16 @@ app.get('/api/contacts/:id', requireRole('company_user', 'team'), async (req, re
     if (!rows.length) return res.status(404).json({ error: 'not_found' });
     const row = rows[0];
     const [interactions] = await pool.execute('SELECT x.*,u.name AS created_by_name FROM interactions x LEFT JOIN users u ON u.id=x.created_by WHERE x.relationship_id=? ORDER BY x.date DESC,x.created_at DESC', [row.id]);
+    const [owners] = await pool.execute(company
+      ? "SELECT id,name,role FROM users WHERE role='company_user' AND organization_id=? ORDER BY name"
+      : "SELECT id,name,role FROM users WHERE role='team' OR (role='company_user' AND organization_id=?) ORDER BY role DESC,name", [row.organization_id]);
     const [settings] = await pool.execute('SELECT deadlines,origins,apex_strategic_categories,holidays FROM settings WHERE id=?', ['settings']);
     const relationship = { ...row, is_demo: /^demo-crm-|^rel-\d+$/.test(row.id) };
     for (const key of ['c_id','c_name','c_email','c_country','c_city','c_role','c_linkedin','c_phone','i_id','i_name','investor_type','niche','ticket_min_musd','ticket_max_musd','interest_type','sectors','description_original','description_pt','website','hq_country','hq_city','owner_name']) delete relationship[key];
     if (company) delete relationship.apex_control;
     const contact = { id:row.c_id,name:row.c_name,email:row.c_email,country:row.c_country,city:row.c_city,role:row.c_role,linkedin:row.c_linkedin,phone:row.c_phone };
     const institution = { id:row.i_id,name:row.i_name,investor_type:row.investor_type,niche:row.niche,ticket_min_musd:row.ticket_min_musd,ticket_max_musd:row.ticket_max_musd,interest_type:row.interest_type,sectors:row.sectors,description_original:row.description_original,description_pt:row.description_pt,website:row.website,hq_country:row.hq_country,hq_city:row.hq_city };
-    res.json({ relationship,organization_name:row.organization_name,owner_name:row.owner_name,contact,institution,interactions,
+    res.json({ relationship,organization_name:row.organization_name,owner_name:row.owner_name,owners,contact,institution,interactions,
       completeness:completenessFor(contact,institution,relationship),pending_request:requestStateFor(relationship,interactions,settings[0]?.holidays),
       origins:Array.from(new Set([...(settings[0]?.origins || []),'Contato direto'])),deadlines:settings[0]?.deadlines || {},...(company ? {} : { apex_categories:settings[0]?.apex_strategic_categories || [] }) });
   } catch (error) { routeError(res, error); }
@@ -595,7 +598,7 @@ app.patch('/api/contacts/:id', requireRole('company_user','team'), async (req,re
   const db = await pool.getConnection();
   try {
     const company = req.user.role === 'company_user';
-    const [rels] = await db.execute(`SELECT r.id,c.id AS contact_id,c.institution_id FROM relationships r JOIN contacts c ON c.id=r.contact_id WHERE r.id=? ${company ? 'AND r.organization_id=?' : ''}`,
+    const [rels] = await db.execute(`SELECT r.id,r.organization_id,c.id AS contact_id,c.institution_id FROM relationships r JOIN contacts c ON c.id=r.contact_id WHERE r.id=? ${company ? 'AND r.organization_id=?' : ''}`,
       company ? [req.params.id,req.user.organization_id] : [req.params.id]);
     if (!rels.length) return res.status(404).json({ error:'not_found' });
     const { contact = {},institution = {},relationship = {} } = req.body || {};
@@ -604,10 +607,17 @@ app.patch('/api/contacts/:id', requireRole('company_user','team'), async (req,re
     for (const key of ['name','country','city']) if (contact[key] !== undefined && !String(contact[key]).trim()) return res.json({ ok:false,error:'invalid',fields:[`contact.${key}`] });
     const cSet = allowedContact.filter((key) => contact[key] !== undefined);
     const iSet = allowedInstitution.filter((key) => institution[key] !== undefined && !(key === 'name' && !String(institution[key]).trim()));
-    const rSet = ['origin','status','deal_expectation'].filter((key) => relationship[key] !== undefined);
+    const rSet = ['origin','status','deal_expectation','owner_user_id'].filter((key) => relationship[key] !== undefined);
     if (relationship.status && !relationshipStatuses.has(relationship.status)) { await db.rollback(); return res.json({ok:false,error:'invalid'}); }
     if (relationship.deal_expectation && (!validUsdTree(relationship.deal_expectation) || relationship.deal_expectation.type && !dealTypes.has(relationship.deal_expectation.type))) { await db.rollback(); return res.json({ok:false,error:'invalid'}); }
     await db.beginTransaction();
+    if (relationship.owner_user_id) {
+      const [owners] = await db.execute(company
+        ? "SELECT id FROM users WHERE id=? AND role='company_user' AND organization_id=?"
+        : "SELECT id FROM users WHERE id=? AND (role='team' OR (role='company_user' AND organization_id=?))",
+      [relationship.owner_user_id, rels[0].organization_id]);
+      if (!owners.length) { await db.rollback(); return res.json({ok:false,error:'invalid',fields:['relationship.owner_user_id']}); }
+    }
     if(relationship.origin){const [settings]=await db.execute('SELECT origins FROM settings WHERE id=?',['settings']);if(!['Portfólio','Contato direto'].includes(relationship.origin)&&!(settings[0]?.origins||[]).includes(relationship.origin)){await db.rollback();return res.json({ok:false,error:'invalid'});}}
     if (cSet.length) await db.execute(`UPDATE contacts SET ${cSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...cSet.map((key) => key === 'country' ? String(contact[key]).toUpperCase() : contact[key]),rels[0].contact_id]);
     if (iSet.length) await db.execute(`UPDATE institutions SET ${iSet.map((key) => `\`${key}\`=?`).join(',')} WHERE id=?`, [...iSet.map((key) => ['sectors'].includes(key) ? jsonColumn(institution[key]) : institution[key]),rels[0].institution_id]);

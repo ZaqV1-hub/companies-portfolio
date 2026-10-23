@@ -4,10 +4,12 @@ import { useI18n } from '../../lib/i18n.js';
 import { href } from '../../lib/router.js';
 import { FilterSelect } from '../../components/FilterSelect.js?v=20261022-crm-report1';
 import { ContactTable, useContactRows } from '../crm/ContactsListPage.js?v=20261014-crm-nobanner3';
+import { exportCrmWorkbook } from '../../lib/exportWorkbook.js?v=20261023-workbook1';
 
 const date = (value) => value ? new Date(value).toISOString().slice(0, 10) : '';
-const today = () => date(new Date());
-const ago = (days) => { const value = new Date(); value.setDate(value.getDate() - days); return date(value); };
+const localDate = (value) => `${value.getFullYear()}-${String(value.getMonth() + 1).padStart(2, '0')}-${String(value.getDate()).padStart(2, '0')}`;
+const today = () => localDate(new Date());
+const ago = (days) => { const value = new Date(); value.setDate(value.getDate() - days); return localDate(value); };
 const within = (value, from, to) => Boolean(value && value >= from && value <= to);
 const meetings = new Set(['in_person_meeting', 'virtual_meeting']);
 const phases = ['lead', 'nia', 'npia', 'br', 'incomplete'];
@@ -27,18 +29,6 @@ function BarChart({ title, description, items, selected, onSelect }) {
       title=${`${caption || key}: ${value}`} onClick=${() => onSelect?.(selected === key ? '' : key)}>
       <span>${caption || key}</span><span class="crm-bar-track"><i style=${{ width: `${value / max * 100}%` }}></i></span><strong>${value}</strong></button>`)
     : html`<span class="crm-empty">${lang === 'en' ? 'No data in this period.' : 'Sem dados neste período.'}</span>`}</div></section>`;
-}
-
-function exportCsv(rows, lang) {
-  const header = lang === 'en' ? ['Contact','Email','Institution','Company','Source','Stage','Status','Created at','Last interaction','Interactions','Demo']
-    : ['Contato','E-mail','Instituição','Empresa','Origem','Fase','Situação','Criado em','Última interação','Interações','Demonstração'];
-  const lines = [header, ...rows.map((r) => [r.contact.name,r.contact.email,r.institution.name,r.organization_name,r.relationship.origin,
-    r.relationship.classification,r.relationship.status,date(r.relationship.created_at),date(r.last_interaction),r.interaction_count,r.relationship.is_demo ? 'DEMO' : ''])];
-  const quote = (value) => `"${String(value ?? '').replaceAll('"', '""')}"`;
-  const blob = new Blob(['\ufeff' + lines.map((row) => row.map(quote).join(';')).join('\r\n')], { type: 'text/csv;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
-  const anchor = document.createElement('a'); anchor.href = url; anchor.download = `crm-contatos-${today()}.csv`;
-  document.body.append(anchor); anchor.click(); anchor.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 export function CrmOverviewPage({ team = true }) {
@@ -121,6 +111,12 @@ export function CrmOverviewPage({ team = true }) {
     [L('Pedidos pelo site','Website requests'),fresh.filter((r) => r.relationship.origin === 'Portfólio').length],
     [L('Em atenção','Needs attention'),warning],[L('Atrasados','Overdue'),overdue]];
   const generatePdf = () => window.print();
+  const generateWorkbook = () => exportCrmWorkbook({ rows: found, lang, from: measureFrom, to: measureTo, label,
+    filters: { company: companies.find(([id]) => id === filter.company)?.[1], origin: filter.origin,
+      phase: filter.phase ? label('classification', filter.phase) : '', demo: filter.demo === 'all' ? '' : filter.demo === 'demo' ? 'DEMO' : L('Somente reais','Real only'),
+      search: filter.search, chart: [selected.phase && label('classification', selected.phase), selected.origin,
+        selected.status && label('rel_status', selected.status), selected.investor, selected.type && label('interaction_types', selected.type), selected.sla]
+        .filter(Boolean).join(' · ') } }).catch(() => setError(L('Não foi possível criar a planilha.', 'Could not create the workbook.')));
   const merge = async (item) => {
     try { if (item.kind === 'contact') await api.mergeContacts(item.a.id, item.b.id);
       else await api.mergeInstitutions(item.a.id, item.b.id); refresh(); }
@@ -131,7 +127,7 @@ export function CrmOverviewPage({ team = true }) {
   return html`<div class="crm-page crm-dashboard">
     <div class="crm-sticky"><div><h1 class="page-title">CRM · Dashboard</h1><div class="page-subtitle">${team ? L('Contatos, atividades e oportunidades do programa','Program contacts, activities and opportunities') : L('Contatos e atividades da empresa','Company contacts and activities')}</div></div>
       <div class="review-actions"><button type="button" class="btn btn-outline crm-no-print" onClick=${generatePdf}>${L('Exportar PDF','Export PDF')}</button>
-        <button type="button" class="btn btn-outline crm-no-print" onClick=${() => exportCsv(found, lang)}>${L('Exportar CSV','Export CSV')}</button>
+        <button type="button" class="btn btn-outline crm-no-print" onClick=${generateWorkbook}>${L('Exportar planilha','Export spreadsheet')}</button>
         <a class="btn btn-lime btn-lg" href=${href(team ? '/team/crm/new' : '/company/contacts/new')}>+ ${L('Adicionar contato','Add contact')}</a></div></div>
     ${error && html`<div class="notice">${error}</div>`}
     <p class="crm-print-context">${L('Período','Period')}: ${selected.bucket?.from || from} – ${selected.bucket?.to || to} · ${L('Empresa','Company')}: ${companies.find(([id]) => id === filter.company)?.[1] || L('Todas','All')} · ${L('Dados','Data')}: ${filter.demo === 'demo' ? 'DEMO' : filter.demo === 'real' ? L('Reais','Real') : L('Todos','All')}</p>
