@@ -128,7 +128,8 @@ export function LookingForCard({ org, project, i18n, onRequestContact, contactSt
     <div class="cta-title">${t('profile.looking_for_card')}</div>
     ${lookingFor.length > 0 && html`<${CtaSection} title=${t('profile.looking_for')}><${Tags} variant="on-navy" items=${lookingFor} /><//>`}
     ${specific}
-    <button type="button" class="btn btn-lime btn-lg" onClick=${onRequestContact}>${t('profile.request_contact')}</button>
+    <button type="button" class=${contactState === 'sent' ? 'btn btn-lg btn-contact-sent' : 'btn btn-lime btn-lg'}
+      disabled=${contactState === 'sent'} onClick=${onRequestContact}>${t(contactState === 'sent' ? 'profile.contact_requested' : 'profile.request_contact')}</button>
     ${contactState === 'sent' && html`<div class="cta-note">${t('profile.request_sent')}</div>`}
   </div>`;
 }

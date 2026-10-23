@@ -7,7 +7,7 @@ import { TopBar } from './components/TopBar.js?v=20261021-investor1';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-verify-tabs1';
 import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
-import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
+import { ProfilePage } from './pages/public/ProfilePage.js?v=20261023-contact-button1';
 import { LoginPage } from './pages/LoginPage.js?v=20261022-empty-logins1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261022-company-crm1';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261022-company-preview1';
@@ -129,14 +129,18 @@ function PublicSite({ route, user, setUser }) {
   const [auth, setAuth] = useState(null); // {mode, reason, pending: {org, projectId, resolve}}
   const [browse, setBrowse] = useState(undefined);
   const [favoriteIds, setFavoriteIds] = useState([]);
+  const [contactRequestedIds, setContactRequestedIds] = useState([]);
   const [verificationNotice, setVerificationNotice] = useState(false);
   const [awaitingVerification, setAwaitingVerification] = useState(0);
   const [verifyResult, setVerifyResult] = useState(null);
   const investor = user && user.role === 'investor' ? user : null;
   useEffect(() => { api.getInvestorBrowseStatus().then(setBrowse).catch(() => setBrowse({ valid:false })); }, []);
   useEffect(() => {
-    if (!investor) { setFavoriteIds([]); return; }
-    api.getInvestorAccount().then((account) => setFavoriteIds(account.favorites.map((item) => item.id))).catch(() => {});
+    if (!investor) { setFavoriteIds([]); setContactRequestedIds([]); return; }
+    api.getInvestorAccount().then((account) => {
+      setFavoriteIds(account.favorites.map((item) => item.id));
+      setContactRequestedIds(account.contacts.map((item) => item.organization_id));
+    }).catch(() => {});
   }, [investor?.id]);
   useEffect(() => {
     if (!browse?.valid) return;
@@ -151,7 +155,13 @@ function PublicSite({ route, user, setUser }) {
 
   // "Solicitar contato" only works for a logged-in investor; otherwise opens sign-up / login first.
   const requestContact = (org, projectId) => new Promise((resolve) => {
-    const run = async () => { try { resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null); } catch { resolve(null); } };
+    const run = async () => {
+      try {
+        const result = await api.requestContact(org.id, projectId);
+        if (result.ok) setContactRequestedIds((current) => current.includes(org.id) ? current : [...current, org.id]);
+        resolve(result.ok ? 'sent' : null);
+      } catch { resolve(null); }
+    };
     if (investor && investor.email_verified) run();
     else {
       saveInvestorIntent({ type: 'contact', orgId: org.id, projectId });
@@ -195,9 +205,15 @@ function PublicSite({ route, user, setUser }) {
     setUser(current);
     setVerificationNotice(eventData?.actionCompleted ? eventData.type || 'account' : 'account');
     setAwaitingVerification(0);
+    if (eventData?.actionCompleted && eventData.type === 'contact' && eventData.orgId) {
+      setContactRequestedIds((currentIds) => currentIds.includes(eventData.orgId) ? currentIds : [...currentIds, eventData.orgId]);
+    }
     if (auth?.verified) auth.verified(Boolean(eventData?.actionCompleted));
     setAuth(null);
-    api.getInvestorAccount().then((account) => setFavoriteIds(account.favorites.map((item) => item.id))).catch(() => {});
+    api.getInvestorAccount().then((account) => {
+      setFavoriteIds(account.favorites.map((item) => item.id));
+      setContactRequestedIds(account.contacts.map((item) => item.organization_id));
+    }).catch(() => {});
   };
   useEffect(() => {
     const onVerified = (event) => {
@@ -246,7 +262,7 @@ function PublicSite({ route, user, setUser }) {
   if (first === 'org' && second) page = browse === undefined && !user
     ? html`<div class="section">${t('common.loading')}</div>`
     : html`<${ProfilePage} orgId=${second} projectId=${route.query.project} onRequestContact=${requestContact}
-        onToggleFavorite=${toggleFavorite} isFavorite=${favoriteIds.includes(second)} />`;
+        onToggleFavorite=${toggleFavorite} isFavorite=${favoriteIds.includes(second)} hasRequestedContact=${contactRequestedIds.includes(second)} />`;
   else if (first === 'investidor') page = investor
     ? html`<${InvestorAccountPage} onUserUpdated=${setUser} onFavoritesChanged=${setFavoriteIds} />`
     : html`<div class="section">${t('common.loading')}</div>`;

@@ -53,6 +53,7 @@ button { font-family: var(--font-body); }
 .btn-link { background: transparent; border: none; padding: 0; color: var(--muted); font-size: 13px; font-weight: 600; cursor: pointer; text-align: left; }
 .btn-link:hover { color: var(--navy); }
 .btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.cta-card .btn-contact-sent:disabled { background: #64748b; border-color: #64748b; color: #fff; opacity: 1; cursor: default; }
 
 /* ---------- public top bar ---------- */
 .topbar { position: sticky; top: 0; z-index: 60; background: #fff; border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 32px; flex-wrap: wrap; }

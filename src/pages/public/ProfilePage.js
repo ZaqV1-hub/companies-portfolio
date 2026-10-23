@@ -3,12 +3,11 @@ import { html, useEffect, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js?v=20261021-investor1';
 import { useI18n } from '../../lib/i18n.js';
 import { href, navigate } from '../../lib/router.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261021-investor1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261023-contact-button1';
 
-export function ProfilePage({ orgId, projectId, onRequestContact, onToggleFavorite, isFavorite }) {
+export function ProfilePage({ orgId, projectId, onRequestContact, onToggleFavorite, isFavorite, hasRequestedContact }) {
   const { t } = useI18n();
   const [org, setOrg] = useState(undefined);
-  const [sent, setSent] = useState({});
 
   useEffect(() => { setOrg(undefined); api.getPublicOrganization(orgId).then(setOrg); }, [orgId]);
 
@@ -16,12 +15,8 @@ export function ProfilePage({ orgId, projectId, onRequestContact, onToggleFavori
   if (org === null) return html`<div class="empty-state"><strong>${t('common.not_found')}</strong><a href=${href('/')}>${t('common.back_to_directory')}</a></div>`;
 
   const current = projectId || org.projects[0].id;
-  const request = async (pid) => {
-    const result = await onRequestContact(org, pid);
-    if (result === 'sent') setSent({ ...sent, [pid]: true });
-  };
   return html`<${ProfileView} org=${org} projectId=${current} backHref=${href('/')}
     onSelectProject=${(pid) => navigate('/org/' + org.id + '?project=' + pid, { keepScroll: true })}
-    onRequestContact=${request} contactState=${sent[current] ? 'sent' : null}
+    onRequestContact=${(pid) => onRequestContact(org, pid)} contactState=${hasRequestedContact ? 'sent' : null}
     onFavorite=${() => onToggleFavorite(org)} isFavorite=${isFavorite} />`;
 }
