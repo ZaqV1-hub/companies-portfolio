@@ -175,7 +175,7 @@ function Forgot({ switchTo }) {
   </form>`;
 }
 
-export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, onDone, onGuest, onClose, required = false }) {
+export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, onDone, onGuest, onClose, onVerificationStarted, required = false }) {
   const { t } = useI18n();
   const [mode,setMode] = useState(initialMode);
   const [waitingData,setWaitingData] = useState(null);
@@ -190,7 +190,7 @@ export function InvestorAuthModal({ initialMode = 'welcome', reason, prefill, on
       <h2 class="form-title">${t('investor.' + (mode === 'account' ? 'signup_title' : mode === 'waiting' ? 'verify_title' : mode === 'login' ? 'login_title' : mode === 'forgot' ? 'forgot_password' : 'welcome_title'))}</h2>
       ${reason && html`<p class="form-subtitle">${reason}</p>`}
       ${mode === 'welcome' && html`<${Welcome} switchTo=${setMode} onGuest=${onGuest} />`}
-      ${mode === 'account' && html`<${AccountStart} switchTo=${setMode} onStarted=${(data) => { setWaitingData(data); setMode('waiting'); }} openLegal=${setLegal} />`}
+      ${mode === 'account' && html`<${AccountStart} switchTo=${setMode} onStarted=${(data) => { setWaitingData(data); setMode('waiting'); onVerificationStarted?.(); }} openLegal=${setLegal} />`}
       ${mode === 'waiting' && html`<div class="auth-form"><p class="form-subtitle">${t('investor.verify_text',{email:waitingData?.email})}</p><p class="section-note">${t('investor.verify_wait')}</p><button class="btn-link link-accent" type="button" onClick=${async () => { try { await api.resendVerification(waitingData.email); setResent(true); setResendError(false); } catch { setResendError(true); } }}>${t('investor.resend')}</button>${resent && html`<p role="status">${t('investor.resent')}</p>`}${resendError && html`<p role="alert">${t('investor.try_again')}</p>`}<button class="btn-link link-accent" type="button" onClick=${() => setMode('account')}>${t('investor.change_email')}</button></div>`}
       ${mode === 'login' && html`<${Login} onLoggedIn=${onDone} switchTo=${setMode} />`}
       ${mode === 'forgot' && html`<${Forgot} switchTo=${setMode} />`}

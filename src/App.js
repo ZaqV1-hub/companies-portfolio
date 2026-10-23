@@ -4,7 +4,7 @@ import * as api from './services/api.js?v=20261022-review-login2';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261021-investor1';
-import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-phone1';
+import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-verify-tabs1';
 import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
@@ -130,6 +130,8 @@ function PublicSite({ route, user, setUser }) {
   const [browse, setBrowse] = useState(undefined);
   const [favoriteIds, setFavoriteIds] = useState([]);
   const [verificationNotice, setVerificationNotice] = useState(false);
+  const [awaitingVerification, setAwaitingVerification] = useState(0);
+  const [verifyResult, setVerifyResult] = useState(null);
   const investor = user && user.role === 'investor' ? user : null;
   useEffect(() => { api.getInvestorBrowseStatus().then(setBrowse).catch(() => setBrowse({ valid:false })); }, []);
   useEffect(() => {
@@ -154,7 +156,7 @@ function PublicSite({ route, user, setUser }) {
     else {
       saveInvestorIntent({ type: 'contact', orgId: org.id, projectId });
       setAuth({ mode: 'login', reason: t('investor.login_to_request', { org: org.name }), pending: run,
-        verified: () => resolve('sent'), cancel: () => resolve(null) });
+        verified: (completed) => resolve(completed ? 'sent' : null), cancel: () => resolve(null) });
     }
   });
   const toggleFavorite = (org) => {
@@ -178,42 +180,65 @@ function PublicSite({ route, user, setUser }) {
   const done = (u) => {
     setUser(u);
     takeInvestorIntent();
+    setAwaitingVerification(0);
     const pending = auth && auth.pending;
     setAuth(null);
     if (pending) pending();
   };
-  const close = () => { if (auth && auth.cancel) auth.cancel(); takeInvestorIntent(); setAuth(null); if (needsAccountLogin) navigate('/'); };
+  const close = () => { if (auth && auth.cancel) auth.cancel(); takeInvestorIntent(); setAwaitingVerification(0); setAuth(null); if (needsAccountLogin) navigate('/'); };
   const browseDone = async (data) => { const access = await api.startInvestorBrowse(data); setBrowse(access); setAuth(null); };
   const logout = async () => { await api.logout(); setUser(null); setBrowse({ valid:false }); navigate('/'); };
   const [verifyError,setVerifyError] = useState(false);
+  const finishInOriginalTab = async (eventData) => {
+    const current = await api.getCurrentUser();
+    if (!current || current.role !== 'investor') return;
+    setUser(current);
+    setVerificationNotice(eventData?.actionCompleted ? eventData.type || 'account' : 'account');
+    setAwaitingVerification(0);
+    if (auth?.verified) auth.verified(Boolean(eventData?.actionCompleted));
+    setAuth(null);
+    api.getInvestorAccount().then((account) => setFavoriteIds(account.favorites.map((item) => item.id))).catch(() => {});
+  };
   useEffect(() => {
     const onVerified = (event) => {
       if (event.key !== investorVerifiedKey || !event.newValue) return;
-      api.getCurrentUser().then((current) => {
-        if (!current || current.role !== 'investor') return;
-        setUser(current);
-        setVerificationNotice(true);
-        if (auth?.verified) auth.verified();
-        setAuth(null);
-        api.getInvestorAccount().then((account) => setFavoriteIds(account.favorites.map((item) => item.id))).catch(() => {});
-      }).catch(() => {});
+      try { finishInOriginalTab(JSON.parse(event.newValue)).catch(() => {}); } catch {}
     };
     window.addEventListener('storage', onVerified);
     return () => window.removeEventListener('storage', onVerified);
   }, [auth]);
+  useEffect(() => {
+    if (!awaitingVerification || first === 'verify-email') return;
+    const check = () => {
+      try {
+        const eventData = JSON.parse(localStorage.getItem(investorVerifiedKey) || 'null');
+        if (eventData?.verifiedAt >= awaitingVerification) {
+          finishInOriginalTab(eventData).catch(() => {});
+        }
+      } catch {}
+    };
+    const timer = setInterval(check, 3000);
+    window.addEventListener('focus', check);
+    document.addEventListener('visibilitychange', check);
+    return () => { clearInterval(timer); window.removeEventListener('focus', check); document.removeEventListener('visibilitychange', check); };
+  }, [awaitingVerification, first, auth]);
   useEffect(() => {
     if (first !== 'verify-email') return;
     api.verifyInvestorEmail(route.query.token).then(async (result) => {
       setUser(result.user);
       setAuth(null);
       const intent = takeInvestorIntent();
+      let actionCompleted = !intent;
       try {
-        if (intent?.type === 'favorite') await api.addInvestorFavorite(intent.orgId);
-        if (intent?.type === 'contact') await api.requestContact(intent.orgId, intent.projectId);
-      } catch { /* The account remains verified even if the original action cannot be completed. */ }
-      try { localStorage.setItem(investorVerifiedKey, String(Date.now())); } catch {}
-      setVerificationNotice(true);
-      navigate(intent?.orgId ? '/org/' + encodeURIComponent(intent.orgId) : '/');
+        let action;
+        if (intent?.type === 'favorite') action = await api.addInvestorFavorite(intent.orgId);
+        if (intent?.type === 'contact') action = await api.requestContact(intent.orgId, intent.projectId);
+        if (intent) actionCompleted = action?.ok === true;
+      } catch { actionCompleted = false; }
+      const destination = intent?.orgId ? '/org/' + encodeURIComponent(intent.orgId) : '/';
+      const eventData = { verifiedAt: Date.now(), type: intent?.type || null, orgId: intent?.orgId || null, actionCompleted };
+      try { localStorage.setItem(investorVerifiedKey, JSON.stringify(eventData)); } catch {}
+      setVerifyResult({ destination, ...eventData });
     }).catch(() => setVerifyError(true));
   }, [first,route.query.token]);
 
@@ -225,18 +250,24 @@ function PublicSite({ route, user, setUser }) {
   else if (first === 'investidor') page = investor
     ? html`<${InvestorAccountPage} onUserUpdated=${setUser} onFavoritesChanged=${setFavoriteIds} />`
     : html`<div class="section">${t('common.loading')}</div>`;
-  else if (first === 'verify-email') page = html`<div class="section"><h1 class="form-title">${t('investor.verify_title')}</h1><p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p></div>`;
+  else if (first === 'verify-email') page = html`<div class="section" style=${{ maxWidth:'680px' }}>
+    <h1 class="form-title">${verifyResult ? t('investor.verify_complete_title') : t('investor.verify_title')}</h1>
+    ${verifyResult ? html`<p>${t(verifyResult.actionCompleted ? 'investor.verify_complete' : 'investor.verify_action_retry')}</p>
+      <p class="section-note">${t('investor.verify_close_tab')}</p>
+      <button type="button" class="btn btn-lime" onClick=${() => navigate(verifyResult.destination)}>${t(verifyResult.type === 'favorite' ? 'investor.verify_view_favorite' : 'investor.verify_continue')}</button>`
+      : html`<p>${verifyError ? t('investor.reset_invalid') : t('common.loading')}</p>`}
+  </div>`;
   else if (first === 'reset-password') page = html`<${ResetPasswordPage} token=${route.query.token} />`;
   else if (first === 'legal') page = html`<${LegalPage} kind=${second === 'privacy' ? 'privacy' : 'terms'} />`;
   else page = html`<${DirectoryPage} />`;
   return html`<div class="page">
     <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'login' })} onLogout=${logout} />
-    ${verificationNotice && first !== 'verify-email' && html`<div class="notice" role="status" style=${{ maxWidth:'1200px', margin:'16px auto' }}>${t('investor.account_verified')}</div>`}
+    ${verificationNotice && first !== 'verify-email' && html`<div class="notice" role="status" style=${{ maxWidth:'1200px', margin:'16px auto' }}>${t('investor.' + (verificationNotice === 'favorite' ? 'account_verified_favorite' : verificationNotice === 'contact' ? 'account_verified_contact' : 'account_verified'))}</div>`}
     ${page}
     <${PublicFooter} />
     ${(auth || needsWelcome || needsAccountLogin) && html`<${InvestorAuthModal} key=${`${auth?.mode || (needsAccountLogin ? 'login' : 'welcome')}:${auth?.prefill?.email || ''}`}
       initialMode=${auth?.mode || (needsAccountLogin ? 'login' : 'welcome')} reason=${auth?.reason} prefill=${auth?.prefill}
-      onDone=${done} onGuest=${browseDone} onClose=${close} required=${needsWelcome} />`}
+      onDone=${done} onGuest=${browseDone} onClose=${close} onVerificationStarted=${() => setAwaitingVerification(Date.now())} required=${needsWelcome} />`}
   </div>`;
 }
 
