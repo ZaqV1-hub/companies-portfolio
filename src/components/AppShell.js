@@ -1,6 +1,7 @@
 // Logged-in layout (company area and team panel): navy sidebar + content.
 import { html } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
+import { navigate } from '../lib/router.js';
 import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
 
 /**
@@ -16,7 +17,8 @@ export function AppShell({ roleLabel, userLabel, nav, onLogout, children }) {
         <div class="sidebar-user">${userLabel}</div>
       </div>
       <nav class="nav">${nav.map((n) => html`
-        <a key=${n.key} href=${n.href} aria-current=${n.current ? 'page' : null}>${n.label}${n.badge ? html` <span class="nav-badge">${n.badge}</span>` : null}</a>`)}
+        <a key=${n.key} href=${n.href} aria-current=${n.current ? 'page' : null}
+          onClick=${(event) => { if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); navigate(n.href); } }}>${n.label}${n.badge ? html` <span class="nav-badge">${n.badge}</span>` : null}</a>`)}
       </nav>
       <div style=${{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: '12px' }}>
         <${LangSwitch} dark=${true} />

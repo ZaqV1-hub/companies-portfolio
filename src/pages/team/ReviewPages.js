@@ -1,11 +1,11 @@
 // Team panel · review queue and review screen (spec 1, 4.3).
 import { cx, html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js';
+import * as api from '../../services/api.js?v=20261022-review-login2';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href, navigate } from '../../lib/router.js';
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField, writeField } from '../../lib/formSchema.js';
-import { collectTexts, displayLines, sameValue, setEnglish } from '../../lib/fieldDisplay.js';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField } from '../../lib/formSchema.js';
+import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { ProfileView } from '../../components/profile/ProfileView.js';
 
@@ -33,20 +33,7 @@ export function ReviewQueuePage() {
   </div>`;
 }
 
-function TextEditors({ value, onChange, i18n }) {
-  const texts = collectTexts(value);
-  if (!texts.length) return null;
-  return html`<div class="en-editors">
-    <div class="en-title">${i18n.t('review.english_version')}</div>
-    ${texts.map((x) => html`<div class="en-row" key=${x.path.join('.')}>
-      <div class="en-pt">PT: ${x.pt || '—'}</div>
-      <textarea class=${cx('input input-sm', !x.en && x.pt && 'missing')} rows=${x.pt.length > 120 ? 3 : 1} value=${x.en}
-        placeholder=${i18n.t('review.en_placeholder')} onInput=${(e) => onChange(setEnglish(value, x.path, e.target.value))}></textarea>
-    </div>`)}
-  </div>`;
-}
-
-function CompareRow({ field, before, after, onChange, i18n, reference, onlyChanges, isNew }) {
+function CompareRow({ field, before, after, i18n, reference, onlyChanges, isNew }) {
   const changed = !isNew && !sameValue(before, after);
   if (onlyChanges && !changed && !isNew) return null;
   const prev = displayLines(field, before, i18n);
@@ -68,7 +55,6 @@ function CompareRow({ field, before, after, onChange, i18n, reference, onlyChang
       ${extraEnglish(after).map((line, i) => html`<div class="cmp-line cmp-english" key=${'en' + i}>${line}</div>`)}
       ${field.type === 'image' && after && html`<div class="image-preview" style=${{ backgroundImage: "url('" + after + "')" }}></div>`}
       ${field.type === 'gallery' && (after || []).map((item, i) => html`<div class="image-preview" key=${i} style=${{ backgroundImage: "url('" + item.url + "')" }}></div>`)}
-      <${TextEditors} value=${after} onChange=${onChange} i18n=${i18n} />
     </div>
   </div>`;
 }
@@ -77,7 +63,6 @@ export function ReviewPage({ versionId }) {
   const i18n = useI18n();
   const { t, lang } = i18n;
   const [data, setData] = useState(null);
-  const [content, setContent] = useState(null);
   const [onlyChanges, setOnlyChanges] = useState(false);
   const [tab, setTab] = useState('compare');
   const [previewLang, setPreviewLang] = useState('en');
@@ -85,17 +70,17 @@ export function ReviewPage({ versionId }) {
   const [comment, setComment] = useState('');
   const [message, setMessage] = useState(null);
 
-  useEffect(() => { api.getReview(versionId).then((d) => { setData(d); setContent(d && d.draft.content); }); }, [versionId]);
+  useEffect(() => { api.getReview(versionId).then(setData); }, [versionId]);
   if (!data) return html`<div>${t('common.loading')}</div>`;
 
+  const content = data.draft.content;
   const isNew = !data.previous;
   const prevContent = data.previous || { organization: {}, projects: [] };
   const refFor = (projectId, key) => (data.imports.find((r) => (r.project_id || null) === (projectId || null) && r.field === key) || {}).previous_answer;
   const editable = data.draft.status === 'in_review';
 
   const orgRows = (fields) => fields.map((f) => html`<${CompareRow} key=${f.key} field=${f} i18n=${i18n} onlyChanges=${onlyChanges} isNew=${isNew}
-    before=${readField(prevContent.organization, f)} after=${readField(content.organization, f)} reference=${refFor(null, f.key)}
-    onChange=${(v) => setContent({ ...content, organization: writeField(content.organization, f, v) })} />`);
+    before=${readField(prevContent.organization, f)} after=${readField(content.organization, f)} reference=${refFor(null, f.key)} />`);
 
   const sections = [
     html`<section class="cmp-section" key="org"><h2 class="block-title">${t('form.step_organization')}</h2>${orgRows(ORG_FIELDS)}</section>`,
@@ -106,18 +91,13 @@ export function ReviewPage({ versionId }) {
       return html`<section class="cmp-section" key=${p.id}>
         <h2 class="block-title">${t('form.step_project')} ${content.projects.length > 1 ? idx + 1 : ''} · ${t('profile_type.' + p.profile_type)}</h2>
         ${projectFields(p, content.projects.length).map((f) => html`<${CompareRow} key=${f.key} field=${f} i18n=${i18n} onlyChanges=${onlyChanges} isNew=${isNew}
-          before=${readField(before, f)} after=${readField(after, f)} reference=${refFor(p.id, f.key)}
-          onChange=${(v) => setContent({ ...content, projects: content.projects.map((x) => {
-            if (x.id !== p.id) return x;
-            return f.key === 'summary' ? { ...x, summary: v } : { ...x, fields: writeField(x.fields, f, v) };
-          }) })} />`)}
+          before=${readField(before, f)} after=${readField(after, f)} reference=${refFor(p.id, f.key)} />`)}
       </section>`;
     }),
     html`<section class="cmp-section" key="lead"><h2 class="block-title">${t('form.step_leadership')}</h2>${orgRows([LEADERSHIP_FIELD])}</section>`,
     html`<section class="cmp-section" key="img"><h2 class="block-title">${t('form.step_images')}</h2>${orgRows(IMAGE_FIELDS)}</section>`,
   ];
 
-  const save = async () => { await api.saveReviewEdits(versionId, content); setMessage(t('review.saved')); };
   const approve = async () => {
     const res = await api.approveReview(versionId, content);
     if (res.ok) navigate('/team/review');
@@ -136,7 +116,6 @@ export function ReviewPage({ versionId }) {
           · ${t('review.online_' + data.organization.public_state)}</div>
       </div>
       ${editable && html`<div class="review-actions">
-        <button type="button" class="btn btn-outline btn-lg" onClick=${save}>${t('review.save')}</button>
         <button type="button" class="btn btn-navy-outline btn-lg" onClick=${() => setReturning(true)}>${t('review.return')}</button>
         <button type="button" class="btn btn-lime btn-lg" onClick=${approve}>${t('review.approve')}</button>
       </div>`}
@@ -181,10 +160,12 @@ export function OrganizationsPage() {
   const i18n = useI18n();
   const { t, lang } = i18n;
   const [rows, setRows] = useState(null);
+  const [loadError, setLoadError] = useState(false);
   const [status, setStatus] = useState('');
   const [q, setQ] = useState('');
-  const load = () => api.listOrganizationsForTeam().then(setRows);
+  const load = () => { setLoadError(false); return api.listOrganizationsForTeam().then(setRows).catch(() => setLoadError(true)); };
   useEffect(() => { load(); }, []);
+  if (loadError) return html`<div class="empty-state"><strong>${t('orgs.load_error')}</strong><button type="button" class="btn btn-lime" onClick=${load}>${t('orgs.retry')}</button></div>`;
   if (!rows) return html`<div>${t('common.loading')}</div>`;
   const counts = Object.fromEntries(STATUSES.map((s) => [s, rows.filter((r) => r.status === s).length]));
   const list = rows.filter((r) => (!status || r.status === status) && (!q || r.name.toLowerCase().includes(q.toLowerCase())));

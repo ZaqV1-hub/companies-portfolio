@@ -42,6 +42,7 @@ function Suggest({ relId, onDone }) {
   const [just, setJust] = useState('');
   const send = async () => { const res = await api.suggestClassification(relId, value, just); if (res.ok) onDone(); };
   return html`<div class="action-panel">
+    <p class="form-help">${t('crm.classification_explain')}</p>
     <${F} label=${t('crm.suggest_value')} level="req"><div class="check-chips">${['nia', 'br'].map((v) => html`<label key=${v} class=${cx('check-chip', value === v && 'on')}>
       <input type="radio" name="sug" checked=${value === v} onChange=${() => setValue(v)} />${label('classification', v)}</label>`)}</div><//>
     <${F} label=${t('crm.justification')} wide=${true}><textarea class="input input-sm" rows="2" maxLength="300" value=${just} onInput=${(e) => setJust(e.target.value)}></textarea>
@@ -57,6 +58,7 @@ function Announce({ relId, onDone }) {
   const send = async () => { const res = await api.reportAnnouncement(relId, a); if (res.ok) onDone(); else setErrors(res.fields || []); };
   const err = (k) => (errors.includes(k) ? t('crm.errors.required') : null);
   return html`<div class="action-panel crm-grid">
+    <p class="form-help" style=${{ gridColumn:'1 / -1' }}>${t('crm.announcement_explain')}</p>
     <${F} label=${t('crm.announce_type')} level="req" wide=${true} error=${err('type')}><select class="input input-sm" value=${a.type} onChange=${(e) => setA({ ...a, type: e.target.value })}>
       <option value="">${t('form.choose')}</option>${'abcdefgh'.split('').map((k) => html`<option key=${k} value=${k}>${t('enum.npia_types.' + k)}</option>`)}</select><//>
     <${F} label=${t('crm.announce_date')} level="req" error=${err('date')}><input class="input input-sm" type="date" value=${a.date} onInput=${(e) => setA({ ...a, date: e.target.value })} /><//>

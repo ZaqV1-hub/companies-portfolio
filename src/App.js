@@ -1,23 +1,36 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261022-session-cache1';
+import * as api from './services/api.js?v=20261022-review-login2';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261021-investor1';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-phone1';
-import { AppShell } from './components/AppShell.js?v=20261014-flags1';
+import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261021-investor1';
 import { LoginPage } from './pages/LoginPage.js?v=20261022-empty-logins1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261022-company-crm1';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261022-company-preview1';
-import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261022-company-crm1';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261022-review-login2';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261022-company-crm1';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261022-review-login2';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261022-company-crm1';
 import { SettingsPage } from './pages/team/SettingsPage.js';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
 import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-phone1';
+
+const investorIntentKey = 'portfolio:investor-intent';
+const investorVerifiedKey = 'portfolio:investor-verified';
+function saveInvestorIntent(intent) {
+  try { localStorage.setItem(investorIntentKey, JSON.stringify({ ...intent, createdAt: Date.now() })); } catch {}
+}
+function takeInvestorIntent() {
+  try {
+    const value = JSON.parse(localStorage.getItem(investorIntentKey) || 'null');
+    localStorage.removeItem(investorIntentKey);
+    return value && Date.now() - value.createdAt < 24 * 60 * 60 * 1000 ? value : null;
+  } catch { return null; }
+}
 
 function PublicFooter() {
   const { t } = useI18n();
@@ -84,8 +97,8 @@ function Routes() {
   const { setLang } = useI18n();
   useEffect(() => { if (route.areaLang) setLang(route.areaLang); }, [route.areaLang]);
   const [user, setUser] = useState(undefined);
-  useEffect(() => { api.getCurrentUser().then(setUser); }, []);
-  if (user === undefined) return null;
+  useEffect(() => { api.getCurrentUser().then(setUser).catch(() => setUser(null)); }, []);
+  if (user === undefined) return html`<div class="section">Carregando...</div>`;
 
   const logout = async () => { await api.logout(); setUser(null); navigate('/'); };
   const [first, second] = route.parts;
@@ -116,6 +129,7 @@ function PublicSite({ route, user, setUser }) {
   const [auth, setAuth] = useState(null); // {mode, reason, pending: {org, projectId, resolve}}
   const [browse, setBrowse] = useState(undefined);
   const [favoriteIds, setFavoriteIds] = useState([]);
+  const [verificationNotice, setVerificationNotice] = useState(false);
   const investor = user && user.role === 'investor' ? user : null;
   useEffect(() => { api.getInvestorBrowseStatus().then(setBrowse).catch(() => setBrowse({ valid:false })); }, []);
   useEffect(() => {
@@ -137,7 +151,11 @@ function PublicSite({ route, user, setUser }) {
   const requestContact = (org, projectId) => new Promise((resolve) => {
     const run = async () => { try { resolve((await api.requestContact(org.id, projectId)).ok ? 'sent' : null); } catch { resolve(null); } };
     if (investor && investor.email_verified) run();
-    else setAuth({ mode: 'login', reason: t('investor.login_to_request', { org: org.name }), pending: run, cancel: () => resolve(null) });
+    else {
+      saveInvestorIntent({ type: 'contact', orgId: org.id, projectId });
+      setAuth({ mode: 'login', reason: t('investor.login_to_request', { org: org.name }), pending: run,
+        verified: () => resolve('sent'), cancel: () => resolve(null) });
+    }
   });
   const toggleFavorite = (org) => {
     const run = async () => {
@@ -152,24 +170,50 @@ function PublicSite({ route, user, setUser }) {
       } catch { /* Keep the previous state if the request fails. */ }
     };
     if (investor && investor.email_verified) run();
-    else setAuth({ mode:'login', reason:t('investor.login_to_favorite', { org:org.name }), pending:run });
+    else {
+      saveInvestorIntent({ type: 'favorite', orgId: org.id });
+      setAuth({ mode:'login', reason:t('investor.login_to_favorite', { org:org.name }), pending:run });
+    }
   };
   const done = (u) => {
     setUser(u);
+    takeInvestorIntent();
     const pending = auth && auth.pending;
     setAuth(null);
     if (pending) pending();
   };
-  const close = () => { if (auth && auth.cancel) auth.cancel(); setAuth(null); if (needsAccountLogin) navigate('/'); };
+  const close = () => { if (auth && auth.cancel) auth.cancel(); takeInvestorIntent(); setAuth(null); if (needsAccountLogin) navigate('/'); };
   const browseDone = async (data) => { const access = await api.startInvestorBrowse(data); setBrowse(access); setAuth(null); };
   const logout = async () => { await api.logout(); setUser(null); setBrowse({ valid:false }); navigate('/'); };
   const [verifyError,setVerifyError] = useState(false);
   useEffect(() => {
+    const onVerified = (event) => {
+      if (event.key !== investorVerifiedKey || !event.newValue) return;
+      api.getCurrentUser().then((current) => {
+        if (!current || current.role !== 'investor') return;
+        setUser(current);
+        setVerificationNotice(true);
+        if (auth?.verified) auth.verified();
+        setAuth(null);
+        api.getInvestorAccount().then((account) => setFavoriteIds(account.favorites.map((item) => item.id))).catch(() => {});
+      }).catch(() => {});
+    };
+    window.addEventListener('storage', onVerified);
+    return () => window.removeEventListener('storage', onVerified);
+  }, [auth]);
+  useEffect(() => {
     if (first !== 'verify-email') return;
-    api.verifyInvestorEmail(route.query.token).then((result) => {
+    api.verifyInvestorEmail(route.query.token).then(async (result) => {
       setUser(result.user);
       setAuth(null);
-      navigate('/investidor');
+      const intent = takeInvestorIntent();
+      try {
+        if (intent?.type === 'favorite') await api.addInvestorFavorite(intent.orgId);
+        if (intent?.type === 'contact') await api.requestContact(intent.orgId, intent.projectId);
+      } catch { /* The account remains verified even if the original action cannot be completed. */ }
+      try { localStorage.setItem(investorVerifiedKey, String(Date.now())); } catch {}
+      setVerificationNotice(true);
+      navigate(intent?.orgId ? '/org/' + encodeURIComponent(intent.orgId) : '/');
     }).catch(() => setVerifyError(true));
   }, [first,route.query.token]);
 
@@ -187,6 +231,7 @@ function PublicSite({ route, user, setUser }) {
   else page = html`<${DirectoryPage} />`;
   return html`<div class="page">
     <${TopBar} investor=${investor} onInvestorAccess=${() => setAuth({ mode: 'login' })} onLogout=${logout} />
+    ${verificationNotice && first !== 'verify-email' && html`<div class="notice" role="status" style=${{ maxWidth:'1200px', margin:'16px auto' }}>${t('investor.account_verified')}</div>`}
     ${page}
     <${PublicFooter} />
     ${(auth || needsWelcome || needsAccountLogin) && html`<${InvestorAuthModal} key=${`${auth?.mode || (needsAccountLogin ? 'login' : 'welcome')}:${auth?.prefill?.email || ''}`}

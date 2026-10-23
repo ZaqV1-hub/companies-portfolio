@@ -2,7 +2,7 @@
 // docs/HANDOFF_CODEX.md; state and authorization live on the API server.
 async function request(path, { method = 'GET', body } = {}) {
   let response;
-  while (true) {
+  for (let attempt = 0; attempt < 4; attempt++) {
     try {
       response = await fetch(`/api${path}`, {
         method,
@@ -12,11 +12,11 @@ async function request(path, { method = 'GET', body } = {}) {
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch (error) {
-      if (method !== 'GET') throw error;
+      if (method !== 'GET' || attempt === 3) throw error;
       await new Promise((resolve) => setTimeout(resolve, 2000));
       continue;
     }
-    if (method === 'GET' && [502, 503, 504].includes(response.status)) {
+    if (method === 'GET' && [502, 503, 504].includes(response.status) && attempt < 3) {
       await new Promise((resolve) => setTimeout(resolve, 2000));
       continue;
     }
