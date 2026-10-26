@@ -1,6 +1,6 @@
 // Team panel · review queue and review screen (spec 1, 4.3).
 import { cx, html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261026-company-invite1';
+import * as api from '../../services/api.js?v=20261026-invite-language1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href, navigate } from '../../lib/router.js';
@@ -8,6 +8,7 @@ import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField } 
 import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout3';
+import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 
 export function ReviewQueuePage() {
   const { t, lang } = useI18n();
@@ -171,6 +172,9 @@ export function OrganizationsPage() {
   const [editingEmail, setEditingEmail] = useState(null);
   const [emailValue, setEmailValue] = useState('');
   const [notice, setNotice] = useState('');
+  const [inviteTarget, setInviteTarget] = useState(null);
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [inviteError, setInviteError] = useState('');
   const load = () => { setLoadError(false); return api.listOrganizationsForTeam().then(setRows).catch(() => setLoadError(true)); };
   useEffect(() => { load(); }, []);
   if (loadError) return html`<div class="empty-state"><strong>${t('orgs.load_error')}</strong><button type="button" class="btn btn-lime" onClick=${load}>${t('orgs.retry')}</button></div>`;
@@ -192,9 +196,11 @@ export function OrganizationsPage() {
     try { await api.updateOrganizationEmail(r.id,emailValue); setEditingEmail(null); await load(); setNotice(lang === 'pt' ? 'E-mail atualizado.' : 'Email updated.'); }
     catch { setNotice(lang === 'pt' ? 'Não foi possível salvar o e-mail.' : 'Could not save the email.'); }
   };
-  const invite = async (r) => {
-    try { const result = await api.inviteOrganization(r.id); setNotice(lang === 'pt' ? `Convite preparado para ${result.email}.` : `Invitation queued for ${result.email}.`); await load(); }
-    catch (error) { setNotice(error.message === 'email_has_account' ? (lang === 'pt' ? 'Este e-mail já tem acesso. Use a recuperação de senha.' : 'This email already has access. Use password reset.') : (lang === 'pt' ? 'Não foi possível enviar o convite.' : 'Could not send the invitation.')); }
+  const invite = async (r,language) => {
+    setInviteBusy(true); setInviteError('');
+    try { const result = await api.inviteOrganization(r.id,language); setNotice(lang === 'pt' ? `Convite preparado para ${result.email}.` : `Invitation queued for ${result.email}.`); setInviteTarget(null); await load(); }
+    catch (error) { setInviteError(error.message === 'email_has_account' ? (lang === 'pt' ? 'Este e-mail já tem acesso. Use a recuperação de senha.' : 'This email already has access. Use password reset.') : (lang === 'pt' ? 'Não foi possível enviar o convite.' : 'Could not send the invitation.')); }
+    finally { setInviteBusy(false); }
   };
   return html`<div class="team-list-page">
     <div class="team-list-head"><div><h1 class="page-title">${t('orgs.title')}</h1>
@@ -221,11 +227,12 @@ export function OrganizationsPage() {
         <div data-label=${t('review.col_online')}><span class=${'air-state ' + (r.public_state === 'hidden' ? 'off' : 'on')}>${r.public_state === 'hidden' ? t('review.online_hidden') : t('review.online_published')}</span></div>
         <div style=${{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           <a class="btn btn-outline" href=${href('/team/orgs/' + r.id)}>${lang === 'pt' ? 'Editar perfil' : 'Edit profile'}</a>
-          <button type="button" class="btn btn-outline" onClick=${() => invite(r)}>${lang === 'pt' ? 'Enviar convite' : 'Send invitation'}</button>
+          <button type="button" class="btn btn-outline" onClick=${() => { setInviteError(''); setInviteTarget(r); }}>${lang === 'pt' ? 'Enviar convite' : 'Send invitation'}</button>
           ${r.public_state !== 'hidden' && html`<a class="btn btn-outline" href=${href('/org/' + r.id)} target="_blank">↗</a>`}
           <button type="button" class="btn btn-outline" disabled=${r.public_state === 'hidden' && !r.last_approved_at} title=${r.public_state === 'hidden' && !r.last_approved_at ? (lang === 'pt' ? 'A empresa precisa validar o perfil antes da publicação.' : 'The company must validate the profile before publication.') : ''} onClick=${() => toggleOnline(r)}>${r.public_state === 'hidden' ? (lang === 'pt' ? 'Colocar no ar' : 'Publish') : t('orgs.take_offline')}</button>
         </div>
       </div>`)}
     </div>
+    ${inviteTarget && html`<${InviteLanguageModal} email=${inviteTarget.invitation_email} busy=${inviteBusy} error=${inviteError} onClose=${() => { setInviteTarget(null); setInviteError(''); }} onConfirm=${(language) => invite(inviteTarget,language)} />`}
   </div>`;
 }

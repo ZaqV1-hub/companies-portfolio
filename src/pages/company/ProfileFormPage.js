@@ -1,7 +1,7 @@
 // Company area · step-by-step profile form (spec 1, sections 4.2 and 5).
 // Steps: Organization → one per project → Leadership → Images → Preview & submit.
 import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261026-org-invite1';
+import * as api from '../../services/api.js?v=20261026-invite-language1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
@@ -11,6 +11,7 @@ import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=2
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
 import { FieldInput } from '../../components/form/inputs.js?v=20261026-image-upload1';
+import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout3';
 
 function problemText(i18n, p) {
@@ -79,6 +80,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const [showErrors, setShowErrors] = useState(false);
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteNotice, setInviteNotice] = useState(null);
+  const [inviteOpen, setInviteOpen] = useState(false);
 
   const load = () => (teamOrgId ? api.getTeamOrganizationForm(teamOrgId) : api.getMyProfileForm()).then((d) => {
     const preview = teamOrgId ? null : getCompanyPreview();
@@ -119,12 +121,13 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     setTimeout(() => setToast(null), 2500);
     if (res.ok) { clearCompanyPreview(); if (teamOrgId) await load(); else setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } }); }
   };
-  const saveAndInvite = async () => {
+  const saveAndInvite = async (language) => {
     if (!teamOrgId || inviteBusy) return;
     setInviteBusy(true); setInviteNotice(null);
     try {
-      const result = await api.saveTeamOrganizationFormAndInvite(teamOrgId, content);
+      const result = await api.saveTeamOrganizationFormAndInvite(teamOrgId, content, language);
       await load();
+      setInviteOpen(false);
       setInviteNotice({ ok:true, text:i18n.lang === 'pt' ? `Rascunho salvo. Convite preparado para ${result.email}.` : `Draft saved. Invitation queued for ${result.email}.` });
     } catch (error) {
       const messages = i18n.lang === 'pt' ? {
@@ -190,7 +193,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
           </ul>
         </div>`}
         ${!teamOrgId && !unchangedInitial && html`<button type="button" class="btn btn-lime btn-xl" disabled=${!check.ok || locked} onClick=${submit}>${t('form.submit')}</button>`}
-        ${teamOrgId && !locked && html`<button type="button" class="btn btn-lime btn-xl" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${saveAndInvite}>${inviteBusy ? (i18n.lang === 'pt' ? 'Preparando convite...' : 'Preparing invitation...') : (i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation')}</button>`}
+        ${teamOrgId && !locked && html`<button type="button" class="btn btn-lime btn-xl" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${() => { setInviteNotice(null); setInviteOpen(true); }}>${i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation'}</button>`}
       </div>`;
   }
 
@@ -206,13 +209,14 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
           ${org.public_state === 'provisional' && html` · ${t('form.updating_public')}`}
         </div>
       </div>
-      ${!locked && (teamOrgId ? html`<div class="team-draft-actions"><div class="team-draft-recipient">${i18n.lang === 'pt' ? 'Convite para' : 'Invitation to'} <strong>${data.organization.invitation_email || '—'}</strong></div><div class="review-actions"><button type="button" class="btn btn-outline btn-lg" disabled=${inviteBusy} onClick=${save}>${i18n.lang === 'pt' ? 'Salvar sem enviar' : 'Save without sending'}</button><button type="button" class="btn btn-lime btn-lg" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${saveAndInvite}>${inviteBusy ? (i18n.lang === 'pt' ? 'Preparando convite...' : 'Preparing invitation...') : (i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation')}</button></div></div>` : html`<button type="button" class="btn btn-outline btn-lg" onClick=${save}>${t('form.save_draft')}</button>`)}
+      ${!locked && (teamOrgId ? html`<div class="team-draft-actions"><div class="team-draft-recipient">${i18n.lang === 'pt' ? 'Convite para' : 'Invitation to'} <strong>${data.organization.invitation_email || '—'}</strong></div><div class="review-actions"><button type="button" class="btn btn-outline btn-lg" disabled=${inviteBusy} onClick=${save}>${i18n.lang === 'pt' ? 'Salvar sem enviar' : 'Save without sending'}</button><button type="button" class="btn btn-lime btn-lg" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${() => { setInviteNotice(null); setInviteOpen(true); }}>${i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation'}</button></div></div>` : html`<button type="button" class="btn btn-outline btn-lg" onClick=${save}>${t('form.save_draft')}</button>`)}
     </div>
     ${locked && html`<div class="notice">${t('form.locked_review')}</div>`}
     ${data.draft.status === 'returned' && data.draft.review_comment && html`<div class="notice warn"><strong>${t('form.returned')}</strong> ${data.draft.review_comment}
       ${data.draft.reviewed_at && html`<small> (${formatDate(data.draft.reviewed_at, i18n.lang)})</small>`}</div>`}
     ${toast && html`<div class="toast" role="status">${toast}</div>`}
     ${inviteNotice && html`<div class=${inviteNotice.ok ? 'notice' : 'notice warn'} role=${inviteNotice.ok ? 'status' : 'alert'}>${inviteNotice.text}</div>`}
+    ${inviteOpen && html`<${InviteLanguageModal} email=${data.organization.invitation_email} busy=${inviteBusy} error=${inviteNotice && !inviteNotice.ok ? inviteNotice.text : null} onClose=${() => { setInviteOpen(false); setInviteNotice(null); }} onConfirm=${saveAndInvite} />`}
 
     <div class="progress" aria-label=${t('form.progress', { n: stepIndex + 1, total: steps.length })}>
       <div class="progress-bar"><span style=${{ width: Math.round(((stepIndex + 1) / steps.length) * 100) + '%' }}></span></div>

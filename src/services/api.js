@@ -70,10 +70,10 @@ export async function listOrganizationsForTeam() { return request('/team/organiz
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
 export async function createOrganization(name,email) { return post('/team/organizations', { name,email }); }
 export async function updateOrganizationEmail(id,email) { return request(`/team/organizations/${q(id)}/contact`, { method:'PATCH',body:{ email } }); }
-export async function inviteOrganization(id) { return post(`/team/organizations/${q(id)}/invite`, {}); }
+export async function inviteOrganization(id,lang) { return post(`/team/organizations/${q(id)}/invite`, { lang }); }
 export async function getTeamOrganizationForm(id) { return request(`/team/organizations/${q(id)}/profile-form`); }
 export async function saveTeamOrganizationForm(id,content) { return put(`/team/organizations/${q(id)}/profile-form`, { content }); }
-export async function saveTeamOrganizationFormAndInvite(id,content) { return post(`/team/organizations/${q(id)}/profile-form/send-invite`, { content }); }
+export async function saveTeamOrganizationFormAndInvite(id,content,lang) { return post(`/team/organizations/${q(id)}/profile-form/send-invite`, { content,lang }); }
 export async function getCompanyInvitation(token) { return request(`/company/invitation?token=${q(token)}`); }
 export async function acceptCompanyInvitation(data) { return post('/company/invitation/accept', data); }
 

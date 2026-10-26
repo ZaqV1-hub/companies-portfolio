@@ -892,7 +892,8 @@ async function deliverOutbox() {
         profile_accepted: { subject:`${name} aceitou o perfil inicial`, title:'Perfil inicial aceito', intro:`${name} aceitou o perfil inicial sem alterações e a página foi publicada.`, button:'Ver organizações', url:`${base}/painel/orgs` },
         profile_returned: { subject:`Revisão do perfil de ${name}`, title:'Perfil devolvido para ajustes', intro:data.comment ? `A equipe revisou o perfil de ${name} e pediu ajustes: ${data.comment}` : `A equipe revisou o perfil de ${name} e devolveu a publicação para ajustes.`, button:'Abrir meu perfil', url:companyUrl },
         profile_approved: { subject:`Perfil de ${name} publicado`, title:'Perfil aprovado', intro:`A revisão do perfil de ${name} foi aprovada e publicada.`, button:'Abrir meu perfil', url:companyUrl },
-        company_invitation: { subject:`Acesso ao portfólio de ${name}`, title:'Crie seu acesso de empresa', intro:`O perfil de ${name} está pronto para sua conferência. Crie sua senha para entrar, revisar os dados e aprovar a publicação. O convite expira em 7 dias.`, button:'Criar acesso', url:`${base}/empresa?invite=${encodeURIComponent(data.token)}`, note:'Este convite é individual e pode ser utilizado apenas uma vez.' },
+        company_invitation: data.lang === 'en' ? { lang:'en', subject:`Your portfolio access | ${name}`, title:'Create your company account', intro:`The ${name} profile is ready for your review. Create a password to access it, check the information and approve publication. This invitation expires in 7 days.`, button:'Create your account', url:`${base}/company?invite=${encodeURIComponent(data.token)}`, note:'This invitation is personal and can be used only once.' }
+          : { lang:'pt', subject:`Acesso ao portfólio de ${name}`, title:'Crie seu acesso de empresa', intro:`O perfil de ${name} está pronto para sua conferência. Crie sua senha para entrar, revisar os dados e aprovar a publicação. O convite expira em 7 dias.`, button:'Criar acesso', url:`${base}/empresa?invite=${encodeURIComponent(data.token)}`, note:'Este convite é individual e pode ser utilizado apenas uma vez.' },
       };
       const message = templates[item.template];
       if (!message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.to)) {
@@ -1109,7 +1110,7 @@ async function saveTeamOrganizationProfile(db, id, content) {
   await db.execute("DELETE FROM profile_versions WHERE organization_id=? AND kind='draft' AND status IN ('filling','returned')", [id]);
   return { ok:true };
 }
-async function queueCompanyInvitation(db, id) {
+async function queueCompanyInvitation(db, id, lang = 'pt') {
   const [orgs] = await db.execute('SELECT invitation_email FROM organizations WHERE id=? FOR UPDATE', [id]);
   if (!orgs.length) return { status:404,error:'not_found' };
   const email = String(orgs[0].invitation_email || '').trim().toLowerCase();
@@ -1121,7 +1122,7 @@ async function queueCompanyInvitation(db, id) {
   const token = crypto.randomBytes(32).toString('hex');
   await db.execute('INSERT INTO company_invitations (id,organization_id,email,token_hash,expires_at,created_at) VALUES (?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY),UTC_TIMESTAMP())', [`ci-${crypto.randomUUID()}`,id,email,tokenHash(token)]);
   await db.execute('UPDATE organizations SET invited_at=UTC_TIMESTAMP() WHERE id=?', [id]);
-  await emailEvent('company_invitation',email,{ organization_id:id, token },db);
+  await emailEvent('company_invitation',email,{ organization_id:id, token, lang },db);
   return { ok:true,email };
 }
 app.put('/api/team/organizations/:id/profile-form', requireRole('team'), async (req,res) => {
@@ -1135,13 +1136,15 @@ app.put('/api/team/organizations/:id/profile-form', requireRole('team'), async (
   finally { db.release(); }
 });
 app.post('/api/team/organizations/:id/profile-form/send-invite', requireRole('team'), async (req,res) => {
+  const lang = req.body.lang || 'pt';
+  if (!['pt','en'].includes(lang)) return res.status(400).json({ error:'invalid_language' });
   if (!mailAvailable()) return res.status(503).json({ error:'email_unavailable' });
   const db = await pool.getConnection();
   try {
     await db.beginTransaction();
     const saved = await saveTeamOrganizationProfile(db,req.params.id,req.body.content);
     if (!saved.ok) { await db.rollback(); return res.status(saved.status).json({ error:saved.error }); }
-    const invited = await queueCompanyInvitation(db,req.params.id);
+    const invited = await queueCompanyInvitation(db,req.params.id,lang);
     if (!invited.ok) { await db.rollback(); return res.status(invited.status).json({ error:invited.error }); }
     await db.commit(); res.json(invited);
   } catch (error) { await db.rollback(); routeError(res,error); }
@@ -1157,11 +1160,13 @@ app.patch('/api/team/organizations/:id/contact', requireRole('team'), async (req
   } catch (error) { routeError(res,error); }
 });
 app.post('/api/team/organizations/:id/invite', requireRole('team'), async (req, res) => {
+  const lang = req.body.lang || 'pt';
+  if (!['pt','en'].includes(lang)) return res.status(400).json({ error:'invalid_language' });
   if (!mailAvailable()) return res.status(503).json({ error:'email_unavailable' });
   const db = await pool.getConnection();
   try {
     await db.beginTransaction();
-    const result = await queueCompanyInvitation(db,req.params.id);
+    const result = await queueCompanyInvitation(db,req.params.id,lang);
     if (!result.ok) { await db.rollback(); return res.status(result.status).json({ error:result.error }); }
     await db.commit(); res.json(result);
   } catch (error) { await db.rollback(); routeError(res,error); }
@@ -1180,7 +1185,9 @@ app.post('/api/company/invitation/accept', signupLimiter, async (req, res) => {
   const token = String(req.body.token || '');
   const name = String(req.body.name || '').trim();
   const password = String(req.body.password || '');
-  if (!/^[a-f0-9]{64}$/.test(token) || name.length < 2 || name.length > 200 || password.length < 10 || password.length > 128 || password !== req.body.confirm_password) return res.status(400).json({ error:'invalid' });
+  if (!/^[a-f0-9]{64}$/.test(token) || name.length < 2 || name.length > 200 || password.length < 10 || password.length > 128
+    || !/\p{Lu}/u.test(password) || !/\p{Ll}/u.test(password) || !/\d/.test(password)
+    || password !== req.body.confirm_password) return res.status(400).json({ error:'invalid' });
   const db = await pool.getConnection();
   try {
     await db.beginTransaction();
