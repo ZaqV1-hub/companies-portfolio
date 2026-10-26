@@ -39,7 +39,7 @@ export function InvitationPage({ token, onLoggedIn }) {
     } catch (e) { setError(e.message === 'email_has_account' ? (pt ? 'Este e-mail já tem uma conta. Entre com sua senha.' : 'This email already has an account. Sign in with your password.') : (pt ? 'Não foi possível criar o acesso. Confira os dados e tente novamente.' : 'Could not create your account. Check the details and try again.')); }
     finally { setBusy(false); }
   };
-  return html`<div class="split"><div class="split-brand"><img src="assets/img/bph-logo.png" alt="Brazilian Pharma & Health" /><div><h2>${pt ? 'Seu perfil no portfólio' : 'Your portfolio profile'}</h2><p>${pt ? 'Confira as informações da empresa e publique seu perfil.' : 'Review your company information and publish your profile.'}</p></div></div>
+  return html`<div class="split"><div class="split-brand invitation-brand"><div class="invitation-brand-logo"><img src="assets/img/bph-logo.png" alt="Brazilian Pharma & Health" /></div><div><h2>${pt ? 'Seu perfil no portfólio' : 'Your portfolio profile'}</h2><p>${pt ? 'Confira as informações da empresa e publique seu perfil.' : 'Review your company information and publish your profile.'}</p></div></div>
     <div class="split-form"><form class="split-form-inner" noValidate=${true} onSubmit=${submit}>
       <div class="kicker">${pt ? 'CONVITE DA EMPRESA' : 'COMPANY INVITATION'}</div>
       <h1 class="form-title">${pt ? 'Crie seu acesso' : 'Create your account'}</h1>
