@@ -858,8 +858,7 @@ function initialProfileSnapshot(org, projects, imports = []) {
 async function emailEvent(template, audience, data, db = pool) {
   let to = audience;
   if (audience === 'team') {
-    const [users] = await db.execute("SELECT email FROM users WHERE role='team' ORDER BY (id='u-team-1') DESC,id LIMIT 1");
-    if (users.length) to = users[0].email;
+    to = process.env.TEAM_NOTIFICATION_EMAIL?.trim() || 'isaque@brevia.company';
   } else if (audience === 'company' && data.organization_id) {
     const [organizations] = await db.execute('SELECT focal_point FROM organizations WHERE id=?', [data.organization_id]);
     const focal = organizations[0]?.focal_point;

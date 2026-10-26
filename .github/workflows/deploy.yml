@@ -65,3 +65,10 @@ jobs:
           $dry = '${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}' -eq 'true'
           & .\deploy\windows\deploy.ps1 -DryRun:$dry
           if (-not $?) { exit 1 }
+
+      - name: Check review notification delivery
+        if: ${{ github.event_name == 'push' }}
+        shell: powershell
+        run: |
+          $env:ENV_FILE = 'C:\Secrets\companiesportfolio\test.env'
+          & 'C:\Lumi\runtime\node-v22.14.0-win-x64\node.exe' 'C:\Services\CompaniesPortfolioApi\app\server\db\mail-status.js'
