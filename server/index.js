@@ -807,29 +807,40 @@ function sanitizeSvg(source) {
   const height = numericSvgLength(root.getAttribute('height')) || (viewBox.length === 4 ? viewBox[3] : 0);
   return { buffer:Buffer.from(new XMLSerializer().serializeToString(doc)), width, height };
 }
-app.post('/api/uploads', requireRole('company_user','team'), upload.single('image'), async (req,res) => {
+app.post('/api/uploads', requireRole('company_user','team'), (req,res,next) => upload.single('image')(req,res,(error) => {
+  if (!error) return next();
+  if (error.code === 'LIMIT_FILE_SIZE') return res.status(413).json({ error:'image_too_big' });
+  return res.status(400).json({ error:'image_type' });
+}), async (req,res) => {
   const file = req.file;
   const kind = req.query.kind;
   if (!file || !['logo','cover','product','gallery'].includes(kind)) return res.status(400).json({ error:'invalid' });
-  const allowed = kind === 'logo' ? ['image/png','image/svg+xml'] : ['image/jpeg','image/png'];
-  if (!allowed.includes(file.mimetype)) return res.status(415).json({ error:'image_type' });
-  if ((kind === 'cover' || kind === 'product') && file.size > 8*1024*1024) return res.status(413).json({ error:'image_too_big' });
+  const extension = path.extname(file.originalname).toLowerCase();
+  const svg = kind === 'logo' && (file.mimetype === 'image/svg+xml' || (file.mimetype === 'application/octet-stream' && extension === '.svg'));
+  const allowed = ['image/jpeg','image/png','image/webp'];
+  if (!svg && !allowed.includes(file.mimetype) && !(file.mimetype === 'application/octet-stream' && ['.jpg','.jpeg','.png','.webp'].includes(extension))) return res.status(415).json({ error:'image_type' });
   try {
     let bytes = file.buffer; let extension; let width; let height;
-    if (file.mimetype === 'image/svg+xml') {
+    if (svg) {
       const cleaned = sanitizeSvg(file.buffer.toString('utf8'));
       bytes = cleaned.buffer; width = cleaned.width; height = cleaned.height; extension = 'svg';
     } else {
-      const metadata = await sharp(bytes, { limitInputPixels:50_000_000 }).metadata();
-      if (!['png','jpeg'].includes(metadata.format)) return res.status(415).json({ error:'image_type' });
-      width = metadata.width; height = metadata.height; extension = metadata.format === 'jpeg' ? 'jpg' : 'png';
+      try {
+        const input = sharp(bytes, { limitInputPixels:50_000_000, failOn:'error' });
+        const metadata = await input.metadata();
+        if (!['png','jpeg','webp'].includes(metadata.format)) return res.status(415).json({ error:'image_type' });
+        width = metadata.width; height = metadata.height;
+        const resized = input.rotate().resize({ width:kind === 'logo' ? 2000 : 3200, height:kind === 'logo' ? 2000 : 3200, fit:'inside', withoutEnlargement:true });
+        if (kind === 'logo') { bytes = await resized.png({ compressionLevel:9 }).toBuffer(); extension = 'png'; }
+        else { bytes = await resized.flatten({ background:'#ffffff' }).jpeg({ quality:84, mozjpeg:true }).toBuffer(); extension = 'jpg'; }
+      } catch { return res.status(415).json({ error:'image_type' }); }
     }
-    if (!width || !height || (kind === 'cover' ? width < 1920 || height < 720 : Math.max(width,height) < (kind === 'gallery' ? 1600 : kind === 'product' ? 1200 : 512))) return res.status(400).json({ error:kind === 'cover' ? 'image_cover_dimensions' : 'image_too_small' });
+    if (!width || !height) return res.status(400).json({ error:'image_type' });
     await fs.mkdir(uploadRoot,{recursive:true});
     const filename = `${crypto.randomUUID()}.${extension}`;
     await fs.writeFile(path.join(uploadRoot,filename),bytes,{flag:'wx'});
     res.status(201).json({ url:`/uploads/${filename}` });
-  } catch (error) { if (error.message?.startsWith('invalid_svg')) return res.status(400).json({ error:'invalid_svg' }); routeError(res,error); }
+  } catch (error) { if (svg && error.message?.startsWith('invalid_svg')) return res.status(400).json({ error:'invalid_svg' }); routeError(res,error); }
 });
 
 const profileOrgKeys = ['name','logo_url','cover_url','description','website','city','state','size','segments','partnership_types','leadership','gallery','focal_point'];

@@ -468,7 +468,7 @@
     },
     "logo_url": {
       "label": "Logo",
-      "help": "PNG or SVG with transparent background, at least 512 px."
+      "help": "Recommended size: 512 px or more. JPG, PNG, WebP or SVG; a transparent background works best. Up to 20 MB."
     },
     "description": {
       "label": "Description",
@@ -740,15 +740,15 @@
     },
     "cover_url": {
       "label": "Profile background photo",
-      "help": "JPG or PNG, 1920 × 720 px, up to 8 MB. The profile always applies the platform's dark blue tone, including to colorful photos."
+      "help": "Recommended size: 1920 × 720 px. JPG, PNG or WebP, up to 20 MB. The platform optimizes the photo and applies its dark blue tone."
     },
     "product_image_url": {
       "label": "Lead product photo",
-      "help": "JPG or PNG, at least 1200 px on the longer side, up to 8 MB. This photo appears beside the product description."
+      "help": "Recommended size: 1200 px or more on the longer side. JPG, PNG or WebP, up to 20 MB. The platform optimizes the photo."
     },
     "gallery": {
       "label": "Photo gallery",
-      "help": "Up to 6 own images, at least 1600 px on the longer side, with caption."
+      "help": "Up to 6 own images with captions. Recommended size: 1600 px or more on the longer side. JPG, PNG or WebP, up to 20 MB each."
     }
   },
   "form": {
@@ -822,13 +822,15 @@
     "segment": "Segment",
     "caption": "Caption",
     "upload": "Upload image",
+    "uploading": "Uploading image...",
     "replace": "Replace image",
     "choose": "Select…",
     "select_period": "Select",
     "image_too_small": "Image too small: at least {min} px.",
     "image_cover_dimensions": "The cover image must be at least 1920 × 720 px.",
-    "image_type": "File type not accepted.",
-    "image_too_big": "File above the size limit.",
+    "image_type": "This image could not be read. Use JPG, PNG, WebP or, for the logo, SVG.",
+    "image_too_big": "Images must be 20 MB or smaller.",
+    "image_upload_failed": "The image could not be uploaded. Please try again.",
     "locked_review": "Your profile is being reviewed by the team. The published version stays online until approval; the form is locked during the review.",
     "returned": "The team returned the profile for changes:",
     "status": "Status",

@@ -468,7 +468,7 @@
     },
     "logo_url": {
       "label": "Logo",
-      "help": "PNG ou SVG com fundo transparente, mínimo 512 px."
+      "help": "Tamanho recomendado: 512 px ou mais. JPG, PNG, WebP ou SVG; fundo transparente é ideal. Até 20 MB."
     },
     "description": {
       "label": "Descrição",
@@ -740,15 +740,15 @@
     },
     "cover_url": {
       "label": "Foto de fundo do perfil",
-      "help": "JPG ou PNG, 1920 × 720 px, até 8 MB. O perfil sempre aplica o tom azul escuro da plataforma, mesmo com fotos coloridas."
+      "help": "Tamanho recomendado: 1920 × 720 px. JPG, PNG ou WebP, até 20 MB. A plataforma otimiza a foto e aplica o tom azul escuro."
     },
     "product_image_url": {
       "label": "Foto do produto principal",
-      "help": "JPG ou PNG, no mínimo 1200 px no lado maior, até 8 MB. Esta foto aparece ao lado da descrição do produto."
+      "help": "Tamanho recomendado: 1200 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB. A plataforma otimiza a foto."
     },
     "gallery": {
       "label": "Galeria de fotos",
-      "help": "Até 6 imagens próprias, mínimo 1600 px no lado maior, com legenda."
+      "help": "Até 6 imagens próprias com legenda. Tamanho recomendado: 1600 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB cada."
     }
   },
   "form": {
@@ -822,13 +822,15 @@
     "segment": "Segmento",
     "caption": "Legenda",
     "upload": "Enviar imagem",
+    "uploading": "Enviando imagem...",
     "replace": "Trocar imagem",
     "choose": "Selecione…",
     "select_period": "Selecione",
     "image_too_small": "Imagem pequena demais: mínimo {min} px.",
     "image_cover_dimensions": "A imagem de capa deve ter pelo menos 1920 × 720 px.",
-    "image_type": "Formato não aceito.",
-    "image_too_big": "Arquivo acima do limite.",
+    "image_type": "Não foi possível ler esta imagem. Use JPG, PNG, WebP ou, para a logo, SVG.",
+    "image_too_big": "A imagem deve ter até 20 MB.",
+    "image_upload_failed": "Não foi possível enviar a imagem. Tente novamente.",
     "locked_review": "Seu perfil está em revisão pela equipe. A versão publicada continua no ar até a aprovação; o formulário fica bloqueado durante a revisão.",
     "returned": "A equipe devolveu o perfil para ajustes:",
     "status": "Status",

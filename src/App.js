@@ -9,7 +9,7 @@ import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261026-profile-layout3';
 import { LoginPage } from './pages/LoginPage.js?v=20261026-company-invite1';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-company-invite1';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-image-upload1';
 import { InvitationPage } from './pages/company/InvitationPage.js';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261026-profile-layout3';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-team-pages1';

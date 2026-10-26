@@ -172,55 +172,51 @@ function TextMini({ value, onChange, max, disabled }) {
     ${max && html`<${Counter} n=${(v[language] || '').length} max=${max} />`}</div>`)}</div>`;
 }
 
-// ---------------------------------------------------------------- images (validated locally and saved on the API server)
-function readImage(file, { minSide, maxMB, types }, kind) {
-  return new Promise((resolve, reject) => {
-    if (!file) { reject(new Error('none')); return; }
-    if (types && !types.includes(file.type)) { reject(new Error('image_type')); return; }
-    if (maxMB && file.size > maxMB * 1024 * 1024) { reject(new Error('image_too_big')); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      if (file.type === 'image/svg+xml') { uploadImage(file, kind).then(resolve, reject); return; }
-      const img = new Image();
-      img.onload = () => {
-        if (kind === 'cover' && (img.naturalWidth < 1920 || img.naturalHeight < 720)) { reject(new Error('image_cover_dimensions')); return; }
-        if (minSide && Math.max(img.naturalWidth, img.naturalHeight) < minSide) { reject(new Error('image_too_small')); return; }
-        uploadImage(file, kind).then(resolve, reject);
-      };
-      img.onerror = () => reject(new Error('image_type'));
-      img.src = reader.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
+// Image sizes shown in the form are recommendations; the API validates and optimizes uploads.
 const IMAGE_RULES = {
-  logo: { minSide: 512, types: ['image/png', 'image/svg+xml'] },
-  cover: { minSide: 1920, maxMB: 8, types: ['image/jpeg', 'image/png'] },
-  product: { minSide: 1200, maxMB: 8, types: ['image/jpeg', 'image/png'] },
-  gallery: { minSide: 1600, types: ['image/jpeg', 'image/png'] },
+  logo: { types: ['image/jpeg', 'image/png', 'image/webp', 'image/svg+xml'] },
+  cover: { types: ['image/jpeg', 'image/png', 'image/webp'] },
+  product: { types: ['image/jpeg', 'image/png', 'image/webp'] },
+  gallery: { types: ['image/jpeg', 'image/png', 'image/webp'] },
 };
+async function readImage(file, { types }, kind) {
+  if (!file) throw new Error('none');
+  const ext = file.name.split('.').pop()?.toLowerCase();
+  const acceptedExt = kind === 'logo' ? ['jpg','jpeg','png','webp','svg'] : ['jpg','jpeg','png','webp'];
+  if (!types.includes(file.type) && !(['','application/octet-stream'].includes(file.type) && acceptedExt.includes(ext))) throw new Error('image_type');
+  if (!file.size) throw new Error('image_type');
+  if (file.size > 20 * 1024 * 1024) throw new Error('image_too_big');
+  return uploadImage(file, kind);
+}
 
 function ImageInput({ field, value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(false);
   const rules = IMAGE_RULES[field.kind];
   const pick = async (e) => {
-    try { onChange(await readImage(e.target.files[0], rules, field.kind)); setErr(null); } catch (x) { setErr(x.message); }
+    if (!e.target.files[0]) return;
+    setBusy(true); setErr(null);
+    try { onChange(await readImage(e.target.files[0], rules, field.kind)); } catch (x) { setErr(x.message === 'invalid_svg' ? 'image_type' : ['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
+    finally { setBusy(false); }
     e.target.value = '';
   };
   return html`<div class=${cx('image-input', field.kind)}>
     ${value && html`<div class="image-preview" style=${{ backgroundImage: "url('" + value + "')" }}></div>`}
-    ${!disabled && html`<label class="btn btn-outline"><input type="file" hidden accept=${rules.types.join(',')} onChange=${pick} />${value ? i18n.t('form.replace') : i18n.t('form.upload')}</label>`}
+    ${!disabled && html`<label class=${cx('btn btn-outline', busy && 'uploading')}><input type="file" hidden disabled=${busy} accept=${rules.types.join(',')} onChange=${pick} />${busy ? i18n.t('form.uploading') : value ? i18n.t('form.replace') : i18n.t('form.upload')}</label>`}
     ${value && !disabled && !field.req && html`<button type="button" class="btn-link" onClick=${() => onChange(null)}>${i18n.t('form.remove')}</button>`}
-    ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err, { min: rules.minSide })}</span>`}
+    ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
   </div>`;
 }
 
 function GalleryInput({ value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
+  const [busy, setBusy] = useState(false);
   const list = value || [];
   const add = async (e) => {
-    try { const url = await readImage(e.target.files[0], IMAGE_RULES.gallery, 'gallery'); onChange(list.concat([{ url, caption: { pt: '', en: '' } }])); setErr(null); } catch (x) { setErr(x.message); }
+    if (!e.target.files[0]) return;
+    setBusy(true); setErr(null);
+    try { const url = await readImage(e.target.files[0], IMAGE_RULES.gallery, 'gallery'); onChange(list.concat([{ url, caption: { pt: '', en: '' } }])); } catch (x) { setErr(x.message === 'invalid_svg' ? 'image_type' : ['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
+    finally { setBusy(false); }
     e.target.value = '';
   };
   return html`<div class="rows">
@@ -230,8 +226,8 @@ function GalleryInput({ value, onChange, i18n, disabled }) {
         <${TextMini} value=${g.caption} disabled=${disabled} max=${120} onChange=${(c) => onChange(list.map((x, j) => (j === i ? { ...x, caption: c } : x)))} /><//></div>
       ${!disabled && html`<button type="button" class="btn-link row-remove" onClick=${() => onChange(list.filter((_, j) => j !== i))}>${i18n.t('form.remove')}</button>`}
     </div>`)}
-    ${!disabled && list.length < 6 && html`<label class="btn btn-outline add-row"><input type="file" hidden accept="image/jpeg,image/png" onChange=${add} />${i18n.t('form.upload')}</label>`}
-    ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err, { min: 1600 })}</span>`}
+    ${!disabled && list.length < 6 && html`<label class=${cx('btn btn-outline add-row', busy && 'uploading')}><input type="file" hidden disabled=${busy} accept=${IMAGE_RULES.gallery.types.join(',')} onChange=${add} />${busy ? i18n.t('form.uploading') : i18n.t('form.upload')}</label>`}
+    ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
   </div>`;
 }
 
