@@ -211,7 +211,7 @@ a.profile-fact-value { display: inline-block; border-bottom: 2px solid var(--lim
 .project-selector-wrap { width: 100%; }
 .profile-cta-mobile { display: none; }
 .profile-main { grid-area: main; display: flex; flex-direction: column; gap: 56px; min-width: 0; }
-.profile-side { grid-area: side; display: flex; flex-direction: column; gap: 18px; min-width: 0; position: sticky; top: 84px; }
+.profile-side { grid-area: side; display: flex; flex-direction: column; gap: 18px; min-width: 0; }
 #gallery { grid-area: gal; }
 .profile-footer { grid-area: foot; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding-top: 22px; border-top: 1px solid var(--line); font-size: 12px; color: var(--muted); }
 .profile-product { background: #141a3b; color: #c9cde0; border-radius: 24px; padding: 34px; display: grid; grid-template-columns: minmax(0, 1fr) 220px; gap: 28px; overflow: hidden; }
