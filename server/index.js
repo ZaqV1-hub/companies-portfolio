@@ -425,12 +425,8 @@ app.post('/api/organizations/:id/contact-requests', requireRole('investor'), con
     if (projectId) { const [project] = await db.execute('SELECT id FROM projects WHERE id=? AND organization_id=?',[projectId,req.params.id]); if(!project.length) projectId=null; }
     await db.execute('INSERT INTO interactions (id,relationship_id,date,description,type,apex_product,event,project_id,auto,created_by,created_at) VALUES (?,?,?,?,?,?,NULL,?,1,?,UTC_TIMESTAMP())',
       [`it-${crypto.randomUUID()}`, relationshipId, localDate(), 'Pedido de contato pela plataforma', 'other', 'investment_portfolio', projectId, investor.id]);
-    await db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())',
-      [`m-${crypto.randomUUID()}`, 'contact_request_team', 'team', jsonColumn({ organization_id: req.params.id, relationship_id: relationshipId }),]);
-    const focal = orgs[0].focal_point || {};
-    const focalEmail = typeof focal === 'string' ? JSON.parse(focal).email : focal.email;
-    await db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())',
-      [`m-${crypto.randomUUID()}`, 'contact_request_company', focalEmail || 'company', jsonColumn({ organization_id: req.params.id, relationship_id: relationshipId })]);
+    await emailEvent('contact_request_team', 'team', { organization_id: req.params.id, relationship_id: relationshipId }, db);
+    await emailEvent('contact_request_company', 'company', { organization_id: req.params.id, relationship_id: relationshipId }, db);
     await db.commit();
     res.status(201).json({ ok: true, relationship_id: relationshipId, reused: false });
   } catch (error) { await db.rollback(); routeError(res, error); }
@@ -839,8 +835,24 @@ app.post('/api/uploads', requireRole('company_user'), upload.single('image'), as
 const profileOrgKeys = ['name','logo_url','cover_url','description','website','city','state','size','segments','partnership_types','leadership','gallery','focal_point'];
 const profileSnapshot = (org, projects) => ({ organization: Object.fromEntries(profileOrgKeys.map((key) => [key, org[key] ?? null])),
   projects: projects.map((project) => ({ id: project.id, profile_type: project.profile_type, summary: project.summary, fields: project.fields })) });
-const emailEvent = (template, to, data) => pool.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())',
-  [`m-${crypto.randomUUID()}`, template, to, jsonColumn(data)]);
+async function emailEvent(template, audience, data, db = pool) {
+  let to = audience;
+  if (audience === 'team') {
+    const [users] = await db.execute("SELECT email FROM users WHERE role='team' ORDER BY (id='u-team-1') DESC,id LIMIT 1");
+    if (users.length) to = users[0].email;
+  } else if (audience === 'company' && data.organization_id) {
+    const [organizations] = await db.execute('SELECT focal_point FROM organizations WHERE id=?', [data.organization_id]);
+    const focal = organizations[0]?.focal_point;
+    const point = typeof focal === 'string' ? JSON.parse(focal) : focal;
+    if (point?.email) to = point.email;
+    else {
+      const [users] = await db.execute("SELECT email FROM users WHERE role='company_user' AND organization_id=? ORDER BY id LIMIT 1", [data.organization_id]);
+      if (users.length) to = users[0].email;
+    }
+  }
+  return db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())',
+    [`m-${crypto.randomUUID()}`, template, to, jsonColumn(data)]);
+}
 const getOpenDraft = async (db, orgId) => {
   const [rows] = await db.execute("SELECT * FROM profile_versions WHERE organization_id=? AND kind='draft' AND status IN ('filling','in_review','returned') ORDER BY created_at LIMIT 1", [orgId]);
   return rows[0] || null;
@@ -948,7 +960,7 @@ app.post('/api/team/reviews/:id/approve', requireRole('team'), async (req, res) 
     if (projects.length !== submittedIds.length || projects.some((project) => !submittedIds.includes(project.id))) throw new Error('projects_changed');
     for (const project of content.projects) await db.execute('UPDATE projects SET summary=?,fields=? WHERE id=? AND organization_id=?', [jsonColumn(project.summary), jsonColumn(project.fields), project.id, version.organization_id]);
     await db.execute("UPDATE profile_versions SET kind='published',status='published',content=?,reviewed_at=UTC_TIMESTAMP(),reviewed_by=?,approved_at=UTC_TIMESTAMP() WHERE id=?", [jsonColumn(content), req.user.id, version.id]);
-    await db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at) VALUES (?,?,?,?,UTC_TIMESTAMP())', [`m-${crypto.randomUUID()}`, 'profile_approved', 'company', jsonColumn({ organization_id: version.organization_id })]);
+    await emailEvent('profile_approved', 'company', { organization_id: version.organization_id }, db);
     await db.commit();
     res.json({ ok: true });
   } catch (error) { await db.rollback(); if (error.message === 'projects_changed') return res.status(400).json({ error: 'projects_changed' }); routeError(res, error); }
