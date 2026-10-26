@@ -858,8 +858,9 @@ async function emailEvent(template, audience, data, db = pool) {
       if (users.length) to = users[0].email;
     }
   }
-  return db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at,ready_to_send) VALUES (?,?,?,?,UTC_TIMESTAMP(),TRUE)',
-    [`m-${crypto.randomUUID()}`, template, to, jsonColumn(data)]);
+  const ready = ['profile_submitted','profile_accepted','profile_returned','profile_approved','company_invitation'].includes(template);
+  return db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at,ready_to_send) VALUES (?,?,?,?,UTC_TIMESTAMP(),?)',
+    [`m-${crypto.randomUUID()}`, template, to, jsonColumn(data),Number(ready)]);
 }
 
 let sendingOutbox = false;
