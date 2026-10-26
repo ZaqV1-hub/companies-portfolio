@@ -735,8 +735,8 @@
       "help": "Até 4 pessoas: nome, cargo e uma linha de experiência."
     },
     "cover_url": {
-      "label": "Imagem de capa",
-      "help": "JPG ou PNG, 1920 × 720 px, até 8 MB. Fica no fundo do cabeçalho."
+      "label": "Foto de fundo do perfil",
+      "help": "JPG ou PNG, 1920 × 720 px, até 8 MB. O perfil sempre aplica o tom azul escuro da plataforma, mesmo com fotos coloridas."
     },
     "gallery": {
       "label": "Galeria de fotos",

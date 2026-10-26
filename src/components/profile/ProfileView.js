@@ -33,7 +33,8 @@ function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
   const sub = subtitle(project, i18n);
   const chip = stageChip(project, i18n);
   const place = [org.city, org.state].filter(Boolean).join(' / ');
-  return html`<div class="profile-hero" style=${org.cover_url ? { backgroundImage: "url('" + org.cover_url + "')" } : null}>
+  return html`<div class="profile-hero">
+    ${org.cover_url && html`<div class="profile-hero-cover" aria-hidden="true" style=${{ backgroundImage: `url("${org.cover_url}")` }}></div>`}
     <div class="profile-hero-inner">
       <div class="profile-hero-actions">
         ${backHref && html`<a class="btn btn-ghost-light" href=${backHref}>${t('common.back_to_directory')}</a>`}

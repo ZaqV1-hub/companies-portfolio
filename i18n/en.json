@@ -735,8 +735,8 @@
       "help": "Up to 4 people: name, role and one line of experience."
     },
     "cover_url": {
-      "label": "Cover image",
-      "help": "JPG or PNG, 1920 × 720 px, up to 8 MB. Used as the header background."
+      "label": "Profile background photo",
+      "help": "JPG or PNG, 1920 × 720 px, up to 8 MB. The profile always applies the platform's dark blue tone, including to colorful photos."
     },
     "gallery": {
       "label": "Photo gallery",
