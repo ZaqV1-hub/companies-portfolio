@@ -11,7 +11,7 @@ import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=2
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
 import { FieldInput } from '../../components/form/inputs.js?v=20261026-profile-layout2';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout2';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout3';
 
 function problemText(i18n, p) {
   return i18n.t('form.errors.' + p.code, p);

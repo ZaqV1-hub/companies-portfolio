@@ -144,13 +144,13 @@ export function ProfileView({ org, projectId, onSelectProject, onRequestContact,
       <main class="profile-main">
         <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
         ${blocks}
+        <${Leadership} org=${org} i18n=${i18n} />
       </main>
       <aside class="profile-side">
         ${cta && html`<div class="profile-cta-desktop">${cta}</div>`}
         ${side}
         ${org.last_approved_at && org.public_state === 'published' && html`<div class="side-card profile-updated"><div class="side-label">${i18n.t('profile.updated_label')}</div><p>${formatDate(org.last_approved_at, i18n.lang)}</p></div>`}
       </aside>
-      <${Leadership} org=${org} i18n=${i18n} />
       <${Gallery} org=${org} i18n=${i18n} />
       <footer class="profile-footer">
         <span>${i18n.t('profile.footer')}</span>
