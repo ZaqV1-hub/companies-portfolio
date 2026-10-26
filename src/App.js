@@ -3,7 +3,7 @@ import { html, useEffect, useState } from './lib/html.js';
 import * as api from './services/api.js?v=20261026-company-invite1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
-import { TopBar } from './components/TopBar.js?v=20261021-investor1';
+import { TopBar } from './components/TopBar.js?v=20261026-partner-logos1';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-verify-tabs1';
 import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
@@ -33,9 +33,8 @@ function takeInvestorIntent() {
 }
 
 function PublicFooter() {
-  const { t } = useI18n();
   return html`<footer class="public-footer">
-    <span>${t('profile.footer')}</span>
+    <img src="assets/img/brand-signature.png" alt="Realização: Brazilian Pharma & Health. Promovido por: ApexBrasil e Abiquifi." />
   </footer>`;
 }
 

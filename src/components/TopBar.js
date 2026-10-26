@@ -9,9 +9,7 @@ export function TopBar({ investor, onInvestorAccess, onLogout }) {
   return html`
     <header class="topbar">
       <a class="topbar-brand" href=${href('/')}>
-        <img src="assets/img/bph-logo.png" alt="Brazilian Pharma & Health" />
-        <div class="topbar-divider"></div>
-        <span class="topbar-tagline">${t('topbar.tagline')}</span>
+        <img class="topbar-partner-logos" src="assets/img/brand-logos.png" alt="Brazilian Pharma & Health, ApexBrasil e Abiquifi" />
       </a>
       <nav class="topbar-actions">
         <${LangSwitch} />
