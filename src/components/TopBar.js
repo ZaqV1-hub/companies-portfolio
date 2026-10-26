@@ -5,12 +5,17 @@ import { href } from '../lib/router.js';
 import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
 
 export function TopBar({ investor, onInvestorAccess, onLogout }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   return html`
     <header class="topbar">
-      <a class="topbar-brand" href=${href('/')}>
-        <img class="topbar-partner-logos" src="assets/img/brand-logos.png" alt="Brazilian Pharma & Health, ApexBrasil e Abiquifi" />
+      <a class="topbar-program" href=${href('/')} aria-label="Brazilian Pharma & Health">
+        <img src="assets/img/bph-program.png" alt="BP&H Brazilian Pharma & Health" />
       </a>
+      <div class="topbar-partners" aria-label="Realização: ApexBrasil e Abiquifi">
+        <span>${lang === 'en' ? 'Partners' : 'Realização'}</span>
+        <img class="topbar-apex" src="assets/img/apexbrasil.png" alt="ApexBrasil" />
+        <img class="topbar-abiquifi" src="assets/img/abiquifi.png" alt="Abiquifi" />
+      </div>
       <nav class="topbar-actions">
         <${LangSwitch} />
         ${investor

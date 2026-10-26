@@ -3,14 +3,14 @@ import { html, useEffect, useState } from './lib/html.js';
 import * as api from './services/api.js?v=20261026-company-invite1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
-import { TopBar } from './components/TopBar.js?v=20261026-partner-logos1';
+import { TopBar } from './components/TopBar.js?v=20261026-layout2';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-verify-tabs1';
-import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
+import { AppShell } from './components/AppShell.js?v=20261026-layout2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261026-profile-layout3';
-import { LoginPage } from './pages/LoginPage.js?v=20261026-company-invite1';
+import { LoginPage } from './pages/LoginPage.js?v=20261026-layout2';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-invite-language1';
-import { InvitationPage } from './pages/company/InvitationPage.js?v=20261026-invite-logo1';
+import { InvitationPage } from './pages/company/InvitationPage.js?v=20261026-layout2';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261026-profile-layout3';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-invite-language1';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
@@ -33,9 +33,9 @@ function takeInvestorIntent() {
 }
 
 function PublicFooter() {
-  return html`<footer class="public-footer">
+  return html`<footer class="public-footer"><div class="public-footer-inner">
     <img src="assets/img/brand-signature.png" alt="Realização: Brazilian Pharma & Health. Promovido por: ApexBrasil e Abiquifi." />
-  </footer>`;
+  </div></footer>`;
 }
 
 function NotFound() {

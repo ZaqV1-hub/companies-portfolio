@@ -6,7 +6,7 @@ import { href, navigate } from '../lib/router.js';
 import { LangSwitch } from '../components/LangSwitch.js?v=20261014-flags1';
 
 export function LoginPage({ role, next, onLoggedIn }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const isTeam = role === 'team';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -41,15 +41,18 @@ export function LoginPage({ role, next, onLoggedIn }) {
     <div class="split-brand">
       <div class="deco-ring" style=${{ top: '-100px', right: '-60px', width: '340px', height: '340px', border: '1px solid rgba(203,232,43,0.25)' }}></div>
       <div class="deco-ring" style=${{ bottom: '-120px', left: '-40px', width: '280px', height: '280px', borderRadius: '70px', transform: 'rotate(18deg)', border: '1px solid rgba(255,255,255,0.09)' }}></div>
-      <div style=${{ position: 'relative', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px' }}>
-        <img src="assets/img/bph-logo.png" alt="Brazilian Pharma & Health" />
+      <div class="split-brand-top">
+        <img class="split-program-logo" src="assets/img/bph-program-negative.png" alt="Brazilian Pharma & Health" />
         <${LangSwitch} dark=${true} />
       </div>
-      <div style=${{ position: 'relative' }}>
+      <div class="split-brand-message">
         <h2>${t('login.brand_title')}</h2>
         <p>${t('login.brand_text')}</p>
+        <div class="split-partners"><span>${lang === 'en' ? 'Partners' : 'Realização'}</span><div>
+          <img src="assets/img/apexbrasil-negative.png" alt="ApexBrasil" />
+          <img src="assets/img/abiquifi-negative.png" alt="Abiquifi" />
+        </div></div>
       </div>
-      <div class="fine">${t('login.brand_fine')}</div>
     </div>
     <div class="split-form">
       <form class="split-form-inner" autoComplete="off" onSubmit=${submit}>
