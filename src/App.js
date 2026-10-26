@@ -1,6 +1,6 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261022-review-login2';
+import * as api from './services/api.js?v=20261026-company-invite1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261021-investor1';
@@ -8,10 +8,11 @@ import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.
 import { AppShell } from './components/AppShell.js?v=20261022-review-login2';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261026-profile-layout3';
-import { LoginPage } from './pages/LoginPage.js?v=20261022-empty-logins1';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-profile-layout3';
+import { LoginPage } from './pages/LoginPage.js?v=20261026-company-invite1';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-company-invite1';
+import { InvitationPage } from './pages/company/InvitationPage.js';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261026-profile-layout3';
-import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-profile-layout3';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-company-invite1';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';
@@ -82,6 +83,7 @@ function TeamArea({ user, route, onLogout }) {
   let content;
   if (section === 'review' && route.parts[2]) content = html`<${ReviewPage} key=${route.parts[2]} versionId=${route.parts[2]} />`;
   else if (section === 'review') content = html`<${ReviewQueuePage} key=${route.path} />`;
+  else if (section === 'orgs' && route.parts[2]) content = html`<${ProfileFormPage} key=${route.parts[2]} teamOrgId=${route.parts[2]} stepParam=${route.query.step} onNavigateStep=${(id) => navigate('/team/orgs/' + route.parts[2] + '?step=' + encodeURIComponent(id))} />`;
   else if (section === 'orgs') content = html`<${OrganizationsPage} />`;
   else if (section === 'crm' && route.parts[2] === 'new') content = html`<${NewContactPage} base="/team/crm" team=${true} />`;
   else if (section === 'crm' && route.parts[2]) content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/team/crm" team=${true} />`;
@@ -105,8 +107,9 @@ function Routes() {
 
   if (first === 'company' || first === 'team') {
     const role = first === 'company' ? 'company_user' : 'team';
+    if (first === 'company' && route.query.invite) return html`<${InvitationPage} token=${route.query.invite} onLoggedIn=${setUser} />`;
     if (second === 'login' || !user || user.role !== role) {
-      return html`<${LoginPage} key=${first} role=${role === 'team' ? 'team' : 'company'} onLoggedIn=${setUser} />`;
+      return html`<${LoginPage} key=${first} role=${role === 'team' ? 'team' : 'company'} next=${second && second !== 'login' ? route.path : null} onLoggedIn=${setUser} />`;
     }
     if (first === 'company' && second === 'preview') return html`<${CompanyPreviewPage} />`;
     return first === 'company'

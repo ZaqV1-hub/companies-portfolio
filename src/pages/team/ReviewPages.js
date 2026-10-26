@@ -1,6 +1,6 @@
 // Team panel · review queue and review screen (spec 1, 4.3).
 import { cx, html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261022-review-login2';
+import * as api from '../../services/api.js?v=20261026-company-invite1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href, navigate } from '../../lib/router.js';
@@ -122,11 +122,11 @@ export function ReviewPage({ versionId }) {
     </div>
     ${message && html`<div class="notice">${message}</div>`}
     ${returning && html`<div class="return-box">
-      <label class="form-label" for="return-comment">${t('review.return_comment')} *</label>
+      <label class="form-label" for="return-comment">${t('review.return_comment')} (${lang === 'pt' ? 'opcional' : 'optional'})</label>
       <textarea id="return-comment" class="input input-sm" rows="3" value=${comment} onInput=${(e) => setComment(e.target.value)}></textarea>
       <div class="review-actions">
         <button type="button" class="btn btn-outline" onClick=${() => setReturning(false)}>${t('review.cancel')}</button>
-        <button type="button" class="btn btn-lime" disabled=${!comment.trim()} onClick=${doReturn}>${t('review.confirm_return')}</button>
+        <button type="button" class="btn btn-lime" onClick=${doReturn}>${t('review.confirm_return')}</button>
       </div>
     </div>`}
     <div class="notice">${t('review.online_note')}</div>
@@ -163,30 +163,55 @@ export function OrganizationsPage() {
   const [loadError, setLoadError] = useState(false);
   const [status, setStatus] = useState('');
   const [q, setQ] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newEmail, setNewEmail] = useState('');
+  const [editingEmail, setEditingEmail] = useState(null);
+  const [emailValue, setEmailValue] = useState('');
+  const [notice, setNotice] = useState('');
   const load = () => { setLoadError(false); return api.listOrganizationsForTeam().then(setRows).catch(() => setLoadError(true)); };
   useEffect(() => { load(); }, []);
   if (loadError) return html`<div class="empty-state"><strong>${t('orgs.load_error')}</strong><button type="button" class="btn btn-lime" onClick=${load}>${t('orgs.retry')}</button></div>`;
   if (!rows) return html`<div>${t('common.loading')}</div>`;
-  const counts = Object.fromEntries(STATUSES.map((s) => [s, rows.filter((r) => r.status === s).length]));
   const list = rows.filter((r) => (!status || r.status === status) && (!q || r.name.toLowerCase().includes(q.toLowerCase())));
-  const cols = { gridTemplateColumns: '2fr 1fr 1.2fr 1fr 1fr 150px' };
+  const cols = { gridTemplateColumns: 'minmax(210px,2fr) minmax(100px,1fr) minmax(130px,1fr) minmax(110px,1fr) minmax(110px,1fr) minmax(240px,2fr)' };
   const toggleOnline = async (r) => {
     const next = r.public_state === 'hidden' ? (r.last_approved_at ? 'published' : 'provisional') : 'hidden';
     await api.setOrganizationPublicState(r.id, next);
     load();
   };
+  const create = async (event) => {
+    event.preventDefault(); setNotice('');
+    try { const org = await api.createOrganization(newName,newEmail); navigate('/team/orgs/' + org.id); }
+    catch { setNotice(lang === 'pt' ? 'Confira o nome e o e-mail da empresa.' : 'Check the company name and email.'); }
+  };
+  const saveEmail = async (r) => {
+    try { await api.updateOrganizationEmail(r.id,emailValue); setEditingEmail(null); await load(); setNotice(lang === 'pt' ? 'E-mail atualizado.' : 'Email updated.'); }
+    catch { setNotice(lang === 'pt' ? 'Não foi possível salvar o e-mail.' : 'Could not save the email.'); }
+  };
+  const invite = async (r) => {
+    try { await api.inviteOrganization(r.id); setNotice(lang === 'pt' ? `Convite enviado para ${r.focal_point?.email}.` : `Invitation sent to ${r.focal_point?.email}.`); await load(); }
+    catch (error) { setNotice(error.message === 'email_has_account' ? (lang === 'pt' ? 'Este e-mail já tem acesso. Use a recuperação de senha.' : 'This email already has access. Use password reset.') : (lang === 'pt' ? 'Não foi possível enviar o convite.' : 'Could not send the invitation.')); }
+  };
   return html`<div>
     <h1 class="page-title">${t('orgs.title')}</h1>
     <div class="page-subtitle" style=${{ marginBottom: '22px' }}>${t('orgs.subtitle')}</div>
-    <div class="stat-grid">${STATUSES.map((s) => html`<button key=${s} type="button" class=${cx('stat-card', status === s && 'on')} onClick=${() => setStatus(status === s ? '' : s)}>
-      <div class="stat-value">${counts[s]}</div><div class="stat-label">${i18n.label('org_status', s)}</div></button>`)}
-    </div>
+    <button type="button" class="btn btn-lime" onClick=${() => setCreating(!creating)}>${lang === 'pt' ? '+ Criar organização' : '+ Create organization'}</button>
+    ${creating && html`<form class="table-card" style=${{ padding:'20px',marginTop:'16px' }} onSubmit=${create}>
+      <div style=${{ display:'flex',gap:'12px',flexWrap:'wrap',alignItems:'end' }}>
+        <label class="form-label">${lang === 'pt' ? 'Nome da empresa' : 'Company name'}<input class="input input-sm" required maxLength="80" value=${newName} onInput=${(e) => setNewName(e.target.value)} /></label>
+        <label class="form-label">${lang === 'pt' ? 'E-mail da empresa' : 'Company email'}<input class="input input-sm" type="email" required value=${newEmail} onInput=${(e) => setNewEmail(e.target.value)} /></label>
+        <button class="btn btn-lime" type="submit">${lang === 'pt' ? 'Criar e preencher perfil' : 'Create and fill profile'}</button>
+      </div></form>`}
+    ${notice && html`<div class="notice" role="status">${notice}</div>`}
     <div class="table-card">
-      <div class="table-tools"><input class="input input-sm" type="search" placeholder=${t('orgs.search')} value=${q} onInput=${(e) => setQ(e.target.value)} /></div>
+      <div class="table-tools"><input class="input input-sm" type="search" placeholder=${t('orgs.search')} value=${q} onInput=${(e) => setQ(e.target.value)} />
+        <select class="input input-sm" value=${status} onChange=${(e) => setStatus(e.target.value)}><option value="">${lang === 'pt' ? 'Todos os status' : 'All statuses'}</option>${STATUSES.map((s) => html`<option value=${s}>${i18n.label('org_status',s)}</option>`)}</select></div>
       <div class="trow thead" style=${cols}><div>${t('review.col_org')}</div><div>${t('orgs.col_profiles')}</div><div>${t('orgs.col_status')}</div><div>${t('orgs.col_approved')}</div><div>${t('orgs.col_updated')}</div><div></div></div>
       ${list.map((r) => html`<div class="trow" key=${r.id} style=${cols}>
         <div><strong>${r.name}</strong>${r.demo && html` <span class="pill">demo</span>`}
-          <div class="cell-sub">🔒 ${r.focal_point ? r.focal_point.name + ' · ' + r.focal_point.email : ''}</div></div>
+          <div class="cell-sub">${r.focal_point?.name || ''}</div>
+          ${editingEmail === r.id ? html`<div style=${{ display:'flex',gap:'6px',marginTop:'8px' }}><input class="input input-sm" type="email" value=${emailValue} onInput=${(e) => setEmailValue(e.target.value)} /><button type="button" class="btn btn-outline" onClick=${() => saveEmail(r)}>${lang === 'pt' ? 'Salvar' : 'Save'}</button></div>` : html`<div class="cell-sub">${r.focal_point?.email || '—'} <button type="button" class="btn-link" onClick=${() => { setEditingEmail(r.id);setEmailValue(r.focal_point?.email || ''); }}>${lang === 'pt' ? 'Editar e-mail' : 'Edit email'}</button></div>`}</div>
         <div>${r.projects.join(', ')}</div>
         <div><span class=${'status-pill s-' + r.status}>${i18n.label('org_status', r.status)}</span>
           <div class="cell-sub">${t('review.online_' + r.public_state)}</div></div>
@@ -194,6 +219,8 @@ export function OrganizationsPage() {
         <div>${r.last_updated_at ? formatDate(r.last_updated_at, lang) : '—'}
           ${r.outdated && html`<div class="cell-alert">${t('orgs.outdated', { n: r.days_since_update })}</div>`}</div>
         <div style=${{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+          <a class="btn btn-outline" href=${href('/team/orgs/' + r.id)}>${lang === 'pt' ? 'Editar perfil' : 'Edit profile'}</a>
+          <button type="button" class="btn btn-outline" onClick=${() => invite(r)}>${lang === 'pt' ? 'Enviar convite' : 'Send invitation'}</button>
           ${r.public_state !== 'hidden' && html`<a class="btn btn-outline" href=${href('/org/' + r.id)} target="_blank">↗</a>`}
           <button type="button" class="btn btn-outline" onClick=${() => toggleOnline(r)}>${r.public_state === 'hidden' ? t('orgs.reactivate') : t('orgs.take_offline')}</button>
         </div>

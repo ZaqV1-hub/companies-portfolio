@@ -59,6 +59,7 @@ export async function logout() { return post('/auth/logout'); }
 export async function getMyProfileForm() { return request('/me/profile-form'); }
 export async function saveMyProfileDraft(content, reviewedSteps) { return put('/me/profile-draft', { content, reviewed_steps: reviewedSteps }); }
 export async function submitMyProfileForReview(content, reviewedSteps) { return post('/me/profile-draft/submit', { content, reviewed_steps: reviewedSteps }); }
+export async function acceptInitialProfile() { return post('/me/profile-draft/accept-initial', {}); }
 
 export async function listReviewQueue() { return request('/team/reviews'); }
 export async function getReview(versionId) { try { return await request(`/team/reviews/${q(versionId)}`); } catch (error) { if (error.status === 404) return null; throw error; } }
@@ -67,6 +68,13 @@ export async function approveReview(versionId, content) { return post(`/team/rev
 export async function returnReview(versionId, content, comment) { return post(`/team/reviews/${q(versionId)}/return`, { content, comment }); }
 export async function listOrganizationsForTeam() { return request('/team/organizations'); }
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
+export async function createOrganization(name,email) { return post('/team/organizations', { name,email }); }
+export async function updateOrganizationEmail(id,email) { return request(`/team/organizations/${q(id)}/contact`, { method:'PATCH',body:{ email } }); }
+export async function inviteOrganization(id) { return post(`/team/organizations/${q(id)}/invite`, {}); }
+export async function getTeamOrganizationForm(id) { return request(`/team/organizations/${q(id)}/profile-form`); }
+export async function saveTeamOrganizationForm(id,content) { return put(`/team/organizations/${q(id)}/profile-form`, { content }); }
+export async function getCompanyInvitation(token) { return request(`/company/invitation?token=${q(token)}`); }
+export async function acceptCompanyInvitation(data) { return post('/company/invitation/accept', data); }
 
 export async function registerInvestor(data) { return post('/investors', data); }
 export async function getInvestorBrowseStatus() { return request(`/investors/browse?fresh=${Date.now()}`); }

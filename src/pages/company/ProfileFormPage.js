@@ -1,7 +1,7 @@
 // Company area · step-by-step profile form (spec 1, sections 4.2 and 5).
 // Steps: Organization → one per project → Leadership → Images → Preview & submit.
 import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js';
+import * as api from '../../services/api.js?v=20261026-company-invite1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
@@ -69,7 +69,7 @@ function PreviewBody({ org }) {
   return html`<${ProfileView} org=${org} projectId=${pid} onSelectProject=${setPid} onRequestContact=${() => {}} />`;
 }
 
-export function ProfileFormPage({ stepParam, onNavigateStep }) {
+export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const i18n = useI18n();
   const { t } = i18n;
   const [data, setData] = useState(null);
@@ -78,8 +78,8 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
   const [toast, setToast] = useState(null);
   const [showErrors, setShowErrors] = useState(false);
 
-  const load = () => api.getMyProfileForm().then((d) => {
-    const preview = getCompanyPreview();
+  const load = () => (teamOrgId ? api.getTeamOrganizationForm(teamOrgId) : api.getMyProfileForm()).then((d) => {
+    const preview = teamOrgId ? null : getCompanyPreview();
     setData(d); setContent(preview?.content || d.draft.content); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
   });
   useEffect(() => { load(); }, []);
@@ -88,12 +88,14 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
   if (!data || !content) return html`<div>${t('common.loading')}</div>`;
 
   const locked = data.draft.status === 'in_review';
+  const unchangedInitial = !teamOrgId && data.firstValidation && JSON.stringify(content) === JSON.stringify(data.initialContent);
+  const saveDraft = () => teamOrgId ? api.saveTeamOrganizationForm(teamOrgId, content) : api.saveMyProfileDraft(content, reviewed);
   const stepIndex = Math.max(0, steps.findIndex((s) => s.id === stepParam));
   const step = steps[stepIndex];
   const check = validateDraft(content, reviewed);
   const markFor = (projectId, key) => data.imports.find((r) => (r.project_id || null) === (projectId || null) && r.field === key);
   const goStep = (i) => {
-    if (!locked) api.saveMyProfileDraft(content, reviewed); // autosave when changing step
+    if (!locked) saveDraft();
     onNavigateStep(steps[i].id);
     window.scrollTo(0, 0);
   };
@@ -110,10 +112,10 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
   });
 
   const save = async () => {
-    const res = await api.saveMyProfileDraft(content, reviewed);
+    const res = await saveDraft();
     setToast(res.ok ? t('form.saved') : res.error);
     setTimeout(() => setToast(null), 2500);
-    if (res.ok) { clearCompanyPreview(); setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } }); }
+    if (res.ok) { clearCompanyPreview(); if (teamOrgId) await load(); else setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } }); }
   };
   const openPreview = () => {
     setCompanyPreview(content, reviewed);
@@ -123,6 +125,10 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
     setShowErrors(true);
     const res = await api.submitMyProfileForReview(content, reviewed);
     if (res.ok) { clearCompanyPreview(); await load(); setToast(t('form.submitted')); }
+  };
+  const acceptInitial = async () => {
+    const res = await api.acceptInitialProfile();
+    if (res.ok) { clearCompanyPreview(); await load(); setToast(i18n.lang === 'pt' ? 'Perfil aceito e publicado.' : 'Profile accepted and published.'); }
   };
 
   const renderFields = (fields, container, onChange, projectId) => fields.map((f) => html`<${Field} key=${f.key} field=${f} stepId=${step.id}
@@ -147,7 +153,9 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
     const stepById = Object.fromEntries(steps.map((s) => [s.id, s]));
     body = html`<${Preview} orgMeta=${data.organization} content=${content} />
       <div class="submit-box">
-        ${!check.ok && !locked && html`<div class="submit-blockers" role="alert">
+        ${unchangedInitial && !locked && html`<div class="notice">${i18n.lang === 'pt' ? 'Os dados iniciais estão prontos para sua aprovação. Se você não alterar nada, pode publicar diretamente.' : 'The initial profile is ready for your approval. You can publish it directly without changes.'}</div>
+          <button type="button" class="btn btn-lime btn-xl" onClick=${acceptInitial}>${i18n.lang === 'pt' ? 'Aceitar e publicar' : 'Accept and publish'}</button>`}
+        ${!teamOrgId && !unchangedInitial && !check.ok && !locked && html`<div class="submit-blockers" role="alert">
           <strong>${t('form.submit_blocked')}</strong>
           <ul>
             ${check.unreviewed.map((id) => html`<li key=${'u' + id}><a href="#" onClick=${(e) => { e.preventDefault(); goStep(steps.indexOf(stepById[id])); }}>${t('form.unreviewed_step', { step: stepTitle(stepById[id], content, i18n) })}</a></li>`)}
@@ -155,7 +163,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
               ${stepTitle(stepById[p.stepId], content, i18n)} › ${t('fields.' + p.field + '.label')}: ${problemText(i18n, p)}</a></li>`)}
           </ul>
         </div>`}
-        <button type="button" class="btn btn-lime btn-xl" disabled=${!check.ok || locked} onClick=${submit}>${t('form.submit')}</button>
+        ${!teamOrgId && !unchangedInitial && html`<button type="button" class="btn btn-lime btn-xl" disabled=${!check.ok || locked} onClick=${submit}>${t('form.submit')}</button>`}
       </div>`;
   }
 
@@ -167,7 +175,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep }) {
         <h1 class="page-title">${org.name}</h1>
         <div class="page-subtitle">
           ${t('form.status')}: <span class=${'status-pill s-' + status}>${i18n.label('org_status', status)}</span>
-          · <button type="button" class="btn-link" onClick=${openPreview}>${t('form.view_public')} ↗</button>
+          ${!teamOrgId && html` · <button type="button" class="btn-link" onClick=${openPreview}>${t('form.view_public')} ↗</button>`}
           ${org.public_state === 'provisional' && html` · ${t('form.updating_public')}`}
         </div>
       </div>

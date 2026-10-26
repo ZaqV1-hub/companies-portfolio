@@ -1,11 +1,11 @@
 // Login for company users and the program team.
 import { html, useState } from '../lib/html.js';
-import * as api from '../services/api.js?v=20261014-legal1';
+import * as api from '../services/api.js?v=20261026-company-invite1';
 import { useI18n } from '../lib/i18n.js';
 import { href, navigate } from '../lib/router.js';
 import { LangSwitch } from '../components/LangSwitch.js?v=20261014-flags1';
 
-export function LoginPage({ role, onLoggedIn }) {
+export function LoginPage({ role, next, onLoggedIn }) {
   const { t } = useI18n();
   const isTeam = role === 'team';
   const [email, setEmail] = useState('');
@@ -28,7 +28,7 @@ export function LoginPage({ role, onLoggedIn }) {
       const res = await api.login(email, password, isTeam ? 'team' : 'company_user');
       if (!res.ok) { setError(t('login.invalid')); return; }
       onLoggedIn(res.user);
-      navigate(isTeam ? '/team/crm' : '/company/contacts');
+      navigate(next && next.startsWith(isTeam ? '/team/' : '/company/') ? next : isTeam ? '/team/crm' : '/company/contacts');
     } catch (err) {
       setError(forgot && err.data?.error === 'email_unavailable' ? t('investor.email_unavailable') : forgot ? t('investor.try_again') : t('login.invalid'));
     } finally {
