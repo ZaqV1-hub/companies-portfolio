@@ -14,19 +14,21 @@ export function ReviewQueuePage() {
   const [rows, setRows] = useState(null);
   useEffect(() => { api.listReviewQueue().then(setRows); }, []);
   if (!rows) return html`<div>${t('common.loading')}</div>`;
-  return html`<div>
-    <h1 class="page-title">${t('review.queue_title')}</h1>
-    <div class="page-subtitle" style=${{ marginBottom: '22px' }}>${t('review.queue_subtitle')}</div>
-    <div class="table-card">
-      <div class="trow thead" style=${{ gridTemplateColumns: '2fr 1.2fr 1fr 1fr 120px' }}>
+  const cols = { gridTemplateColumns:'minmax(190px,2fr) minmax(160px,1.4fr) minmax(120px,1fr) minmax(90px,.8fr) 130px' };
+  return html`<div class="team-list-page">
+    <div class="team-list-head"><div><h1 class="page-title">${t('review.queue_title')}</h1>
+      <div class="page-subtitle">${t('review.queue_subtitle')}</div></div>
+      <span class="team-count">${rows.length} ${lang === 'pt' ? 'aguardando' : 'pending'}</span></div>
+    <div class="table-card team-table">
+      <div class="trow thead" style=${cols}>
         <div>${t('review.col_org')}</div><div>${t('review.col_type')}</div><div>${t('review.col_submitted')}</div><div>${t('review.col_online')}</div><div></div>
       </div>
-      ${rows.length === 0 && html`<div class="empty-row">${t('review.queue_empty')}</div>`}
-      ${rows.map((r) => html`<div class="trow" key=${r.version_id} style=${{ gridTemplateColumns: '2fr 1.2fr 1fr 1fr 120px' }}>
-        <div><strong>${r.organization_name}</strong><div class="cell-sub">${t('common.projects_count', { n: r.projects })}</div></div>
-        <div>${r.first_validation ? t('review.first_validation') : t('review.update')}</div>
-        <div>${formatDate(r.submitted_at, lang)}</div>
-        <div>${t('review.online_' + r.public_state)}</div>
+      ${rows.length === 0 && html`<div class="team-empty"><div class="team-empty-mark">✓</div><strong>${t('review.queue_empty')}</strong><p>${lang === 'pt' ? 'As próximas alterações enviadas pelas empresas aparecerão aqui.' : 'New changes submitted by companies will appear here.'}</p></div>`}
+      ${rows.map((r) => html`<div class="trow" key=${r.version_id} style=${cols}>
+        <div data-label=${t('review.col_org')}><strong>${r.organization_name}</strong></div>
+        <div data-label=${t('review.col_type')}><span class="validation-kind">${r.first_validation ? t('review.first_validation') : t('review.update')}</span></div>
+        <div data-label=${t('review.col_submitted')}>${formatDate(r.submitted_at, lang)}</div>
+        <div data-label=${t('review.col_online')}><span class=${'air-state ' + (r.public_state === 'hidden' ? 'off' : 'on')}>${r.public_state === 'hidden' ? t('review.online_hidden') : t('review.online_published')}</span></div>
         <div><a class="btn btn-lime" href=${href('/team/review/' + r.version_id)}>${t('review.open')}</a></div>
       </div>`)}
     </div>
@@ -113,7 +115,7 @@ export function ReviewPage({ versionId }) {
       <div>
         <h1 class="page-title">${data.organization.name}</h1>
         <div class="page-subtitle">${isNew ? t('review.first_validation') : t('review.update')} · ${t('review.col_submitted')}: ${formatDate(data.draft.submitted_at, lang)}
-          · ${t('review.online_' + data.organization.public_state)}</div>
+          · ${data.organization.public_state === 'hidden' ? t('review.online_hidden') : t('review.online_published')}</div>
       </div>
       ${editable && html`<div class="review-actions">
         <button type="button" class="btn btn-navy-outline btn-lg" onClick=${() => setReturning(true)}>${t('review.return')}</button>
@@ -174,9 +176,10 @@ export function OrganizationsPage() {
   if (loadError) return html`<div class="empty-state"><strong>${t('orgs.load_error')}</strong><button type="button" class="btn btn-lime" onClick=${load}>${t('orgs.retry')}</button></div>`;
   if (!rows) return html`<div>${t('common.loading')}</div>`;
   const list = rows.filter((r) => (!status || r.status === status) && (!q || r.name.toLowerCase().includes(q.toLowerCase())));
-  const cols = { gridTemplateColumns: 'minmax(210px,2fr) minmax(100px,1fr) minmax(130px,1fr) minmax(110px,1fr) minmax(110px,1fr) minmax(240px,2fr)' };
+  const cols = { gridTemplateColumns: 'minmax(230px,2fr) minmax(145px,1fr) minmax(120px,.9fr) minmax(100px,.8fr) minmax(240px,1.8fr)' };
   const toggleOnline = async (r) => {
-    const next = r.public_state === 'hidden' ? (r.last_approved_at ? 'published' : 'provisional') : 'hidden';
+    if (r.public_state === 'hidden' && !r.last_approved_at) return;
+    const next = r.public_state === 'hidden' ? 'published' : 'hidden';
     await api.setOrganizationPublicState(r.id, next);
     load();
   };
@@ -193,10 +196,10 @@ export function OrganizationsPage() {
     try { await api.inviteOrganization(r.id); setNotice(lang === 'pt' ? `Convite enviado para ${r.focal_point?.email}.` : `Invitation sent to ${r.focal_point?.email}.`); await load(); }
     catch (error) { setNotice(error.message === 'email_has_account' ? (lang === 'pt' ? 'Este e-mail já tem acesso. Use a recuperação de senha.' : 'This email already has access. Use password reset.') : (lang === 'pt' ? 'Não foi possível enviar o convite.' : 'Could not send the invitation.')); }
   };
-  return html`<div>
-    <h1 class="page-title">${t('orgs.title')}</h1>
-    <div class="page-subtitle" style=${{ marginBottom: '22px' }}>${t('orgs.subtitle')}</div>
-    <button type="button" class="btn btn-lime" onClick=${() => setCreating(!creating)}>${lang === 'pt' ? '+ Criar organização' : '+ Create organization'}</button>
+  return html`<div class="team-list-page">
+    <div class="team-list-head"><div><h1 class="page-title">${t('orgs.title')}</h1>
+      <div class="page-subtitle">${t('orgs.subtitle')}</div></div>
+      <button type="button" class="btn btn-lime btn-lg" onClick=${() => setCreating(!creating)}>${lang === 'pt' ? '+ Criar organização' : '+ Create organization'}</button></div>
     ${creating && html`<form class="table-card" style=${{ padding:'20px',marginTop:'16px' }} onSubmit=${create}>
       <div style=${{ display:'flex',gap:'12px',flexWrap:'wrap',alignItems:'end' }}>
         <label class="form-label">${lang === 'pt' ? 'Nome da empresa' : 'Company name'}<input class="input input-sm" required maxLength="80" value=${newName} onInput=${(e) => setNewName(e.target.value)} /></label>
@@ -204,25 +207,23 @@ export function OrganizationsPage() {
         <button class="btn btn-lime" type="submit">${lang === 'pt' ? 'Criar e preencher perfil' : 'Create and fill profile'}</button>
       </div></form>`}
     ${notice && html`<div class="notice" role="status">${notice}</div>`}
-    <div class="table-card">
+    <div class="table-card team-table">
       <div class="table-tools"><input class="input input-sm" type="search" placeholder=${t('orgs.search')} value=${q} onInput=${(e) => setQ(e.target.value)} />
         <select class="input input-sm" value=${status} onChange=${(e) => setStatus(e.target.value)}><option value="">${lang === 'pt' ? 'Todos os status' : 'All statuses'}</option>${STATUSES.map((s) => html`<option value=${s}>${i18n.label('org_status',s)}</option>`)}</select></div>
-      <div class="trow thead" style=${cols}><div>${t('review.col_org')}</div><div>${t('orgs.col_profiles')}</div><div>${t('orgs.col_status')}</div><div>${t('orgs.col_approved')}</div><div>${t('orgs.col_updated')}</div><div></div></div>
+      <div class="trow thead" style=${cols}><div>${t('review.col_org')}</div><div>${t('orgs.col_status')}</div><div>${t('orgs.col_updated')}</div><div>${t('review.col_online')}</div><div></div></div>
       ${list.map((r) => html`<div class="trow" key=${r.id} style=${cols}>
-        <div><strong>${r.name}</strong>${r.demo && html` <span class="pill">demo</span>`}
+        <div data-label=${t('review.col_org')}><strong>${r.name}</strong>${r.demo && html` <span class="pill">demo</span>`}
           <div class="cell-sub">${r.focal_point?.name || ''}</div>
           ${editingEmail === r.id ? html`<div style=${{ display:'flex',gap:'6px',marginTop:'8px' }}><input class="input input-sm" type="email" value=${emailValue} onInput=${(e) => setEmailValue(e.target.value)} /><button type="button" class="btn btn-outline" onClick=${() => saveEmail(r)}>${lang === 'pt' ? 'Salvar' : 'Save'}</button></div>` : html`<div class="cell-sub">${r.focal_point?.email || '—'} <button type="button" class="btn-link" onClick=${() => { setEditingEmail(r.id);setEmailValue(r.focal_point?.email || ''); }}>${lang === 'pt' ? 'Editar e-mail' : 'Edit email'}</button></div>`}</div>
-        <div>${r.projects.join(', ')}</div>
-        <div><span class=${'status-pill s-' + r.status}>${i18n.label('org_status', r.status)}</span>
-          <div class="cell-sub">${t('review.online_' + r.public_state)}</div></div>
-        <div>${r.last_approved_at ? formatDate(r.last_approved_at, lang) : '—'}</div>
-        <div>${r.last_updated_at ? formatDate(r.last_updated_at, lang) : '—'}
+        <div data-label=${t('orgs.col_status')}><span class=${'status-pill s-' + r.status}>${r.status === 'provisional' ? (lang === 'pt' ? 'Aguardando validação' : 'Awaiting validation') : i18n.label('org_status', r.status)}</span></div>
+        <div data-label=${t('orgs.col_updated')}>${r.last_updated_at ? formatDate(r.last_updated_at, lang) : '—'}
           ${r.outdated && html`<div class="cell-alert">${t('orgs.outdated', { n: r.days_since_update })}</div>`}</div>
+        <div data-label=${t('review.col_online')}><span class=${'air-state ' + (r.public_state === 'hidden' ? 'off' : 'on')}>${r.public_state === 'hidden' ? t('review.online_hidden') : t('review.online_published')}</span></div>
         <div style=${{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
           <a class="btn btn-outline" href=${href('/team/orgs/' + r.id)}>${lang === 'pt' ? 'Editar perfil' : 'Edit profile'}</a>
           <button type="button" class="btn btn-outline" onClick=${() => invite(r)}>${lang === 'pt' ? 'Enviar convite' : 'Send invitation'}</button>
           ${r.public_state !== 'hidden' && html`<a class="btn btn-outline" href=${href('/org/' + r.id)} target="_blank">↗</a>`}
-          <button type="button" class="btn btn-outline" onClick=${() => toggleOnline(r)}>${r.public_state === 'hidden' ? t('orgs.reactivate') : t('orgs.take_offline')}</button>
+          <button type="button" class="btn btn-outline" disabled=${r.public_state === 'hidden' && !r.last_approved_at} title=${r.public_state === 'hidden' && !r.last_approved_at ? (lang === 'pt' ? 'A empresa precisa validar o perfil antes da publicação.' : 'The company must validate the profile before publication.') : ''} onClick=${() => toggleOnline(r)}>${r.public_state === 'hidden' ? (lang === 'pt' ? 'Colocar no ar' : 'Publish') : t('orgs.take_offline')}</button>
         </div>
       </div>`)}
     </div>

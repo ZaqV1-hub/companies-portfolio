@@ -1170,12 +1170,12 @@ app.post('/api/company/invitation/accept', signupLimiter, async (req, res) => {
 });
 app.put('/api/team/organizations/:id/public-state', requireRole('team'), async (req, res) => {
   const state = req.body.public_state;
-  if (!['published','provisional','hidden'].includes(state)) return res.status(400).json({ error: 'invalid' });
+  if (!['published','hidden'].includes(state)) return res.status(400).json({ error: 'invalid' });
   try {
     const [current]=await pool.execute('SELECT last_approved_at FROM organizations WHERE id=?',[req.params.id]);
     if(!current.length)return res.status(404).json({error:'not_found'});
     if(state==='published'&&!current[0].last_approved_at)return res.status(400).json({error:'approval_required'});
-    const status = state === 'hidden' ? 'offline' : state === 'provisional' ? 'provisional' : 'published';
+    const status = state === 'hidden' ? 'offline' : 'published';
     const [result] = await pool.execute('UPDATE organizations SET public_state=?,status=? WHERE id=?', [state, status, req.params.id]);
     if (!result.affectedRows) return res.status(404).json({ error: 'not_found' });
     const [rows] = await pool.execute('SELECT * FROM organizations WHERE id=?', [req.params.id]);

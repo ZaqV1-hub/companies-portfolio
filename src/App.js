@@ -12,12 +12,11 @@ import { LoginPage } from './pages/LoginPage.js?v=20261026-company-invite1';
 import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-company-invite1';
 import { InvitationPage } from './pages/company/InvitationPage.js';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261026-profile-layout3';
-import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-company-invite1';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-team-pages1';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';
-import { SettingsPage } from './pages/team/SettingsPage.js';
-import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261014-api-recovery3';
+import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261026-team-pages1';
 import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-phone1';
 
 const investorIntentKey = 'portfolio:investor-intent';
@@ -77,7 +76,6 @@ function TeamArea({ user, route, onLogout }) {
     { key: 'crm', label: 'CRM', href: href('/team/crm') },
     { key: 'review', label: t('app.nav_review'), badge: queue || null, href: href('/team/review') },
     { key: 'orgs', label: t('app.nav_orgs'), href: href('/team/orgs') },
-    { key: 'settings', label: t('app.nav_settings'), href: href('/team/settings') },
     { key: 'documents', label: t('app.nav_documents'), href: href('/team/documents') },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
@@ -88,7 +86,6 @@ function TeamArea({ user, route, onLogout }) {
   else if (section === 'crm' && route.parts[2] === 'new') content = html`<${NewContactPage} base="/team/crm" team=${true} />`;
   else if (section === 'crm' && route.parts[2]) content = html`<${ContactRecordPage} key=${route.parts[2]} relId=${route.parts[2]} base="/team/crm" team=${true} />`;
   else if (section === 'crm') content = html`<${CrmOverviewPage} />`;
-  else if (section === 'settings') content = html`<${SettingsPage} />`;
   else if (section === 'documents') content = html`<${DocumentsPage} />`;
   else content = html`<${NotFound} />`;
   return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
