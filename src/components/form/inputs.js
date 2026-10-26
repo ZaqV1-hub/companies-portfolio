@@ -2,7 +2,7 @@
 // Every widget receives {field, value, onChange, i18n, disabled} and calls onChange(newValue).
 import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
-import { UFS } from '../../lib/formSchema.js';
+import { UFS } from '../../lib/formSchema.js?v=20261026-profile-layout2';
 import { uploadImage } from '../../services/api.js';
 
 // ---------------------------------------------------------------- USD (spec 1, 5.2)
@@ -197,6 +197,7 @@ function readImage(file, { minSide, maxMB, types }, kind) {
 const IMAGE_RULES = {
   logo: { minSide: 512, types: ['image/png', 'image/svg+xml'] },
   cover: { minSide: 1920, maxMB: 8, types: ['image/jpeg', 'image/png'] },
+  product: { minSide: 1200, maxMB: 8, types: ['image/jpeg', 'image/png'] },
   gallery: { minSide: 1600, types: ['image/jpeg', 'image/png'] },
 };
 

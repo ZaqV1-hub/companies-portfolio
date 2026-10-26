@@ -52,6 +52,10 @@
     "contact_requested": "Contact requested",
     "request_sent": "✓ Request sent — the company will reach out to you shortly.",
     "stage": "Stage",
+    "development_stage": "Development stage",
+    "focus_area": "Focus area",
+    "location": "Location",
+    "product_photo": "Product photo",
     "trl": "TRL {n}",
     "leadership": "Leadership",
     "gallery": "Gallery",
@@ -737,6 +741,10 @@
     "cover_url": {
       "label": "Profile background photo",
       "help": "JPG or PNG, 1920 × 720 px, up to 8 MB. The profile always applies the platform's dark blue tone, including to colorful photos."
+    },
+    "product_image_url": {
+      "label": "Lead product photo",
+      "help": "JPG or PNG, at least 1200 px on the longer side, up to 8 MB. This photo appears beside the product description."
     },
     "gallery": {
       "label": "Photo gallery",

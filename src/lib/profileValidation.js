@@ -1,6 +1,6 @@
 // Validation of a profile draft (spec 1, 5.2 and 5.6). Runs in the browser for instant feedback and
 // MUST run again on the server before accepting "Enviar para revisão" (see docs/HANDOFF_CODEX.md).
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField } from './formSchema.js';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField } from './formSchema.js?v=20261026-profile-layout2';
 
 export const USD_MESSAGE_KEY = 'form.usd_error'; // "Informe o valor em dólares americanos, apenas números"
 

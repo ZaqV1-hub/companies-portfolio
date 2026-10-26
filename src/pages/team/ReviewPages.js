@@ -7,7 +7,7 @@ import { href, navigate } from '../../lib/router.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField } from '../../lib/formSchema.js';
 import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js';
 import { draftToPublic } from '../../lib/draftPreview.js';
-import { ProfileView } from '../../components/profile/ProfileView.js';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout2';
 
 export function ReviewQueuePage() {
   const { t, lang } = useI18n();

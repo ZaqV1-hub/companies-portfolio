@@ -6,12 +6,12 @@ import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
 import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js';
-import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261014-profile1';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261026-profile-layout2';
+import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261026-profile-layout2';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261022-company-crm1';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-blue-profile-cover1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261026-profile-layout2';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout2';
 
 function problemText(i18n, p) {
   return i18n.t('form.errors.' + p.code, p);

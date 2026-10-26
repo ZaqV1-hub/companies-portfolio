@@ -43,6 +43,7 @@ const A = [
   { key: 'regulatory_phase', type: 'select', list: 'regulatory_phase', req: true },
   { key: 'lead_product_name', type: 'plain', max: 80, req: true },
   { key: 'lead_product_moa', type: 'text', max: 400, req: true },
+  { key: 'product_image_url', type: 'image', kind: 'product', req: false },
   { key: 'pipeline', type: 'pipeline', req: false },
   { key: 'patents_filed', type: 'text', max: 300, req: false },
   { key: 'patents_granted', type: 'text', max: 300, req: false },

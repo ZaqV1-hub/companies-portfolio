@@ -5,7 +5,7 @@ import { navigate } from '../../lib/router.js';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { validateDraft } from '../../lib/profileValidation.js';
 import { getCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
-import { ProfileView } from '../../components/profile/ProfileView.js';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout2';
 
 export function CompanyPreviewPage() {
   const { t, lang } = useI18n();

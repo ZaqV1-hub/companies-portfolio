@@ -814,10 +814,10 @@ function sanitizeSvg(source) {
 app.post('/api/uploads', requireRole('company_user'), upload.single('image'), async (req,res) => {
   const file = req.file;
   const kind = req.query.kind;
-  if (!file || !['logo','cover','gallery'].includes(kind)) return res.status(400).json({ error:'invalid' });
+  if (!file || !['logo','cover','product','gallery'].includes(kind)) return res.status(400).json({ error:'invalid' });
   const allowed = kind === 'logo' ? ['image/png','image/svg+xml'] : ['image/jpeg','image/png'];
   if (!allowed.includes(file.mimetype)) return res.status(415).json({ error:'image_type' });
-  if (kind === 'cover' && file.size > 8*1024*1024) return res.status(413).json({ error:'image_too_big' });
+  if ((kind === 'cover' || kind === 'product') && file.size > 8*1024*1024) return res.status(413).json({ error:'image_too_big' });
   try {
     let bytes = file.buffer; let extension; let width; let height;
     if (file.mimetype === 'image/svg+xml') {
@@ -828,7 +828,7 @@ app.post('/api/uploads', requireRole('company_user'), upload.single('image'), as
       if (!['png','jpeg'].includes(metadata.format)) return res.status(415).json({ error:'image_type' });
       width = metadata.width; height = metadata.height; extension = metadata.format === 'jpeg' ? 'jpg' : 'png';
     }
-    if (!width || !height || (kind === 'cover' ? width < 1920 || height < 720 : Math.max(width,height) < (kind === 'gallery' ? 1600 : 512))) return res.status(400).json({ error:kind === 'cover' ? 'image_cover_dimensions' : 'image_too_small' });
+    if (!width || !height || (kind === 'cover' ? width < 1920 || height < 720 : Math.max(width,height) < (kind === 'gallery' ? 1600 : kind === 'product' ? 1200 : 512))) return res.status(400).json({ error:kind === 'cover' ? 'image_cover_dimensions' : 'image_too_small' });
     await fs.mkdir(uploadRoot,{recursive:true});
     const filename = `${crypto.randomUUID()}.${extension}`;
     await fs.writeFile(path.join(uploadRoot,filename),bytes,{flag:'wx'});

@@ -52,6 +52,10 @@
     "contact_requested": "Contato solicitado",
     "request_sent": "✓ Pedido enviado — a empresa entrará em contato em breve.",
     "stage": "Estágio",
+    "development_stage": "Estágio de desenvolvimento",
+    "focus_area": "Área de atuação",
+    "location": "Sede",
+    "product_photo": "Foto do produto",
     "trl": "TRL {n}",
     "leadership": "Liderança",
     "gallery": "Galeria",
@@ -737,6 +741,10 @@
     "cover_url": {
       "label": "Foto de fundo do perfil",
       "help": "JPG ou PNG, 1920 × 720 px, até 8 MB. O perfil sempre aplica o tom azul escuro da plataforma, mesmo com fotos coloridas."
+    },
+    "product_image_url": {
+      "label": "Foto do produto principal",
+      "help": "JPG ou PNG, no mínimo 1200 px no lado maior, até 8 MB. Esta foto aparece ao lado da descrição do produto."
     },
     "gallery": {
       "label": "Galeria de fotos",

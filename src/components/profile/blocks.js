@@ -158,11 +158,14 @@ function TargetMarketsCard({ f, i18n }) {
 function mainA(org, f, i18n) {
   const t = i18n.t;
   return [
-    html`<${Description} key="d" org=${org} i18n=${i18n} />`,
-    (present(f.lead_product_name) || present(f.lead_product_moa)) && html`<${Block} key="lp" id="lead_product" title=${t('block.lead_product')}>
-      ${present(f.lead_product_name) && html`<div class="sub-title strong">${f.lead_product_name}</div>`}
-      <${Text} value=${f.lead_product_moa} i18n=${i18n} />
-    <//>`,
+    (present(f.lead_product_name) || present(f.lead_product_moa)) && html`<section key="lp" class="pblock" id="lead_product">
+      <div class="eyebrow">${t('block.lead_product')}</div>
+      <div class="profile-product">
+        <div><h2>${f.lead_product_name}</h2><p>${i18n.tx(f.lead_product_moa)}</p></div>
+        ${(f.product_image_url || org.cover_url) && html`<div class="profile-product-photo" role="img" aria-label=${t('profile.product_photo')}
+          style=${{ backgroundImage: `url("${f.product_image_url || org.cover_url}")` }}></div>`}
+      </div>
+    </section>`,
     present(f.pipeline) && html`<${Block} key="pl" id="pipeline" title=${t('block.pipeline')}>
       <ul class="list">${f.pipeline.map((p, i) => html`<li key=${i}><strong>${p.name}</strong>${present(p.indication) ? ' — ' + i18n.tx(p.indication) : ''}</li>`)}</ul>
     <//>`,
@@ -186,7 +189,7 @@ function mainB(org, f, i18n) {
     ${present(text) && html`<div style=${{ marginTop: '10px' }}><${Text} value=${text} i18n=${i18n} /></div>`}
   <//>`;
   return [
-    html`<${Description} key="d" org=${org} i18n=${i18n} extra=${f.platform_description} />`,
+    present(f.platform_description) && html`<${Block} key="pd" id="platform_description" title=${t('block.platform_type')}><${Text} value=${f.platform_description} i18n=${i18n} /><//>`,
     tagsText('technology', t('block.technology'), 'technology_tags', f.technology_tags, f.technology_text),
     tagsText('business_model', t('block.business_model'), 'business_models', f.business_models, f.business_model_text),
     (present(f.traction) || revenueLine(f.revenue, i18n)) && html`<${Block} key="tr" id="traction" title=${t('block.traction')}>
@@ -209,7 +212,6 @@ function mainC(org, f, i18n) {
   const facts = [clientLine(f, i18n), revenueLine(f.revenue, i18n), exportsLine(f.exports, i18n)];
   const factTitles = [t('block.client_profile'), t('block.revenue'), t('block.exports')];
   return [
-    html`<${Description} key="d" org=${org} i18n=${i18n} />`,
     servicesBlock(f, i18n, 'c_services'),
     present(f.molecule_types) && html`<${Block} key="mt" id="molecule_types" title=${t('block.molecule_types')}><${Tags} items=${labels(i18n, 'molecule_types', f.molecule_types)} /><//>`,
     (present(f.capacity_scales) || present(f.utilization_pct) || present(f.capacity_text)) && html`<${Block} key="cp" id="capacity" title=${t('block.capacity')}>
@@ -231,7 +233,6 @@ function mainD(org, f, i18n) {
   const money = [revenueLine(f.revenue, i18n), exportsLine(f.exports, i18n)];
   const moneyTitles = [t('block.revenue'), t('block.exports')];
   return [
-    html`<${Description} key="d" org=${org} i18n=${i18n} />`,
     servicesBlock(f, i18n, 'd_services'),
     (present(f.therapeutic_areas) || present(f.scope_text)) && html`<${Block} key="ta" id="therapeutic_areas" title=${t('block.therapeutic_areas')}>
       <${Tags} items=${labels(i18n, 'therapeutic_areas', f.therapeutic_areas)} />
@@ -252,7 +253,6 @@ function mainD(org, f, i18n) {
 function mainE(org, f, i18n) {
   const t = i18n.t;
   return [
-    html`<${Description} key="d" org=${org} i18n=${i18n} />`,
     present(f.product_portfolio) && html`<${Block} key="pp" id="product_portfolio" title=${t('block.product_portfolio')}>
       <ul class="list">${f.product_portfolio.map((p, i) => html`<li key=${i}><strong>${i18n.tx(p.category)}</strong>${present(p.description) ? ' — ' + i18n.tx(p.description) : ''}</li>`)}</ul>
     <//>`,
@@ -278,7 +278,6 @@ function mainF(org, f, i18n) {
   const facts = [share, revenueLine(f.revenue, i18n), exportsLine(f.exports, i18n)];
   const titles = [t('block.market_share'), t('block.revenue'), t('block.exports')];
   return [
-    html`<${Description} key="d" org=${org} i18n=${i18n} />`,
     (present(f.products) || present(f.products_text)) && html`<${Block} key="pr" id="products" title=${t('block.products')}>
       ${present(f.products) && html`<ul class="list" style=${{ marginTop: 0 }}>${f.products.map((p, i) => html`<li key=${i}>${i18n.tx(p)}</li>`)}</ul>`}
       ${present(f.products_text) && html`<div style=${{ marginTop: '10px' }}><${Text} value=${f.products_text} i18n=${i18n} /></div>`}

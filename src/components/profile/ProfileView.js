@@ -5,7 +5,7 @@ import { formatDate } from '../../lib/format.js';
 import { useI18n } from '../../lib/i18n.js';
 import { present, stage, subtitle } from '../../lib/profileModel.js';
 import { LogoPlate } from '../ui.js';
-import { LookingForCard, mainBlocks, otherSideCards } from './blocks.js?v=20261023-contact-button1';
+import { LookingForCard, mainBlocks, otherSideCards } from './blocks.js?v=20261026-profile-layout2';
 
 function StageChart({ project, i18n }) {
   const s = stage(project);
@@ -21,18 +21,9 @@ function StageChart({ project, i18n }) {
   </div>`;
 }
 
-function stageChip(project, i18n) {
-  const s = stage(project);
-  if (!s || s.index < 0) return null;
-  const label = i18n.label(s.list, s.steps[s.index]);
-  return s.trl ? label + ' · ' + i18n.t('profile.trl', { n: s.trl }) : label;
-}
-
 function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
   const t = i18n.t;
   const sub = subtitle(project, i18n);
-  const chip = stageChip(project, i18n);
-  const place = [org.city, org.state].filter(Boolean).join(' / ');
   return html`<div class="profile-hero">
     ${org.cover_url && html`<div class="profile-hero-cover" aria-hidden="true" style=${{ backgroundImage: `url("${org.cover_url}")` }}></div>`}
     <div class="profile-hero-inner">
@@ -47,18 +38,40 @@ function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
           <span class="hero-chip">${t('profile_type.' + project.profile_type)}</span>
           <h1>${org.name}</h1>
           ${sub && html`<p class="subtitle">${sub}</p>`}
-          <div class="hero-meta">
-            ${chip && html`<span class="meta-chip">${chip}</span>`}
-            ${org.size && html`<span class="meta-chip">${i18n.label('size', org.size)}</span>`}
-            ${(org.segments || []).map((segment) => html`<span class="meta-chip" key=${segment}>${i18n.label('segments', segment)}</span>`)}
-            ${place && html`<span>${place}</span>`}
-            ${org.website && html`<a href=${org.website} target="_blank" rel="noopener">${org.website.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '')}</a>`}
-          </div>
-          <${StageChart} project=${project} i18n=${i18n} />
         </div>
       </div>
+      ${present(org.description) && html`<div class="profile-hero-about">
+        <div class="eyebrow">${t('block.description')}</div>
+        <p>${i18n.tx(org.description)}</p>
+        <div class="profile-hero-tags">
+          ${org.size && html`<span>${i18n.label('size', org.size)}</span>`}
+          ${(org.segments || []).map((segment) => html`<span key=${segment}>${i18n.label('segments', segment)}</span>`)}
+        </div>
+      </div>`}
     </div>
   </div>`;
+}
+
+function Facts({ org, project, i18n }) {
+  const s = stage(project);
+  const place = [org.city, org.state].filter(Boolean).join(' / ');
+  const site = org.website?.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
+  const facts = [];
+  if (s && s.index >= 0) facts.push(html`<div class="profile-fact profile-fact-stage" key="stage">
+    <div class="profile-fact-label">${i18n.t('profile.development_stage')}</div>
+    <div class="profile-fact-value">${s.trl && html`<strong>${s.trl}<small>/9 TRL</small></strong>`}
+      <span>${i18n.label(s.list, s.steps[s.index])}</span></div>
+    <${StageChart} project=${project} i18n=${i18n} />
+  </div>`);
+  if (present(project.fields.segment) || present(project.fields.platform_type)) facts.push(html`<div class="profile-fact" key="area">
+    <div class="profile-fact-label">${i18n.t('profile.focus_area')}</div>
+    <div class="profile-fact-value">${subtitle(project, i18n)}</div>
+  </div>`);
+  if (place) facts.push(html`<div class="profile-fact" key="place"><div class="profile-fact-label">${i18n.t('profile.location')}</div><div class="profile-fact-value">${place}</div></div>`);
+  if (site) facts.push(html`<div class="profile-fact" key="site"><div class="profile-fact-label">${i18n.t('profile.website')}</div><a class="profile-fact-value" href=${org.website} target="_blank" rel="noopener">${site}</a></div>`);
+  if (!facts.length) return null;
+  const columns = s && s.index >= 0 && facts.length > 1 ? `minmax(0, 2.2fr) repeat(${facts.length - 1}, minmax(0, 1fr))` : `repeat(${facts.length}, minmax(0, 1fr))`;
+  return html`<div class="profile-facts"><div class="profile-facts-inner" style=${{ gridTemplateColumns: columns }}>${facts}</div></div>`;
 }
 
 function ProjectSelector({ org, project, i18n, onSelect }) {
@@ -125,12 +138,12 @@ export function ProfileView({ org, projectId, onSelectProject, onRequestContact,
   const blocks = mainBlocks(org, project, i18n);
   return html`<div class="profile">
     <${Header} org=${org} project=${project} i18n=${i18n} backHref=${backHref} onFavorite=${onFavorite} isFavorite=${isFavorite} />
+    <${Facts} org=${org} project=${project} i18n=${i18n} />
     <div class="profile-body">
       ${cta && html`<div class="profile-cta-mobile">${cta}</div>`}
       <main class="profile-main">
-        ${blocks[0]}
         <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
-        ${blocks.slice(1)}
+        ${blocks}
       </main>
       <aside class="profile-side">
         ${cta && html`<div class="profile-cta-desktop">${cta}</div>`}
