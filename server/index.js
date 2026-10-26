@@ -1056,7 +1056,7 @@ app.post('/api/team/reviews/:id/return', requireRole('team'), async (req, res) =
 });
 app.get('/api/team/organizations', requireRole('team'), async (_req, res) => {
   try {
-    const [orgs] = await pool.query('SELECT id,name,status,public_state,last_approved_at,last_updated_at,focal_point,demo,is_featured FROM organizations ORDER BY name');
+    const [orgs] = await pool.query('SELECT id,name,status,public_state,last_approved_at,last_updated_at,focal_point,invitation_email,invited_at,demo,is_featured FROM organizations ORDER BY name');
     const [projects] = await pool.query('SELECT organization_id,profile_type FROM projects');
     const [settings] = await pool.execute('SELECT deadlines FROM settings WHERE id=?', ['settings']);
     const outdatedDays = settings[0]?.deadlines?.outdated_profile_alert_days ?? 120;
@@ -1076,7 +1076,7 @@ app.post('/api/team/organizations', requireRole('team'), async (req, res) => {
   try {
     await db.beginTransaction();
     const id = `org-${crypto.randomUUID()}`;
-    await db.execute("INSERT INTO organizations (id,name,focal_point,status,public_state,created_at) VALUES (?,?,?,'awaiting_validation','hidden',UTC_TIMESTAMP())", [id,name,jsonColumn({ name, email })]);
+    await db.execute("INSERT INTO organizations (id,name,focal_point,invitation_email,status,public_state,created_at) VALUES (?,?,?,?,'awaiting_validation','hidden',UTC_TIMESTAMP())", [id,name,jsonColumn({ name, email }),email]);
     await db.execute("INSERT INTO projects (id,organization_id,profile_type,sort_order,summary,fields) VALUES (?,?,'A',0,?,?)", [`proj-${crypto.randomUUID()}`,id,jsonColumn({pt:'',en:''}),jsonColumn({})]);
     await db.commit();
     res.status(201).json({ id,name,email });
@@ -1089,30 +1089,61 @@ app.get('/api/team/organizations/:id/profile-form', requireRole('team'), async (
     if (!orgs.length) return res.status(404).json({ error:'not_found' });
     const [projects] = await pool.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [req.params.id]);
     const org = orgs[0];
-    res.json({ organization:{ id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at },
+    res.json({ organization:{ id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,invitation_email:org.invitation_email,invited_at:org.invited_at },
       draft:{ id:'team-base',status:org.public_state==='hidden' && !org.last_approved_at ? 'filling' : 'in_review',content:profileSnapshot(org,projects),reviewed_steps:{} },
       imports:[],firstValidation:false });
   } catch (error) { routeError(res,error); }
 });
+async function saveTeamOrganizationProfile(db, id, content) {
+  const [orgs] = await db.execute('SELECT public_state,last_approved_at FROM organizations WHERE id=? FOR UPDATE', [id]);
+  if (!orgs.length) return { status:404,error:'not_found' };
+  if (orgs[0].public_state !== 'hidden' || orgs[0].last_approved_at) return { status:409,error:'published_profile' };
+  const [active] = await db.execute("SELECT id FROM profile_versions WHERE organization_id=? AND kind='draft' AND status='in_review' LIMIT 1", [id]);
+  if (active.length) return { status:409,error:'in_review' };
+  const [projects] = await db.execute('SELECT id FROM projects WHERE organization_id=?', [id]);
+  if (!content?.organization || !Array.isArray(content.projects) || projects.length !== content.projects.length || projects.some((p) => !content.projects.some((x) => x.id===p.id))) return { status:400,error:'invalid' };
+  const org = content.organization;
+  const fields = profileOrgKeys.map((key) => `\`${key}\`=?`).join(',');
+  await db.execute(`UPDATE organizations SET ${fields} WHERE id=?`, [...profileOrgKeys.map((key) => jsonColumn(org[key])),id]);
+  for (const project of content.projects) await db.execute('UPDATE projects SET summary=?,fields=? WHERE id=? AND organization_id=?', [jsonColumn(project.summary),jsonColumn(project.fields),project.id,id]);
+  await db.execute("DELETE FROM profile_versions WHERE organization_id=? AND kind='draft' AND status IN ('filling','returned')", [id]);
+  return { ok:true };
+}
+async function queueCompanyInvitation(db, id) {
+  const [orgs] = await db.execute('SELECT invitation_email FROM organizations WHERE id=? FOR UPDATE', [id]);
+  if (!orgs.length) return { status:404,error:'not_found' };
+  const email = String(orgs[0].invitation_email || '').trim().toLowerCase();
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { status:400,error:'invalid_email' };
+  const [users] = await db.execute('SELECT id FROM users WHERE email_normalized=?', [email]);
+  if (users.length) return { status:409,error:'email_has_account' };
+  await db.execute('UPDATE company_invitations SET used_at=UTC_TIMESTAMP() WHERE organization_id=? AND used_at IS NULL', [id]);
+  await db.execute("UPDATE email_outbox SET ready_to_send=FALSE WHERE template='company_invitation' AND sent=FALSE AND JSON_UNQUOTE(JSON_EXTRACT(data,'$.organization_id'))=?", [id]);
+  const token = crypto.randomBytes(32).toString('hex');
+  await db.execute('INSERT INTO company_invitations (id,organization_id,email,token_hash,expires_at,created_at) VALUES (?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY),UTC_TIMESTAMP())', [`ci-${crypto.randomUUID()}`,id,email,tokenHash(token)]);
+  await db.execute('UPDATE organizations SET invited_at=UTC_TIMESTAMP() WHERE id=?', [id]);
+  await emailEvent('company_invitation',email,{ organization_id:id, token },db);
+  return { ok:true,email };
+}
 app.put('/api/team/organizations/:id/profile-form', requireRole('team'), async (req,res) => {
   const db = await pool.getConnection();
   try {
     await db.beginTransaction();
-    const [orgs] = await db.execute('SELECT public_state,last_approved_at FROM organizations WHERE id=? FOR UPDATE', [req.params.id]);
-    if (!orgs.length) { await db.rollback(); return res.status(404).json({ error:'not_found' }); }
-    if (orgs[0].public_state !== 'hidden' || orgs[0].last_approved_at) { await db.rollback(); return res.status(409).json({ error:'published_profile' }); }
-    const content = req.body.content;
-    const [projects] = await db.execute('SELECT id FROM projects WHERE organization_id=?', [req.params.id]);
-    if (!content?.organization || !Array.isArray(content.projects) || projects.length !== content.projects.length || projects.some((p) => !content.projects.some((x) => x.id===p.id))) {
-      await db.rollback(); return res.status(400).json({ error:'invalid' });
-    }
-    const org = content.organization;
-    const fields = profileOrgKeys.map((key) => `\`${key}\`=?`).join(',');
-    await db.execute(`UPDATE organizations SET ${fields} WHERE id=?`, [...profileOrgKeys.map((key) => jsonColumn(org[key])),req.params.id]);
-    for (const project of content.projects) await db.execute('UPDATE projects SET summary=?,fields=? WHERE id=? AND organization_id=?', [jsonColumn(project.summary),jsonColumn(project.fields),project.id,req.params.id]);
-    await db.execute("DELETE FROM profile_versions WHERE organization_id=? AND kind='draft' AND status IN ('filling','returned')", [req.params.id]);
-    await db.commit();
-    res.json({ ok:true });
+    const result = await saveTeamOrganizationProfile(db, req.params.id, req.body.content);
+    if (!result.ok) { await db.rollback(); return res.status(result.status).json({ error:result.error }); }
+    await db.commit(); res.json(result);
+  } catch (error) { await db.rollback(); routeError(res,error); }
+  finally { db.release(); }
+});
+app.post('/api/team/organizations/:id/profile-form/send-invite', requireRole('team'), async (req,res) => {
+  if (!mailAvailable()) return res.status(503).json({ error:'email_unavailable' });
+  const db = await pool.getConnection();
+  try {
+    await db.beginTransaction();
+    const saved = await saveTeamOrganizationProfile(db,req.params.id,req.body.content);
+    if (!saved.ok) { await db.rollback(); return res.status(saved.status).json({ error:saved.error }); }
+    const invited = await queueCompanyInvitation(db,req.params.id);
+    if (!invited.ok) { await db.rollback(); return res.status(invited.status).json({ error:invited.error }); }
+    await db.commit(); res.json(invited);
   } catch (error) { await db.rollback(); routeError(res,error); }
   finally { db.release(); }
 });
@@ -1120,10 +1151,8 @@ app.patch('/api/team/organizations/:id/contact', requireRole('team'), async (req
   const email = String(req.body.email || '').trim().toLowerCase();
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ error:'invalid_email' });
   try {
-    const [rows] = await pool.execute('SELECT focal_point FROM organizations WHERE id=?', [req.params.id]);
-    if (!rows.length) return res.status(404).json({ error:'not_found' });
-    const focal = rows[0].focal_point || {};
-    await pool.execute('UPDATE organizations SET focal_point=? WHERE id=?', [jsonColumn({ ...focal,email }),req.params.id]);
+    const [result] = await pool.execute("UPDATE organizations SET invitation_email=?,focal_point=JSON_SET(COALESCE(focal_point,JSON_OBJECT()),'$.email',?) WHERE id=?", [email,email,req.params.id]);
+    if (!result.affectedRows) return res.status(404).json({ error:'not_found' });
     res.json({ ok:true,email });
   } catch (error) { routeError(res,error); }
 });
@@ -1132,18 +1161,9 @@ app.post('/api/team/organizations/:id/invite', requireRole('team'), async (req, 
   const db = await pool.getConnection();
   try {
     await db.beginTransaction();
-    const [orgs] = await db.execute('SELECT focal_point FROM organizations WHERE id=? FOR UPDATE', [req.params.id]);
-    if (!orgs.length) { await db.rollback(); return res.status(404).json({ error:'not_found' }); }
-    const email = String(orgs[0].focal_point?.email || '').trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { await db.rollback(); return res.status(400).json({ error:'invalid_email' }); }
-    const [users] = await db.execute('SELECT id FROM users WHERE email_normalized=?', [email]);
-    if (users.length) { await db.rollback(); return res.status(409).json({ error:'email_has_account' }); }
-    const token = crypto.randomBytes(32).toString('hex');
-    await db.execute('INSERT INTO company_invitations (id,organization_id,email,token_hash,expires_at,created_at) VALUES (?,?,?,?,DATE_ADD(UTC_TIMESTAMP(),INTERVAL 7 DAY),UTC_TIMESTAMP())', [`ci-${crypto.randomUUID()}`,req.params.id,email,tokenHash(token)]);
-    await db.execute('UPDATE organizations SET invited_at=UTC_TIMESTAMP() WHERE id=?', [req.params.id]);
-    await emailEvent('company_invitation','company',{ organization_id:req.params.id, token },db);
-    await db.commit();
-    res.json({ ok:true,email });
+    const result = await queueCompanyInvitation(db,req.params.id);
+    if (!result.ok) { await db.rollback(); return res.status(result.status).json({ error:result.error }); }
+    await db.commit(); res.json(result);
   } catch (error) { await db.rollback(); routeError(res,error); }
   finally { db.release(); }
 });

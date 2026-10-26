@@ -427,6 +427,10 @@ a.profile-fact-value { display: inline-block; border-bottom: 2px solid var(--lim
 /* ---------- company form ---------- */
 .form-page { max-width: 1040px; }
 .form-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+.team-draft-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; max-width: 100%; }
+.team-draft-recipient { font-size: 12px; color: var(--muted); overflow-wrap: anywhere; text-align: right; }
+.team-draft-recipient strong { color: var(--navy); }
+@media (max-width: 700px) { .team-draft-actions { align-items: stretch; width: 100%; } .team-draft-recipient { text-align: left; } .team-draft-actions .review-actions .btn { flex: 1; } }
 .status-pill { display: inline-block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; padding: 4px 9px; border-radius: 20px; background: var(--line-soft); color: var(--text-2); }
 .status-pill.s-published { background: var(--navy); color: #fff; }
 .status-pill.s-in_review { background: #e7ecff; color: #3548a8; }

@@ -193,7 +193,7 @@ export function OrganizationsPage() {
     catch { setNotice(lang === 'pt' ? 'Não foi possível salvar o e-mail.' : 'Could not save the email.'); }
   };
   const invite = async (r) => {
-    try { await api.inviteOrganization(r.id); setNotice(lang === 'pt' ? `Convite enviado para ${r.focal_point?.email}.` : `Invitation sent to ${r.focal_point?.email}.`); await load(); }
+    try { const result = await api.inviteOrganization(r.id); setNotice(lang === 'pt' ? `Convite preparado para ${result.email}.` : `Invitation queued for ${result.email}.`); await load(); }
     catch (error) { setNotice(error.message === 'email_has_account' ? (lang === 'pt' ? 'Este e-mail já tem acesso. Use a recuperação de senha.' : 'This email already has access. Use password reset.') : (lang === 'pt' ? 'Não foi possível enviar o convite.' : 'Could not send the invitation.')); }
   };
   return html`<div class="team-list-page">
@@ -203,7 +203,7 @@ export function OrganizationsPage() {
     ${creating && html`<form class="table-card" style=${{ padding:'20px',marginTop:'16px' }} onSubmit=${create}>
       <div style=${{ display:'flex',gap:'12px',flexWrap:'wrap',alignItems:'end' }}>
         <label class="form-label">${lang === 'pt' ? 'Nome da empresa' : 'Company name'}<input class="input input-sm" required maxLength="80" value=${newName} onInput=${(e) => setNewName(e.target.value)} /></label>
-        <label class="form-label">${lang === 'pt' ? 'E-mail da empresa' : 'Company email'}<input class="input input-sm" type="email" required value=${newEmail} onInput=${(e) => setNewEmail(e.target.value)} /></label>
+        <label class="form-label">${lang === 'pt' ? 'E-mail que receberá o convite' : 'Email that will receive the invitation'}<input class="input input-sm" type="email" required value=${newEmail} onInput=${(e) => setNewEmail(e.target.value)} /></label>
         <button class="btn btn-lime" type="submit">${lang === 'pt' ? 'Criar e preencher perfil' : 'Create and fill profile'}</button>
       </div></form>`}
     ${notice && html`<div class="notice" role="status">${notice}</div>`}
@@ -214,7 +214,7 @@ export function OrganizationsPage() {
       ${list.map((r) => html`<div class="trow" key=${r.id} style=${cols}>
         <div data-label=${t('review.col_org')}><strong>${r.name}</strong>${r.demo && html` <span class="pill">demo</span>`}
           <div class="cell-sub">${r.focal_point?.name || ''}</div>
-          ${editingEmail === r.id ? html`<div style=${{ display:'flex',gap:'6px',marginTop:'8px' }}><input class="input input-sm" type="email" value=${emailValue} onInput=${(e) => setEmailValue(e.target.value)} /><button type="button" class="btn btn-outline" onClick=${() => saveEmail(r)}>${lang === 'pt' ? 'Salvar' : 'Save'}</button></div>` : html`<div class="cell-sub">${r.focal_point?.email || '—'} <button type="button" class="btn-link" onClick=${() => { setEditingEmail(r.id);setEmailValue(r.focal_point?.email || ''); }}>${lang === 'pt' ? 'Editar e-mail' : 'Edit email'}</button></div>`}</div>
+          ${editingEmail === r.id ? html`<div style=${{ display:'flex',gap:'6px',marginTop:'8px' }}><input class="input input-sm" type="email" aria-label=${lang === 'pt' ? 'E-mail do convite' : 'Invitation email'} value=${emailValue} onInput=${(e) => setEmailValue(e.target.value)} /><button type="button" class="btn btn-outline" onClick=${() => saveEmail(r)}>${lang === 'pt' ? 'Salvar' : 'Save'}</button></div>` : html`<div class="cell-sub">${lang === 'pt' ? 'Convite: ' : 'Invitation: '}${r.invitation_email || '—'} <button type="button" class="btn-link" onClick=${() => { setEditingEmail(r.id);setEmailValue(r.invitation_email || ''); }}>${lang === 'pt' ? 'Editar e-mail' : 'Edit email'}</button></div>`}</div>
         <div data-label=${t('orgs.col_status')}><span class=${'status-pill s-' + r.status}>${r.status === 'provisional' ? (lang === 'pt' ? 'Aguardando validação' : 'Awaiting validation') : i18n.label('org_status', r.status)}</span></div>
         <div data-label=${t('orgs.col_updated')}>${r.last_updated_at ? formatDate(r.last_updated_at, lang) : '—'}
           ${r.outdated && html`<div class="cell-alert">${t('orgs.outdated', { n: r.days_since_update })}</div>`}</div>

@@ -73,6 +73,7 @@ export async function updateOrganizationEmail(id,email) { return request(`/team/
 export async function inviteOrganization(id) { return post(`/team/organizations/${q(id)}/invite`, {}); }
 export async function getTeamOrganizationForm(id) { return request(`/team/organizations/${q(id)}/profile-form`); }
 export async function saveTeamOrganizationForm(id,content) { return put(`/team/organizations/${q(id)}/profile-form`, { content }); }
+export async function saveTeamOrganizationFormAndInvite(id,content) { return post(`/team/organizations/${q(id)}/profile-form/send-invite`, { content }); }
 export async function getCompanyInvitation(token) { return request(`/company/invitation?token=${q(token)}`); }
 export async function acceptCompanyInvitation(data) { return post('/company/invitation/accept', data); }
 
