@@ -59,7 +59,7 @@ export async function logout() { return post('/auth/logout'); }
 export async function getMyProfileForm() { return request('/me/profile-form'); }
 export async function saveMyProfileDraft(content, reviewedSteps) { return put('/me/profile-draft', { content, reviewed_steps: reviewedSteps }); }
 export async function submitMyProfileForReview(content, reviewedSteps) { return post('/me/profile-draft/submit', { content, reviewed_steps: reviewedSteps }); }
-export async function acceptInitialProfile() { return post('/me/profile-draft/accept-initial', {}); }
+export async function acceptInitialProfile(content) { return post('/me/profile-draft/accept-initial', { content }); }
 
 export async function listReviewQueue() { return request('/team/reviews'); }
 export async function getReview(versionId) { try { return await request(`/team/reviews/${q(versionId)}`); } catch (error) { if (error.status === 404) return null; throw error; } }

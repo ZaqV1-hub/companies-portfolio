@@ -1,7 +1,7 @@
 // Company area · step-by-step profile form (spec 1, sections 4.2 and 5).
 // Steps: Organization → one per project → Leadership → Images → Preview & submit.
 import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261026-invite-language1';
+import * as api from '../../services/api.js?v=20261026-accept-initial1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
@@ -81,6 +81,8 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteNotice, setInviteNotice] = useState(null);
   const [inviteOpen, setInviteOpen] = useState(false);
+  const [acceptBusy, setAcceptBusy] = useState(false);
+  const [acceptError, setAcceptError] = useState('');
 
   const load = () => (teamOrgId ? api.getTeamOrganizationForm(teamOrgId) : api.getMyProfileForm()).then((d) => {
     const preview = teamOrgId ? null : getCompanyPreview();
@@ -156,8 +158,19 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     if (res.ok) { clearCompanyPreview(); await load(); setToast(t('form.submitted')); }
   };
   const acceptInitial = async () => {
-    const res = await api.acceptInitialProfile();
-    if (res.ok) { clearCompanyPreview(); await load(); setToast(i18n.lang === 'pt' ? 'Perfil aceito e publicado.' : 'Profile accepted and published.'); }
+    if (acceptBusy) return;
+    setAcceptBusy(true); setAcceptError('');
+    try {
+      const res = await api.acceptInitialProfile(content);
+      if (!res.ok) throw new Error(res.error || 'publish_failed');
+      clearCompanyPreview();
+      setToast(i18n.lang === 'pt' ? 'Perfil aceito e publicado.' : 'Profile accepted and published.');
+      await load().catch(() => setToast(i18n.lang === 'pt' ? 'Perfil publicado. Recarregue a página para ver a atualização.' : 'Profile published. Reload the page to see the update.'));
+    } catch (error) {
+      setAcceptError(error.message === 'changes_require_review'
+        ? (i18n.lang === 'pt' ? 'Este perfil tem alterações salvas. Revise os dados e envie para revisão.' : 'This profile has saved changes. Review the information and submit it for review.')
+        : (i18n.lang === 'pt' ? 'Não foi possível publicar agora. Tente novamente.' : 'Could not publish now. Please try again.'));
+    } finally { setAcceptBusy(false); }
   };
 
   const renderFields = (fields, container, onChange, projectId) => fields.map((f) => html`<${Field} key=${f.key} field=${f} stepId=${step.id}
@@ -183,7 +196,8 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     body = html`<${Preview} orgMeta=${data.organization} content=${content} />
       <div class="submit-box">
         ${unchangedInitial && !locked && html`<div class="notice">${i18n.lang === 'pt' ? 'Os dados iniciais estão prontos para sua aprovação. Se você não alterar nada, pode publicar diretamente.' : 'The initial profile is ready for your approval. You can publish it directly without changes.'}</div>
-          <button type="button" class="btn btn-lime btn-xl" onClick=${acceptInitial}>${i18n.lang === 'pt' ? 'Aceitar e publicar' : 'Accept and publish'}</button>`}
+          <button type="button" class="btn btn-lime btn-xl" disabled=${acceptBusy} onClick=${acceptInitial}>${acceptBusy ? (i18n.lang === 'pt' ? 'Publicando...' : 'Publishing...') : (i18n.lang === 'pt' ? 'Aceitar e publicar' : 'Accept and publish')}</button>
+          ${acceptError && html`<div class="form-error" role="alert">${acceptError}</div>`}`}
         ${!teamOrgId && !unchangedInitial && !check.ok && !locked && html`<div class="submit-blockers" role="alert">
           <strong>${t('form.submit_blocked')}</strong>
           <ul>

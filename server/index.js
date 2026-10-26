@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { isDeepStrictEqual } from 'node:util';
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import express from 'express';
@@ -984,11 +985,11 @@ app.post('/api/me/profile-draft/accept-initial', requireRole('company_user'), as
     const [imports] = await db.execute('SELECT project_id,field,mode FROM form_imports WHERE organization_id=?', [req.user.organization_id]);
     const draft = await getOpenDraft(db, req.user.organization_id);
     const baseline = initialProfileSnapshot(orgs[0], projects, imports);
-    if (!draft || draft.status === 'in_review' || JSON.stringify(draft.content) !== JSON.stringify(baseline)) {
+    if (!draft || draft.status === 'in_review' || !isDeepStrictEqual(req.body?.content, baseline)) {
       await db.rollback(); return res.status(409).json({ error:'changes_require_review' });
     }
     await db.execute("UPDATE organizations SET status='published',public_state='published',last_approved_at=?,last_updated_at=? WHERE id=?", [localDate(),localDate(),req.user.organization_id]);
-    await db.execute("UPDATE profile_versions SET kind='published',status='published',reviewed_at=UTC_TIMESTAMP(),reviewed_by=?,approved_at=UTC_TIMESTAMP() WHERE id=?", [req.user.id,draft.id]);
+    await db.execute("UPDATE profile_versions SET kind='published',status='published',content=?,reviewed_at=UTC_TIMESTAMP(),reviewed_by=?,approved_at=UTC_TIMESTAMP() WHERE id=?", [jsonColumn(baseline),req.user.id,draft.id]);
     await emailEvent('profile_accepted','team',{ organization_id:req.user.organization_id },db);
     await db.commit();
     res.json({ ok:true });
