@@ -52,7 +52,7 @@ function CompanyArea({ user, route, onLogout }) {
     { key: 'contacts', label: 'CRM', href: href('/company/contacts') },
     { key: 'profile', label: t('app.nav_profile'), href: href('/company/profile') },
     { key: 'public', label: t('app.nav_view_public'), href: href('/company/preview') },
-    { key: 'feedback', label: lang === 'pt' ? 'Dúvidas e sugestões' : 'Questions and suggestions', onClick: () => setFeedbackOpen(true) },
+    { key: 'feedback', label: lang === 'pt' ? 'Mande suas dúvidas ou sugestões' : 'Send us your questions or suggestions', onClick: () => setFeedbackOpen(true) },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
   if (section === 'profile') {
