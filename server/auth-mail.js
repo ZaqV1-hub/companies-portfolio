@@ -14,6 +14,7 @@ function transport() {
   return nodemailer.createTransport({
     host:process.env.SMTP_HOST, port, secure:port === 465, requireTLS:port === 587,
     auth:process.env.SMTP_USER ? { user:process.env.SMTP_USER, pass:process.env.SMTP_PASSWORD } : undefined,
+    connectionTimeout:20000, greetingTimeout:20000, socketTimeout:30000,
     disableFileAccess:true, disableUrlAccess:true,
   });
 }
