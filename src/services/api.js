@@ -60,6 +60,7 @@ export async function getMyProfileForm() { return request('/me/profile-form'); }
 export async function saveMyProfileDraft(content, reviewedSteps) { return put('/me/profile-draft', { content, reviewed_steps: reviewedSteps }); }
 export async function submitMyProfileForReview(content, reviewedSteps) { return post('/me/profile-draft/submit', { content, reviewed_steps: reviewedSteps }); }
 export async function acceptInitialProfile(content) { return post('/me/profile-draft/accept-initial', { content }); }
+export async function sendCompanyFeedback(message) { return post('/me/feedback', { message }); }
 
 export async function listReviewQueue() { return request('/team/reviews'); }
 export async function getReview(versionId) { try { return await request(`/team/reviews/${q(versionId)}`); } catch (error) { if (error.status === 404) return null; throw error; } }
@@ -67,6 +68,9 @@ export async function saveReviewEdits(versionId, content) { return put(`/team/re
 export async function approveReview(versionId, content) { return post(`/team/reviews/${q(versionId)}/approve`, { content }); }
 export async function returnReview(versionId, content, comment) { return post(`/team/reviews/${q(versionId)}/return`, { content, comment }); }
 export async function listOrganizationsForTeam() { return request('/team/organizations'); }
+export async function listProfileTags() { return request('/team/tags'); }
+export async function createProfileTag(label) { return post('/team/tags', { label }); }
+export async function setOrganizationTags(id,tags) { return put(`/team/organizations/${q(id)}/tags`, { tags }); }
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
 export async function createOrganization(name,email) { return post('/team/organizations', { name,email }); }
 export async function updateOrganizationEmail(id,email) { return request(`/team/organizations/${q(id)}/contact`, { method:'PATCH',body:{ email } }); }

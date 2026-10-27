@@ -13,6 +13,7 @@ export function draftToPublic(orgMeta, content, { publicState = 'published', app
     state: o.state,
     size: o.size,
     segments: o.segments || [],
+    custom_tags: orgMeta.custom_tags || [],
     partnership_types: o.partnership_types || [],
     leadership: o.leadership || [],
     gallery: o.gallery || [],

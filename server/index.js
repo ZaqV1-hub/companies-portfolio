@@ -58,9 +58,10 @@ app.use('/api', (req,res,next) => {
 
 const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false });
 const signupLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false });
+const feedbackLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false });
 
 const PUBLIC_ORG_FIELDS = ['id', 'name', 'logo_url', 'cover_url', 'description', 'website', 'city', 'state', 'size', 'segments',
-  'partnership_types', 'leadership', 'gallery', 'public_state', 'last_approved_at', 'is_featured'];
+  'partnership_types', 'leadership', 'gallery', 'custom_tags', 'public_state', 'last_approved_at', 'is_featured'];
 
 function publicOrg(row) {
   const result = {};
@@ -869,7 +870,7 @@ async function emailEvent(template, audience, data, db = pool) {
       if (users.length) to = users[0].email;
     }
   }
-  const ready = ['profile_submitted','profile_accepted','profile_returned','profile_approved','company_invitation'].includes(template);
+  const ready = ['profile_submitted','profile_accepted','profile_returned','profile_approved','company_invitation','company_feedback'].includes(template);
   return db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at,ready_to_send) VALUES (?,?,?,?,UTC_TIMESTAMP(),?)',
     [`m-${crypto.randomUUID()}`, template, to, jsonColumn(data),Number(ready)]);
 }
@@ -892,6 +893,7 @@ async function deliverOutbox() {
         profile_accepted: { subject:`${name} aceitou o perfil inicial`, title:'Perfil inicial aceito', intro:`${name} aceitou o perfil inicial sem alterações e a página foi publicada.`, button:'Ver organizações', url:`${base}/painel/orgs` },
         profile_returned: { subject:`Revisão do perfil de ${name}`, title:'Perfil devolvido para ajustes', intro:data.comment ? `A equipe revisou o perfil de ${name} e pediu ajustes: ${data.comment}` : `A equipe revisou o perfil de ${name} e devolveu a publicação para ajustes.`, button:'Abrir meu perfil', url:companyUrl },
         profile_approved: { subject:`Perfil de ${name} publicado`, title:'Perfil aprovado', intro:`A revisão do perfil de ${name} foi aprovada e publicada.`, button:'Abrir meu perfil', url:companyUrl },
+        company_feedback: { subject:`Dúvida ou sugestão de ${name}`, title:'Mensagem da empresa', intro:`${data.sender_name} (${data.sender_email}), de ${name}, escreveu:\n\n${data.message}`, button:'Abrir organização', url:`${base}/painel/orgs/${encodeURIComponent(data.organization_id)}`, replyTo:data.sender_email },
         company_invitation: data.lang === 'en' ? { lang:'en', subject:`Your portfolio access | ${name}`, title:'Create your company account', intro:`The ${name} profile is ready for your review. Create a password to access it, check the information and approve publication. This invitation expires in 7 days.`, button:'Create your account', url:`${base}/company?invite=${encodeURIComponent(data.token)}`, note:'This invitation is personal and can be used only once.' }
           : { lang:'pt', subject:`Acesso ao portfólio de ${name}`, title:'Crie seu acesso de empresa', intro:`O perfil de ${name} está pronto para sua conferência. Crie sua senha para entrar, revisar os dados e aprovar a publicação. O convite expira em 7 dias.`, button:'Criar acesso', url:`${base}/empresa?invite=${encodeURIComponent(data.token)}`, note:'Este convite é individual e pode ser utilizado apenas uma vez.' },
       };
@@ -937,11 +939,21 @@ app.get('/api/me/profile-form', requireRole('company_user'), async (req, res) =>
         [draft.id, orgId, draft.kind, draft.status, jsonColumn(content), jsonColumn({})]);
     }
     await db.commit();
-    res.json({ organization: { id: org.id,name: org.name,status: org.status,public_state: org.public_state,last_approved_at: org.last_approved_at }, draft,
+    res.json({ organization: { id: org.id,name: org.name,status: org.status,public_state: org.public_state,last_approved_at: org.last_approved_at,custom_tags:org.custom_tags || [] }, draft,
       imports: imports.map(({ project_id, field, mode, previous_answer }) => ({ project_id,field,mode,previous_answer })), firstValidation,
       initialContent: firstValidation ? initialProfileSnapshot(org, projects, imports) : null });
   } catch (error) { await db.rollback();routeError(res, error); }
   finally {db.release();}
+});
+
+app.post('/api/me/feedback', requireRole('company_user'), feedbackLimiter, async (req, res) => {
+  const message = String(req.body?.message || '').trim();
+  if (message.length < 5 || message.length > 3000) return res.status(400).json({ error:'invalid_message' });
+  try {
+    await emailEvent('company_feedback', 'team', { organization_id:req.user.organization_id,
+      sender_name:req.user.name, sender_email:req.user.email, message });
+    res.status(201).json({ ok:true, queued:true });
+  } catch (error) { routeError(res,error); }
 });
 
 async function storeCompanyDraft(req, content, reviewedSteps, submitting = false) {
@@ -1012,7 +1024,7 @@ app.get('/api/team/reviews/:id', requireRole('team'), async (req, res) => {
     const org = orgs[0];
     const [projects] = await pool.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [org.id]);
     const [imports] = await pool.execute("SELECT project_id,field,previous_answer FROM form_imports WHERE organization_id=? AND mode='reference'", [org.id]);
-    res.json({ organization: { id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at }, draft,
+    res.json({ organization: { id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,custom_tags:org.custom_tags || [] }, draft,
       previous: org.public_state === 'hidden' && !org.last_approved_at ? null : profileSnapshot(org, projects), previousIsProvisional: org.public_state === 'provisional', imports });
   } catch (error) { routeError(res, error); }
 });
@@ -1055,9 +1067,32 @@ app.post('/api/team/reviews/:id/return', requireRole('team'), async (req, res) =
     res.json({ ok: true });
   } catch (error) { routeError(res, error); }
 });
+app.get('/api/team/tags', requireRole('team'), async (_req, res) => {
+  try { const [rows] = await pool.query('SELECT label FROM profile_tags ORDER BY label');res.json(rows.map((row) => row.label)); }
+  catch (error) { routeError(res,error); }
+});
+app.post('/api/team/tags', requireRole('team'), async (req, res) => {
+  const label = String(req.body?.label || '').trim().replace(/\s+/g, ' ');
+  if (!label || label.length > 80 || /[<>]/.test(label)) return res.status(400).json({ error:'invalid_tag' });
+  try { await pool.execute('INSERT INTO profile_tags (label,created_at) VALUES (?,UTC_TIMESTAMP())',[label]);res.status(201).json({ label }); }
+  catch (error) { if (error.code === 'ER_DUP_ENTRY') return res.status(409).json({ error:'duplicate_tag' });routeError(res,error); }
+});
+app.put('/api/team/organizations/:id/tags', requireRole('team'), async (req, res) => {
+  const tags = req.body?.tags;
+  if (!Array.isArray(tags) || tags.length > 30 || tags.some((tag) => typeof tag !== 'string' || tag.length > 80) || new Set(tags.map((tag) => tag.toLocaleLowerCase())).size !== tags.length) return res.status(400).json({ error:'invalid_tags' });
+  try {
+    const [catalog] = await pool.query('SELECT label FROM profile_tags');
+    const canonical = new Map(catalog.map((row) => [row.label.toLocaleLowerCase(),row.label]));
+    const selected = tags.map((tag) => canonical.get(tag.toLocaleLowerCase()));
+    if (selected.some((tag) => !tag)) return res.status(400).json({ error:'unknown_tag' });
+    const [result] = await pool.execute('UPDATE organizations SET custom_tags=? WHERE id=?',[jsonColumn(selected),req.params.id]);
+    if (!result.affectedRows) return res.status(404).json({ error:'not_found' });
+    res.json({ tags:selected });
+  } catch (error) { routeError(res,error); }
+});
 app.get('/api/team/organizations', requireRole('team'), async (_req, res) => {
   try {
-    const [orgs] = await pool.query('SELECT id,name,status,public_state,last_approved_at,last_updated_at,focal_point,invitation_email,invited_at,demo,is_featured FROM organizations ORDER BY name');
+    const [orgs] = await pool.query('SELECT id,name,status,public_state,last_approved_at,last_updated_at,focal_point,invitation_email,invited_at,demo,is_featured,custom_tags FROM organizations ORDER BY name');
     const [projects] = await pool.query('SELECT organization_id,profile_type FROM projects');
     const [settings] = await pool.execute('SELECT deadlines FROM settings WHERE id=?', ['settings']);
     const outdatedDays = settings[0]?.deadlines?.outdated_profile_alert_days ?? 120;
@@ -1090,7 +1125,7 @@ app.get('/api/team/organizations/:id/profile-form', requireRole('team'), async (
     if (!orgs.length) return res.status(404).json({ error:'not_found' });
     const [projects] = await pool.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [req.params.id]);
     const org = orgs[0];
-    res.json({ organization:{ id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,invitation_email:org.invitation_email,invited_at:org.invited_at },
+    res.json({ organization:{ id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,invitation_email:org.invitation_email,invited_at:org.invited_at,custom_tags:org.custom_tags || [] },
       draft:{ id:'team-base',status:org.public_state==='hidden' && !org.last_approved_at ? 'filling' : 'in_review',content:profileSnapshot(org,projects),reviewed_steps:{} },
       imports:[],firstValidation:false });
   } catch (error) { routeError(res,error); }

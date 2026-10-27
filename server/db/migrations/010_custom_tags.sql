@@ -1,0 +1,6 @@
+ALTER TABLE organizations ADD COLUMN custom_tags JSON NULL;
+
+CREATE TABLE IF NOT EXISTS profile_tags (
+  label VARCHAR(80) NOT NULL PRIMARY KEY,
+  created_at DATETIME NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -40,12 +40,12 @@ function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
           ${sub && html`<p class="subtitle">${sub}</p>`}
         </div>
       </div>
-      ${present(org.description) && html`<div class="profile-hero-about">
-        <div class="eyebrow">${t('block.description')}</div>
-        <p>${i18n.tx(org.description)}</p>
+      ${Boolean(present(org.description) || org.size || org.segments?.length || org.custom_tags?.length) && html`<div class="profile-hero-about">
+        ${present(org.description) && html`<div class="eyebrow">${t('block.description')}</div><p>${i18n.tx(org.description)}</p>`}
         <div class="profile-hero-tags">
           ${org.size && html`<span>${i18n.label('size', org.size)}</span>`}
           ${(org.segments || []).map((segment) => html`<span key=${segment}>${i18n.label('segments', segment)}</span>`)}
+          ${(org.custom_tags || []).map((tag) => html`<span key=${'custom-' + tag}>${tag}</span>`)}
         </div>
       </div>`}
     </div>
