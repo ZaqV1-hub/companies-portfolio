@@ -5,9 +5,9 @@ import { navigate } from '../lib/router.js';
 import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
 
 /**
- * @param {{roleLabel: string, userLabel: string, nav: {key: string, label: string, href: string, current?: boolean}[], onLogout: Function}} props
+ * @param {{roleLabel: string, userLabel: string, nav: {key: string, label: string, href: string, current?: boolean}[], onLogout: Function, onFeedback?: Function}} props
  */
-export function AppShell({ roleLabel, userLabel, nav, onLogout, children }) {
+export function AppShell({ roleLabel, userLabel, nav, onLogout, onFeedback, children }) {
   const { t, lang } = useI18n();
   const initials = userLabel.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('');
   return html`<div class="shell">
@@ -20,6 +20,11 @@ export function AppShell({ roleLabel, userLabel, nav, onLogout, children }) {
         <a key=${n.key} href=${n.href} aria-current=${n.current ? 'page' : null}
           onClick=${(event) => { if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); navigate(n.href); } }}>${n.label}${n.badge ? html` <span class="nav-badge">${n.badge}</span>` : null}</a>`)}
       </nav>
+      ${onFeedback && html`<section class="sidebar-help" aria-labelledby="sidebar-help-title">
+        <div class="sidebar-help-head"><span class="sidebar-help-icon" aria-hidden="true">?</span><h2 id="sidebar-help-title">${lang === 'pt' ? 'Dúvidas ou sugestões?' : 'Questions or suggestions?'}</h2></div>
+        <p>${lang === 'pt' ? 'Fale direto com a equipe da Abiquifi.' : 'Talk directly to the Abiquifi team.'}</p>
+        <button type="button" onClick=${onFeedback}>${lang === 'pt' ? 'Enviar mensagem' : 'Send a message'}</button>
+      </section>`}
       <div class="sidebar-foot">
         <div class="sidebar-partners"><span>${lang === 'en' ? 'Partners' : 'Realização'}</span><div>
           <img src="assets/img/apexbrasil-negative.png" alt="ApexBrasil" />

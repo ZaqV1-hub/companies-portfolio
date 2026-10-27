@@ -893,7 +893,7 @@ async function deliverOutbox() {
         profile_accepted: { subject:`${name} aceitou o perfil inicial`, title:'Perfil inicial aceito', intro:`${name} aceitou o perfil inicial sem alterações e a página foi publicada.`, button:'Ver organizações', url:`${base}/painel/orgs` },
         profile_returned: { subject:`Revisão do perfil de ${name}`, title:'Perfil devolvido para ajustes', intro:data.comment ? `A equipe revisou o perfil de ${name} e pediu ajustes: ${data.comment}` : `A equipe revisou o perfil de ${name} e devolveu a publicação para ajustes.`, button:'Abrir meu perfil', url:companyUrl },
         profile_approved: { subject:`Perfil de ${name} publicado`, title:'Perfil aprovado', intro:`A revisão do perfil de ${name} foi aprovada e publicada.`, button:'Abrir meu perfil', url:companyUrl },
-        company_feedback: { subject:`Dúvida ou sugestão de ${name}`, title:'Mensagem da empresa', intro:`${data.sender_name} (${data.sender_email}), de ${name}, escreveu:\n\n${data.message}`, button:'Abrir organização', url:`${base}/painel/orgs/${encodeURIComponent(data.organization_id)}`, replyTo:data.sender_email },
+        company_feedback: { subject:`${({question:'Dúvida',suggestion:'Sugestão',profile_update:'Atualização do perfil',dashboard_issue:'Problema no painel'})[data.type] || 'Mensagem'} de ${name}${data.subject ? `: ${data.subject}` : ''}`, title:'Mensagem da empresa', intro:`${data.sender_name} (${data.sender_email}), de ${name}, enviou uma mensagem.\nTipo: ${({question:'Dúvida',suggestion:'Sugestão',profile_update:'Atualização do perfil',dashboard_issue:'Problema no painel'})[data.type] || 'Mensagem'}\nE-mail para resposta: ${data.reply_email || data.sender_email}${data.subject ? `\nAssunto: ${data.subject}` : ''}\n\n${data.message}`, button:'Abrir organização', url:`${base}/painel/orgs/${encodeURIComponent(data.organization_id)}`, replyTo:data.reply_email || data.sender_email },
         company_invitation: data.lang === 'en' ? { lang:'en', subject:`Your portfolio access | ${name}`, title:'Create your company account', intro:`The ${name} profile is ready for your review. Create a password to access it, check the information and approve publication. This invitation expires in 7 days.`, button:'Create your account', url:`${base}/company?invite=${encodeURIComponent(data.token)}`, note:'This invitation is personal and can be used only once.' }
           : { lang:'pt', subject:`Acesso ao portfólio de ${name}`, title:'Crie seu acesso de empresa', intro:`O perfil de ${name} está pronto para sua conferência. Crie sua senha para entrar, revisar os dados e aprovar a publicação. O convite expira em 7 dias.`, button:'Criar acesso', url:`${base}/empresa?invite=${encodeURIComponent(data.token)}`, note:'Este convite é individual e pode ser utilizado apenas uma vez.' },
       };
@@ -947,11 +947,14 @@ app.get('/api/me/profile-form', requireRole('company_user'), async (req, res) =>
 });
 
 app.post('/api/me/feedback', requireRole('company_user'), feedbackLimiter, async (req, res) => {
+  const type = String(req.body?.type || 'question');
+  const subject = String(req.body?.subject || '').trim();
   const message = String(req.body?.message || '').trim();
-  if (message.length < 5 || message.length > 3000) return res.status(400).json({ error:'invalid_message' });
+  const replyEmail = String(req.body?.replyEmail || req.user.email || '').trim();
+  if (!['question','suggestion','profile_update','dashboard_issue'].includes(type) || subject.length > 160 || message.length < 5 || message.length > 2000 || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(replyEmail)) return res.status(400).json({ error:'invalid_feedback' });
   try {
     await emailEvent('company_feedback', 'team', { organization_id:req.user.organization_id,
-      sender_name:req.user.name, sender_email:req.user.email, message });
+      sender_name:req.user.name, sender_email:req.user.email, reply_email:replyEmail, type, subject, message });
     res.status(201).json({ ok:true, queued:true });
   } catch (error) { routeError(res,error); }
 });

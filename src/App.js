@@ -1,12 +1,12 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261026-tags-feedback1';
+import * as api from './services/api.js?v=20261027-company-help1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261026-layout2';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-verify-tabs1';
-import { AppShell } from './components/AppShell.js?v=20261026-tags-feedback1';
-import { CompanyFeedbackModal } from './components/CompanyFeedbackModal.js';
+import { AppShell } from './components/AppShell.js?v=20261027-company-help1';
+import { CompanyFeedbackModal } from './components/CompanyFeedbackModal.js?v=20261027-company-help1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261026-profile-layout3';
 import { LoginPage } from './pages/LoginPage.js?v=20261026-layout2';
@@ -45,14 +45,13 @@ function NotFound() {
 }
 
 function CompanyArea({ user, route, onLogout }) {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const section = route.parts[1] || 'contacts';
   const nav = [
     { key: 'contacts', label: 'CRM', href: href('/company/contacts') },
     { key: 'profile', label: t('app.nav_profile'), href: href('/company/profile') },
     { key: 'public', label: t('app.nav_view_public'), href: href('/company/preview') },
-    { key: 'feedback', label: lang === 'pt' ? 'Mande suas dúvidas ou sugestões' : 'Send us your questions or suggestions', onClick: () => setFeedbackOpen(true) },
   ].map((n) => ({ ...n, current: n.key === section }));
   let content;
   if (section === 'profile') {
@@ -66,7 +65,7 @@ function CompanyArea({ user, route, onLogout }) {
   } else {
     content = html`<${NotFound} />`;
   }
-  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
+  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
 }
 
 function TeamArea({ user, route, onLogout }) {
