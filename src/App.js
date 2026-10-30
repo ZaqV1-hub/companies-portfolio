@@ -48,6 +48,11 @@ function NotFound() {
 function CompanyArea({ user, route, onLogout }) {
   const { t } = useI18n();
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const [companyName, setCompanyName] = useState(user.organization_name || '');
+  useEffect(() => {
+    if (user.organization_name) { setCompanyName(user.organization_name); return; }
+    api.getCurrentUser().then((current) => setCompanyName(current?.organization_name || '')).catch(() => {});
+  }, [user.id, user.organization_name]);
   const section = route.parts[1] || 'contacts';
   const nav = [
     { key: 'contacts', label: 'CRM', href: href('/company/contacts') },
@@ -66,7 +71,7 @@ function CompanyArea({ user, route, onLogout }) {
   } else {
     content = html`<${NotFound} />`;
   }
-  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
+  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${companyName || t('app.company_role')} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
 }
 
 function TeamArea({ user, route, onLogout }) {
