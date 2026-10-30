@@ -955,6 +955,16 @@ async function deliverOutbox() {
           : { lang:'pt', subject:`Confirme o e-mail da empresa | ${name}`, title:'Confirme seu e-mail', intro:`Confirme seu e-mail empresarial para concluir o cadastro de ${name}. Depois, preencha o perfil e envie a inscrição para análise da Abiquifi. A empresa não será publicada automaticamente. O link expira em 24 horas.`, button:'Confirmar e-mail', url:`${base}/empresa/confirmar-email?token=${encodeURIComponent(data.token)}` },
       };
       const message = templates[item.template];
+      if (message && item.template === 'company_feedback') {
+        message.intro = `${name} enviou uma mensagem à equipe da Abiquifi.`;
+        message.fields = [['Empresa',name],['Enviado por',data.sender_name],['E-mail para resposta',data.reply_email || data.sender_email],['Tipo',({question:'Dúvida',suggestion:'Sugestão',profile_update:'Atualização do perfil',dashboard_issue:'Problema no painel'})[data.type] || 'Mensagem'],['Assunto',data.subject]];
+        message.message = data.message;
+      }
+      if (message && ['profile_returned','profile_rejected'].includes(item.template)) {
+        message.intro = item.template === 'profile_returned' ? `A Abiquifi revisou o perfil de ${name} e solicitou ajustes. Confira as considerações abaixo e atualize seu perfil.` : `A Abiquifi analisou a inscrição de ${name} e não a aprovou. Confira o motivo abaixo.`;
+        message.messageLabel = 'Considerações da Abiquifi';
+        message.message = data.comment;
+      }
       if (message && ['profile_returned','profile_rejected','profile_approved','company_invitation','company_signup_verify'].includes(item.template))
         message.replyTo = process.env.TEAM_NOTIFICATION_EMAIL?.trim() || 'investment@abiquifi.org.br';
       if (!message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(item.to)) {
