@@ -65,6 +65,7 @@ button { font-family: var(--font-body); }
 .topbar-partners .topbar-apex { height: 28px; }
 .topbar-partners .topbar-abiquifi { height: 23px; }
 .topbar-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-left: auto; }
+.topbar-company-cta { white-space: nowrap; }
 .lang-switch { display: inline-flex; border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; }
 .lang-switch button { border: none; background: #fff; color: var(--muted); font-weight: 800; font-size: 12px; padding: 9px 11px; cursor: pointer; letter-spacing: 0.4px; }
 .lang-switch button { display: inline-flex; align-items: center; gap: 6px; }
@@ -756,6 +757,9 @@ a.profile-fact-value { display: inline-block; border-bottom: 2px solid var(--lim
 .legal-copy { color: var(--text-2); font-size: 14px; line-height: 1.65; }
 .legal-copy p { margin: 0 0 1em; }
 .auth-switch { font-size: 13px; color: var(--muted); margin: 0; }
+.auth-company-entry { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-top: 4px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--text-2); font-size: 13px; }
+.auth-company-entry .btn { display: inline-flex; align-items: center; }
+@media (max-width: 600px) { .topbar-company-cta { display: none; } }
 .link-accent { color: var(--accent); font-weight: 800; }
 .verify { align-items: flex-start; }
 .verify-icon { font-size: 34px; }

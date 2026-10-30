@@ -20,7 +20,7 @@ export function TopBar({ investor, onInvestorAccess, onLogout }) {
         <${LangSwitch} />
         ${investor
           ? html`<a class="investor-chip" href=${href('/investidor')}>${t('investor.hello', { name:investor.name.split(' ')[0] })}</a><button class="btn btn-outline" onClick=${onLogout}>${t('common.log_out')}</button>`
-          : html`<button class="btn btn-lime" onClick=${onInvestorAccess}>${t('topbar.investor_access')}</button>`}
+          : html`<a class="btn btn-outline topbar-company-cta" href=${href('/company/signup')}>${lang === 'pt' ? 'Cadastre sua empresa' : 'Add your company'}</a><button class="btn btn-lime" onClick=${onInvestorAccess}>${t('topbar.investor_access')}</button>`}
       </nav>
     </header>`;
 }

@@ -2,6 +2,7 @@
 import { html, useState } from '../lib/html.js';
 import * as api from '../services/api.js?v=20261021-investor1';
 import { useI18n } from '../lib/i18n.js';
+import { href } from '../lib/router.js';
 import { CountryControl, StateControl } from './InvestorLocationFields.js?v=20261022-investor-form1';
 import { formatPhoneInput } from '../lib/phone.js?v=20261022-phone1';
 
@@ -108,7 +109,7 @@ function AccountStart({ switchTo, onStarted, openLegal }) {
 }
 
 function Welcome({ switchTo, onGuest }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [data, setData] = useState({ name:'',company:'',email:'' });
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -128,6 +129,7 @@ function Welcome({ switchTo, onGuest }) {
     <button class="btn btn-lime btn-xl" type="submit" disabled=${busy}>${t('investor.browse_24h')}</button>
     <p class="auth-switch">${t('investor.have_account')} <button type="button" class="btn-link link-accent" onClick=${() => switchTo('login')}>${t('investor.log_in')}</button></p>
     <p class="auth-switch">${t('investor.want_account')} <button type="button" class="btn-link link-accent" onClick=${() => switchTo('account')}>${t('investor.create_account')}</button></p>
+    <div class="auth-company-entry"><span>${lang === 'pt' ? 'Representa uma empresa?' : 'Representing a company?'}</span><a class="btn btn-outline" href=${href('/company/signup')}>${lang === 'pt' ? 'Cadastre sua empresa' : 'Add your company'}</a></div>
   </form>`;
 }
 
