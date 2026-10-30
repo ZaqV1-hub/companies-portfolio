@@ -16,6 +16,9 @@ export function CompanySignupPage() {
   const [busy,setBusy] = useState(false);
   const [sent,setSent] = useState(false);
   const [error,setError] = useState('');
+  const [submitted,setSubmitted] = useState(false);
+  const [touched,setTouched] = useState({});
+  const touch = (field) => setTouched((current)=>({...current,[field]:true}));
   const rules = [
     [pt ? 'Entre 10 e 128 caracteres' : 'Between 10 and 128 characters',password.length >= 10 && password.length <= 128],
     [pt ? 'Uma letra maiúscula' : 'One uppercase letter',/\p{Lu}/u.test(password)],
@@ -24,8 +27,17 @@ export function CompanySignupPage() {
   ];
   const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const freeEmail = /@(gmail|googlemail|outlook|hotmail|live|yahoo|icloud|aol|proton)\./i.test(email);
+  const errors = {
+    company:company.trim().length < 2 ? (pt ? 'Informe o nome da empresa, com pelo menos 2 caracteres.' : 'Enter the company name, using at least 2 characters.') : '',
+    name:name.trim().length < 2 ? (pt ? 'Informe seu nome, com pelo menos 2 caracteres.' : 'Enter your name, using at least 2 characters.') : '',
+    email:!emailValid ? (pt ? 'Informe um e-mail válido, como nome@empresa.com.br.' : 'Enter a valid email, such as name@company.com.') : freeEmail ? (pt ? 'Use o e-mail da sua empresa. E-mails pessoais, como Gmail ou Outlook, não são aceitos neste cadastro.' : 'Use your company email. Personal addresses such as Gmail or Outlook are not accepted here.') : '',
+    password:!rules.every(([,ok])=>ok) ? (pt ? 'A senha precisa cumprir todos os requisitos abaixo.' : 'Your password must meet all the requirements below.') : '',
+    confirm:!confirm ? (pt ? 'Confirme sua senha.' : 'Confirm your password.') : confirm !== password ? (pt ? 'As senhas não coincidem. Digite a mesma senha nos dois campos.' : 'Passwords do not match. Enter the same password in both fields.') : '',
+  };
+  const visible = (field) => (submitted || touched[field] || (field === 'email' && email) || (field === 'confirm' && confirm)) ? errors[field] : '';
+  const message = (field) => visible(field) && html`<small class="field-error" role="status">${visible(field)}</small>`;
   const submit = async (event) => {
-    event.preventDefault();setError('');
+    event.preventDefault();setError('');setSubmitted(true);
     if (company.trim().length < 2 || name.trim().length < 2 || !emailValid || freeEmail || !rules.every(([,ok])=>ok) || confirm !== password || !terms || !privacy) {
       setError(pt ? 'Confira os campos, use um e-mail empresarial e aceite os termos antes de continuar.' : 'Check the fields, use a business email and accept the terms before continuing.');
       return;
@@ -39,14 +51,15 @@ export function CompanySignupPage() {
     <div class="split-form"><div class="split-form-inner"><div class="kicker">${pt ? 'INSCRIÇÃO DE EMPRESA' : 'COMPANY APPLICATION'}</div><h1 class="form-title">${pt ? 'Cadastre sua empresa' : 'Add your company'}</h1>
       ${sent ? html`<div class="notice" role="status"><strong>${pt ? 'Confira seu e-mail' : 'Check your email'}</strong><p>${pt ? 'Enviamos um link para confirmar o e-mail empresarial. Depois, preencha o perfil e envie a inscrição para análise da Abiquifi.' : 'We sent a link to confirm your business email. Then complete your profile and submit the application for Abiquifi review.'}</p></div>` : html`<form class="stack company-signup-form" noValidate=${true} onSubmit=${submit}>
         <p class="form-subtitle">${pt ? 'A inscrição depende de aprovação da Abiquifi. Sua empresa só aparecerá no portfólio após essa análise.' : 'Your application requires Abiquifi approval. Your company will only appear in the portfolio after review.'}</p>
-        <label><span class="field-label">${pt ? 'Nome da empresa' : 'Company name'} *</span><input class="input input-sm" value=${company} maxLength="80" onInput=${(e)=>setCompany(e.target.value)} /></label>
-        <label><span class="field-label">${pt ? 'Seu nome' : 'Your name'} *</span><input class="input input-sm" value=${name} maxLength="200" autocomplete="name" onInput=${(e)=>setName(e.target.value)} /></label>
-        <label><span class="field-label">${pt ? 'E-mail empresarial' : 'Business email'} *</span><input class=${`input input-sm${email && (!emailValid || freeEmail) ? ' invalid' : ''}`} type="email" value=${email} autocomplete="email" onInput=${(e)=>setEmail(e.target.value)} /></label>
-        <label><span class="field-label">${pt ? 'Criar senha' : 'Create password'} *</span><input class="input input-sm" type="password" value=${password} autocomplete="new-password" onInput=${(e)=>setPassword(e.target.value)} /></label>
+        <label><span class="field-label">${pt ? 'Nome da empresa' : 'Company name'} *</span><input class=${`input input-sm${visible('company') ? ' invalid' : ''}`} aria-invalid=${!!visible('company')} value=${company} maxLength="80" onBlur=${()=>touch('company')} onInput=${(e)=>setCompany(e.target.value)} />${message('company')}</label>
+        <label><span class="field-label">${pt ? 'Seu nome' : 'Your name'} *</span><input class=${`input input-sm${visible('name') ? ' invalid' : ''}`} aria-invalid=${!!visible('name')} value=${name} maxLength="200" autocomplete="name" onBlur=${()=>touch('name')} onInput=${(e)=>setName(e.target.value)} />${message('name')}</label>
+        <label><span class="field-label">${pt ? 'E-mail empresarial' : 'Business email'} *</span><input class=${`input input-sm${visible('email') ? ' invalid' : ''}`} aria-invalid=${!!visible('email')} type="email" value=${email} autocomplete="email" onBlur=${()=>touch('email')} onInput=${(e)=>setEmail(e.target.value)} />${message('email')}</label>
+        <label><span class="field-label">${pt ? 'Criar senha' : 'Create password'} *</span><input class=${`input input-sm${visible('password') ? ' invalid' : ''}`} aria-invalid=${!!visible('password')} type="password" value=${password} autocomplete="new-password" onBlur=${()=>touch('password')} onInput=${(e)=>setPassword(e.target.value)} />${message('password')}</label>
         <ul class="auth-password-rules">${rules.map(([label,ok])=>html`<li class=${ok ? 'met' : password ? 'unmet' : ''}>${label}</li>`)}</ul>
-        <label><span class="field-label">${pt ? 'Confirmar senha' : 'Confirm password'} *</span><input class=${`input input-sm${confirm && confirm !== password ? ' invalid' : ''}${confirm && confirm === password ? ' valid' : ''}`} type="password" value=${confirm} autocomplete="new-password" onInput=${(e)=>setConfirm(e.target.value)} /></label>
+        <label><span class="field-label">${pt ? 'Confirmar senha' : 'Confirm password'} *</span><input class=${`input input-sm${visible('confirm') ? ' invalid' : ''}${confirm && confirm === password ? ' valid' : ''}`} aria-invalid=${!!visible('confirm')} type="password" value=${confirm} autocomplete="new-password" onBlur=${()=>touch('confirm')} onInput=${(e)=>setConfirm(e.target.value)} />${message('confirm')}</label>
         <label class="check-line"><input type="checkbox" checked=${terms} onChange=${(e)=>setTerms(e.target.checked)} />${pt ? 'Aceito os' : 'I accept the'} <a href=${href('/legal/terms')} target="_blank">${pt ? 'Termos de uso' : 'Terms of use'}</a></label>
         <label class="check-line"><input type="checkbox" checked=${privacy} onChange=${(e)=>setPrivacy(e.target.checked)} />${pt ? 'Aceito a' : 'I accept the'} <a href=${href('/legal/privacy')} target="_blank">${pt ? 'Política de privacidade' : 'Privacy policy'}</a></label>
+        ${submitted && (!terms || !privacy) && html`<small class="field-error" role="status">${pt ? 'Aceite os Termos de uso e a Política de privacidade para continuar.' : 'Accept the Terms of use and Privacy policy to continue.'}</small>`}
         ${error && html`<div class="form-error" role="alert">${error}</div>`}
         <button class="btn btn-lime btn-xl" type="submit" disabled=${busy}>${busy ? (pt ? 'Enviando...' : 'Sending...') : (pt ? 'Criar conta para análise' : 'Create account for review')}</button>
         <a class="btn-link" href=${href('/company/login')}>${pt ? 'Já tem acesso? Entrar' : 'Already have access? Sign in'}</a>
