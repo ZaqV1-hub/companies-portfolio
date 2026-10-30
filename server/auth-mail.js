@@ -1,8 +1,10 @@
 import nodemailer from 'nodemailer';
 
 export function mailAvailable() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_FROM && process.env.PUBLIC_ORIGIN
-    && (!process.env.SMTP_USER || process.env.SMTP_PASSWORD));
+  const official = 'investment@abiquifi.org.br';
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.PUBLIC_ORIGIN && process.env.SMTP_PASSWORD
+    && String(process.env.SMTP_FROM || '').trim().toLowerCase() === official
+    && String(process.env.SMTP_USER || '').trim().toLowerCase() === official);
 }
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);

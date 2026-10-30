@@ -1,4 +1,5 @@
 import { createPool } from './connection.js';
+import { mailAvailable } from '../auth-mail.js';
 
 const pool = createPool();
 try {
@@ -17,7 +18,7 @@ try {
   `, Array(5).fill(recipient));
   const status = rows[0];
   console.log('Review mail status:', JSON.stringify(status));
-  console.log('SMTP configured:', Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_FROM && process.env.PUBLIC_ORIGIN));
+  console.log('SMTP configured:', mailAvailable());
 } finally {
   await pool.end();
 }
