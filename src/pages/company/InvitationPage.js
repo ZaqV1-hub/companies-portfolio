@@ -1,5 +1,5 @@
 import { html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261026-company-invite1';
+import * as api from '../../services/api.js?v=20261030-intake1';
 import { useI18n } from '../../lib/i18n.js';
 import { navigate } from '../../lib/router.js';
 
@@ -39,11 +39,11 @@ export function InvitationPage({ token, onLoggedIn }) {
     } catch (e) { setError(e.message === 'email_has_account' ? (pt ? 'Este e-mail já tem uma conta. Entre com sua senha.' : 'This email already has an account. Sign in with your password.') : (pt ? 'Não foi possível criar o acesso. Confira os dados e tente novamente.' : 'Could not create your account. Check the details and try again.')); }
     finally { setBusy(false); }
   };
-  return html`<div class="split"><div class="split-brand invitation-brand"><div class="split-brand-top"><img class="split-program-logo" src="assets/img/bph-program-negative.png" alt="Brazilian Pharma & Health" /></div><div class="split-brand-message"><h2>${pt ? 'Seu perfil no portfólio' : 'Your portfolio profile'}</h2><p>${pt ? 'Confira as informações da empresa e publique seu perfil.' : 'Review your company information and publish your profile.'}</p><div class="split-partners"><span>${pt ? 'Realização' : 'Partners'}</span><div><img src="assets/img/apexbrasil-negative.png" alt="ApexBrasil" /><img src="assets/img/abiquifi-negative.png" alt="Abiquifi" /></div></div></div></div>
+  return html`<div class="split"><div class="split-brand invitation-brand"><div class="split-brand-top"><img class="split-program-logo" src="assets/img/bph-program-negative.png" alt="Brazilian Pharma & Health" /></div><div class="split-brand-message"><h2>${pt ? 'Sua inscrição no portfólio' : 'Your portfolio application'}</h2><p>${pt ? 'Monte seu perfil e envie para análise da Abiquifi. A publicação depende de aprovação.' : 'Build your profile and submit it for Abiquifi approval. Publication is not automatic.'}</p><div class="split-partners"><span>${pt ? 'Realização' : 'Partners'}</span><div><img src="assets/img/apexbrasil-negative.png" alt="ApexBrasil" /><img src="assets/img/abiquifi-negative.png" alt="Abiquifi" /></div></div></div></div>
     <div class="split-form"><form class="split-form-inner" noValidate=${true} onSubmit=${submit}>
       <div class="kicker">${pt ? 'CONVITE DA EMPRESA' : 'COMPANY INVITATION'}</div>
       <h1 class="form-title">${pt ? 'Crie seu acesso' : 'Create your account'}</h1>
-      ${invitation ? html`<p class="form-subtitle">${invitation.name}</p><div class="stack">
+      ${invitation ? html`<p class="form-subtitle">${invitation.name}. ${pt ? 'Depois de criar sua conta, preencha o perfil e envie a inscrição para análise da Abiquifi.' : 'After creating your account, complete the profile and submit it for Abiquifi review.'}</p><div class="stack">
         <label><span class="field-label">${pt ? 'E-mail' : 'Email'}</span><input class="input input-sm" value=${invitation.email} disabled /></label>
         <label class=${`auth-field${visible('name') ? ' has-error' : ''}${valid('name') ? ' is-valid' : ''}`}><span class="field-label">${pt ? 'Seu nome' : 'Your name'} *</span><input class="input input-sm" autocomplete="name" aria-invalid=${Boolean(visible('name'))} value=${name} onInput=${(e) => setName(e.target.value)} onBlur=${() => touch('name')} />${visible('name') && html`<small class="field-error" role="status">${visible('name')}</small>`}</label>
         <label class=${`auth-field${visible('password') ? ' has-error' : ''}${valid('password') ? ' is-valid' : ''}`}><span class="field-label">${pt ? 'Criar senha' : 'Create password'} *</span><input class="input input-sm" type="password" autocomplete="new-password" aria-invalid=${Boolean(visible('password'))} value=${password} onInput=${(e) => setPassword(e.target.value)} onFocus=${() => touch('password')} />

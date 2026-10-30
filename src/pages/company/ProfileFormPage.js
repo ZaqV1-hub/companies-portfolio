@@ -1,7 +1,7 @@
 // Company area · step-by-step profile form (spec 1, sections 4.2 and 5).
 // Steps: Organization → one per project → Leadership → Images → Preview & submit.
 import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261026-accept-initial1';
+import * as api from '../../services/api.js?v=20261030-intake1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
@@ -93,7 +93,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const steps = useMemo(() => (content ? formSteps(content) : []), [content]);
   if (!data || !content) return html`<div>${t('common.loading')}</div>`;
 
-  const locked = data.draft.status === 'in_review';
+  const locked = ['in_review','rejected'].includes(data.draft.status);
   const unchangedInitial = !teamOrgId && data.firstValidation && JSON.stringify(content) === JSON.stringify(data.initialContent);
   const saveDraft = () => teamOrgId ? api.saveTeamOrganizationForm(teamOrgId, content) : api.saveMyProfileDraft(content, reviewed);
   const stepIndex = Math.max(0, steps.findIndex((s) => s.id === stepParam));
@@ -155,7 +155,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const submit = async () => {
     setShowErrors(true);
     const res = await api.submitMyProfileForReview(content, reviewed);
-    if (res.ok) { clearCompanyPreview(); await load(); setToast(t('form.submitted')); }
+    if (res.ok) { clearCompanyPreview(); await load(); setToast(i18n.lang === 'pt' ? 'Sua inscrição foi enviada para análise da Abiquifi.' : 'Your application was submitted for Abiquifi review.'); }
   };
   const acceptInitial = async () => {
     if (acceptBusy) return;
@@ -195,6 +195,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     const stepById = Object.fromEntries(steps.map((s) => [s.id, s]));
     body = html`<${Preview} orgMeta=${data.organization} content=${content} />
       <div class="submit-box">
+        ${!teamOrgId && data.organization.intake_mode !== 'legacy' && html`<div class="notice">${i18n.lang === 'pt' ? 'Antes de enviar: sua inscrição será analisada pela Abiquifi. O perfil só aparecerá no portfólio após aprovação.' : 'Before submitting: Abiquifi will review your application. The profile will only appear in the portfolio after approval.'}</div>`}
         ${unchangedInitial && !locked && html`<div class="notice">${i18n.lang === 'pt' ? 'Os dados iniciais estão prontos para sua aprovação. Se você não alterar nada, pode publicar diretamente.' : 'The initial profile is ready for your approval. You can publish it directly without changes.'}</div>
           <button type="button" class="btn btn-lime btn-xl" disabled=${acceptBusy} onClick=${acceptInitial}>${acceptBusy ? (i18n.lang === 'pt' ? 'Publicando...' : 'Publishing...') : (i18n.lang === 'pt' ? 'Aceitar e publicar' : 'Accept and publish')}</button>
           ${acceptError && html`<div class="form-error" role="alert">${acceptError}</div>`}`}
@@ -225,7 +226,8 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
       </div>
       ${!locked && (teamOrgId ? html`<div class="team-draft-actions"><div class="team-draft-recipient">${i18n.lang === 'pt' ? 'Convite para' : 'Invitation to'} <strong>${data.organization.invitation_email || '—'}</strong></div><div class="review-actions"><button type="button" class="btn btn-outline btn-lg" disabled=${inviteBusy} onClick=${save}>${i18n.lang === 'pt' ? 'Salvar sem enviar' : 'Save without sending'}</button><button type="button" class="btn btn-lime btn-lg" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${() => { setInviteNotice(null); setInviteOpen(true); }}>${i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation'}</button></div></div>` : html`<button type="button" class="btn btn-outline btn-lg" onClick=${save}>${t('form.save_draft')}</button>`)}
     </div>
-    ${locked && html`<div class="notice">${t('form.locked_review')}</div>`}
+    ${data.draft.status === 'in_review' && html`<div class="notice">${t('form.locked_review')}</div>`}
+    ${data.draft.status === 'rejected' && html`<div class="notice warn" role="status"><strong>${i18n.lang === 'pt' ? 'Inscrição recusada pela Abiquifi.' : 'Application rejected by Abiquifi.'}</strong> ${data.draft.review_comment}</div>`}
     ${data.draft.status === 'returned' && data.draft.review_comment && html`<div class="notice warn"><strong>${t('form.returned')}</strong> ${data.draft.review_comment}
       ${data.draft.reviewed_at && html`<small> (${formatDate(data.draft.reviewed_at, i18n.lang)})</small>`}</div>`}
     ${toast && html`<div class="toast" role="status">${toast}</div>`}

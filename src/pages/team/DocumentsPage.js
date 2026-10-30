@@ -1,16 +1,18 @@
 import { html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261014-documents1';
+import * as api from '../../services/api.js?v=20261030-intake1';
 import { useI18n } from '../../lib/i18n.js';
 
 function DocumentRow({ document, onChanged }) {
   const { t, lang } = useI18n();
   const [titlePt,setTitlePt] = useState(document.title_pt);
   const [titleEn,setTitleEn] = useState(document.title_en);
+  const [language,setLanguage] = useState(document.language || 'pt');
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState('');
+  const validTitles = (language === 'en' || titlePt.trim()) && (language === 'pt' || titleEn.trim());
   const save = async (published) => {
     setBusy(true); setError('');
-    try { await api.updateDocument(document.id,{title_pt:titlePt,title_en:titleEn,published}); await onChanged(); }
+    try { await api.updateDocument(document.id,{title_pt:titlePt,title_en:titleEn,language,published}); await onChanged(); }
     catch { setError(t('documents.error')); }
     finally { setBusy(false); }
   };
@@ -26,11 +28,12 @@ function DocumentRow({ document, onChanged }) {
       <label class="crm-field"><span class="field-label">${t('documents.title_pt')}</span><input class="input input-sm" maxlength="160" value=${titlePt} onInput=${(e)=>setTitlePt(e.target.value)} /></label>
       <label class="crm-field"><span class="field-label">${t('documents.title_en')}</span><input class="input input-sm" maxlength="160" value=${titleEn} onInput=${(e)=>setTitleEn(e.target.value)} /></label>
     </div>
+    <label class="crm-field"><span class="field-label">${lang === 'pt' ? 'Disponível em' : 'Available in'}</span><select class="input input-sm" value=${language} onChange=${(e)=>setLanguage(e.target.value)}><option value="pt">${lang === 'pt' ? 'Português' : 'Portuguese'}</option><option value="en">${lang === 'pt' ? 'Inglês' : 'English'}</option><option value="both">${lang === 'pt' ? 'Ambos' : 'Both'}</option></select></label>
     ${error && html`<p class="field-error" role="alert">${error}</p>`}
     <div class="document-actions">
       <a class="btn btn-outline" href=${`/api/team/documents/${document.id}/file`} target="_blank" rel="noopener">${t('documents.view')}</a>
-      <button class="btn btn-outline" type="button" disabled=${busy || !titlePt.trim() || !titleEn.trim()} onClick=${()=>save(document.published)}>${t('documents.save')}</button>
-      <button class="btn btn-lime" type="button" disabled=${busy || !titlePt.trim() || !titleEn.trim()} onClick=${()=>save(!document.published)}>${t(document.published ? 'documents.unpublish' : 'documents.publish')}</button>
+      <button class="btn btn-outline" type="button" disabled=${busy || !validTitles} onClick=${()=>save(document.published)}>${t('documents.save')}</button>
+      <button class="btn btn-lime" type="button" disabled=${busy || !validTitles} onClick=${()=>save(!document.published)}>${t(document.published ? 'documents.unpublish' : 'documents.publish')}</button>
       <button class="btn-link" type="button" disabled=${busy} onClick=${remove}>${t('documents.delete')}</button>
     </div>
   </article>`;
@@ -41,6 +44,7 @@ export function DocumentsPage() {
   const [documents,setDocuments] = useState(null);
   const [titlePt,setTitlePt] = useState('');
   const [titleEn,setTitleEn] = useState('');
+  const [language,setLanguage] = useState('pt');
   const [file,setFile] = useState(null);
   const [busy,setBusy] = useState(false);
   const [error,setError] = useState('');
@@ -48,9 +52,9 @@ export function DocumentsPage() {
   useEffect(() => { load().catch(()=>setError(t('documents.error'))); }, []);
   const upload = async (event) => {
     event.preventDefault();
-    if (!file || !titlePt.trim() || !titleEn.trim()) return;
+    if (!file || (language !== 'en' && !titlePt.trim()) || (language !== 'pt' && !titleEn.trim())) return;
     setBusy(true); setError('');
-    try { await api.uploadDocument(file,titlePt.trim(),titleEn.trim()); setTitlePt(''); setTitleEn(''); setFile(null); event.target.reset(); await load(); }
+    try { await api.uploadDocument(file,titlePt.trim(),titleEn.trim(),language); setTitlePt(''); setTitleEn(''); setLanguage('pt'); setFile(null); event.target.reset(); await load(); }
     catch { setError(t('documents.error')); }
     finally { setBusy(false); }
   };
@@ -62,9 +66,10 @@ export function DocumentsPage() {
       <form onSubmit=${upload} class="document-upload">
         <label class="document-file-picker"><input type="file" accept="application/pdf,.pdf" required onChange=${(e)=>setFile(e.target.files[0]||null)} /><span class="document-file-picker-title">${file ? file.name : (lang === 'pt' ? 'Escolher arquivo PDF' : 'Choose PDF file')}</span><span class="document-file-picker-hint">${file ? `${(file.size / 1048576).toFixed(1)} MB` : t('documents.limit')}</span></label>
         <div class="crm-grid">
-          <label class="crm-field"><span class="field-label">${t('documents.title_pt')}</span><input class="input input-sm" required maxlength="160" value=${titlePt} onInput=${(e)=>setTitlePt(e.target.value)} /></label>
-          <label class="crm-field"><span class="field-label">${t('documents.title_en')}</span><input class="input input-sm" required maxlength="160" value=${titleEn} onInput=${(e)=>setTitleEn(e.target.value)} /></label>
+          <label class="crm-field"><span class="field-label">${t('documents.title_pt')}</span><input class="input input-sm" required=${language !== 'en'} maxlength="160" value=${titlePt} onInput=${(e)=>setTitlePt(e.target.value)} /></label>
+          <label class="crm-field"><span class="field-label">${t('documents.title_en')}</span><input class="input input-sm" required=${language !== 'pt'} maxlength="160" value=${titleEn} onInput=${(e)=>setTitleEn(e.target.value)} /></label>
         </div>
+        <label class="crm-field"><span class="field-label">${lang === 'pt' ? 'Disponível em' : 'Available in'}</span><select class="input input-sm" value=${language} onChange=${(e)=>setLanguage(e.target.value)}><option value="pt">${lang === 'pt' ? 'Português' : 'Portuguese'}</option><option value="en">${lang === 'pt' ? 'Inglês' : 'English'}</option><option value="both">${lang === 'pt' ? 'Ambos' : 'Both'}</option></select></label>
         ${error && html`<p class="field-error" role="alert">${error}</p>`}
         <button class="btn btn-lime btn-lg" type="submit" disabled=${busy || !file}>${busy ? (lang === 'pt' ? 'Enviando...' : 'Uploading...') : t('documents.upload')}</button>
       </form>

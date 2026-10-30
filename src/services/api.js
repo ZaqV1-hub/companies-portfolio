@@ -50,7 +50,7 @@ export async function init() { await request('/health'); }
 export async function listPublicOrganizations() { return request('/public/organizations'); }
 export async function getPublicOrganization(id) { try { return await request(`/public/organizations/${q(id)}`); } catch (error) { if (error.status === 404) return null; throw error; } }
 export async function getPublicSettings() { return request('/public/settings'); }
-export async function listPublicDocuments() { return request('/public/documents'); }
+export async function listPublicDocuments(lang = 'pt') { return request(`/public/documents?lang=${q(lang)}`); }
 
 export async function getCurrentUser() { try { return await request(`/me?fresh=${Date.now()}`); } catch (error) { if (error.status === 401) return null; throw error; } }
 export async function login(email, password, role) { return post('/auth/login', { email, password, role }); }
@@ -70,9 +70,11 @@ export async function returnReview(versionId, content, comment) { return post(`/
 export async function listOrganizationsForTeam() { return request('/team/organizations'); }
 export async function listProfileTags() { return request('/team/tags'); }
 export async function createProfileTag(label) { return post('/team/tags', { label }); }
+export async function deleteProfileTag(label) { return request(`/team/tags/${q(label)}`, { method:'DELETE' }); }
 export async function setOrganizationTags(id,tags) { return put(`/team/organizations/${q(id)}/tags`, { tags }); }
 export async function setOrganizationPublicState(orgId, publicState) { return put(`/team/organizations/${q(orgId)}/public-state`, { public_state: publicState }); }
 export async function createOrganization(name,email) { return post('/team/organizations', { name,email }); }
+export async function createCompanyInvitation(name,email,lang) { return post('/team/invitations', {name,email,lang}); }
 export async function updateOrganizationEmail(id,email) { return request(`/team/organizations/${q(id)}/contact`, { method:'PATCH',body:{ email } }); }
 export async function inviteOrganization(id,lang) { return post(`/team/organizations/${q(id)}/invite`, { lang }); }
 export async function getTeamOrganizationForm(id) { return request(`/team/organizations/${q(id)}/profile-form`); }
@@ -80,6 +82,9 @@ export async function saveTeamOrganizationForm(id,content) { return put(`/team/o
 export async function saveTeamOrganizationFormAndInvite(id,content,lang) { return post(`/team/organizations/${q(id)}/profile-form/send-invite`, { content,lang }); }
 export async function getCompanyInvitation(token) { return request(`/company/invitation?token=${q(token)}`); }
 export async function acceptCompanyInvitation(data) { return post('/company/invitation/accept', data); }
+export async function registerCompany(data) { return post('/company/signup', data); }
+export async function verifyCompanyEmail(token) { return post('/company/signup/verify', {token}); }
+export async function rejectReview(versionId, comment) { return post(`/team/reviews/${q(versionId)}/reject`, {comment}); }
 
 export async function registerInvestor(data) { return post('/investors', data); }
 export async function getInvestorBrowseStatus() { return request(`/investors/browse?fresh=${Date.now()}`); }
@@ -118,9 +123,9 @@ export async function getCrmDashboard(year) { return request(`/team/contacts/das
 export async function getSettings() { return request('/team/settings'); }
 export async function updateSettings(patch) { return put('/team/settings', patch); }
 export async function listTeamDocuments() { return request('/team/documents'); }
-export async function uploadDocument(file, titlePt, titleEn) {
+export async function uploadDocument(file, titlePt, titleEn, language = 'pt') {
   const form = new FormData();
-  form.append('file', file); form.append('title_pt', titlePt); form.append('title_en', titleEn);
+  form.append('file', file); form.append('title_pt', titlePt); form.append('title_en', titleEn); form.append('language', language);
   const response = await fetch('/api/team/documents', { method:'POST', credentials:'same-origin', body:form });
   const result = await response.json().catch(() => null);
   if (!response.ok) throw new Error(result?.error || `http_${response.status}`);

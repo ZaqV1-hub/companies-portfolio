@@ -1,8 +1,8 @@
 // Entry point: loads translations and data, then mounts the app.
 import { html } from './lib/html.js';
 import { loadDictionaries } from './lib/i18n.js';
-import * as api from './services/api.js?v=20261026-company-invite1';
-import { App } from './App.js?v=20261027-company-help1';
+import * as api from './services/api.js?v=20261030-intake1';
+import { App } from './App.js?v=20261030-intake1';
 
 async function start() {
   document.getElementById('root').textContent = 'Conectando ao portfólio...';

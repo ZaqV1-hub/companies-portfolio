@@ -1,8 +1,9 @@
 // Directory / home: program presentation, search and filters, documents, company cards.
 import { html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261014-api-recovery3';
+import * as api from '../../services/api.js?v=20261030-intake1';
 import { useI18n } from '../../lib/i18n.js';
 import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js';
+import { href } from '../../lib/router.js';
 import { OrgCard } from '../../components/OrgCard.js?v=20261014-api-recovery3';
 import { EMPTY_FILTERS, FILTER_DEFS, activeFilterCount, matchesFilters, matchingProject } from '../../lib/directoryFilters.js';
 
@@ -16,7 +17,8 @@ export function DirectoryPage() {
   const profile = filters.profile;
   const setFilter = (key, value) => setFilters({ ...filters, [key]: value });
 
-  useEffect(() => { api.listPublicOrganizations().then(setOrgs); api.listPublicDocuments().then(setDocuments).catch(()=>setDocuments([])); }, []);
+  useEffect(() => { api.listPublicOrganizations().then(setOrgs); }, []);
+  useEffect(() => { setSelectedDocument(null); api.listPublicDocuments(lang).then(setDocuments).catch(()=>setDocuments([])); }, [lang]);
 
   const filtered = useMemo(() => {
     if (!orgs) return [];
@@ -36,6 +38,7 @@ export function DirectoryPage() {
         <div class="hero-kicker">${t('home.kicker')}</div>
         <h1>${t('home.title')}</h1>
         <p>${t('home.intro')}</p>
+        <div class="hero-company-action"><a class="btn btn-lime hero-company-signup" href=${href('/company/signup')}>${lang === 'pt' ? 'Cadastre sua empresa' : 'Add your company'}</a><span>${lang === 'pt' ? 'Inscrição sujeita à aprovação da Abiquifi' : 'Application subject to Abiquifi approval'}</span></div>
         <div class="hero-stats">
           <div><div class="hero-stat-value">${orgs.length}</div><div class="hero-stat-label">${t('home.stat_orgs')}</div></div>
           <div><div class="hero-stat-value">${projectCount}</div><div class="hero-stat-label">${t('home.stat_projects')}</div></div>
@@ -65,7 +68,7 @@ export function DirectoryPage() {
       <aside class="home-documents" aria-label=${t('documents.title')}>
         <div class="home-documents-head"><span class="home-documents-icon" aria-hidden="true">PDF</span><h2>${t('documents.title')}</h2></div>
         <p>${t('documents.intro')}</p>
-        ${documents.length ? html`<div class="home-document-list">${documents.map((document)=>html`<button type="button" class="home-document" key=${document.id} onClick=${()=>setSelectedDocument(document)}><span class="home-document-name">${lang==='pt' ? document.title_pt : document.title_en}</span><span class="home-document-view">${t('documents.view')} ↗</span></button>`)}</div>` : html`<p class="home-documents-empty">${t('documents.empty')}</p>`}
+        ${documents.length ? html`<div class="home-document-list">${documents.map((document)=>html`<button type="button" class="home-document" key=${document.id} onClick=${()=>setSelectedDocument(document)}><span class="home-document-name">${lang==='pt' ? document.title_pt || document.title_en : document.title_en || document.title_pt}</span><span class="home-document-view">${t('documents.view')} ↗</span></button>`)}</div>` : html`<p class="home-documents-empty">${t('documents.empty')}</p>`}
       </aside>
     </div>
 
@@ -78,7 +81,7 @@ export function DirectoryPage() {
     </section>
     ${selectedDocument && html`<div class="doc-modal-backdrop" onClick=${(event)=>{if(event.target===event.currentTarget)setSelectedDocument(null)}}>
       <div class="doc-modal" role="dialog" aria-modal="true" aria-label=${lang==='pt' ? selectedDocument.title_pt : selectedDocument.title_en}>
-        <div class="doc-modal-head"><strong>${lang==='pt' ? selectedDocument.title_pt : selectedDocument.title_en}</strong><div><a class="btn btn-outline" href=${selectedDocument.url} target="_blank" rel="noopener">${t('documents.open_new_tab')}</a><button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${()=>setSelectedDocument(null)}>×</button></div></div>
+        <div class="doc-modal-head"><strong>${lang==='pt' ? selectedDocument.title_pt || selectedDocument.title_en : selectedDocument.title_en || selectedDocument.title_pt}</strong><div><a class="btn btn-outline" href=${selectedDocument.url} target="_blank" rel="noopener">${t('documents.open_new_tab')}</a><button type="button" class="modal-close" aria-label=${t('common.close')} onClick=${()=>setSelectedDocument(null)}>×</button></div></div>
         <iframe title=${lang==='pt' ? selectedDocument.title_pt : selectedDocument.title_en} src=${selectedDocument.url}></iframe>
       </div>
     </div>`}

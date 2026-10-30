@@ -1,7 +1,8 @@
 import nodemailer from 'nodemailer';
 
 export function mailAvailable() {
-  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_FROM && process.env.PUBLIC_ORIGIN);
+  return Boolean(process.env.SMTP_HOST && process.env.SMTP_PORT && process.env.SMTP_FROM && process.env.PUBLIC_ORIGIN
+    && (!process.env.SMTP_USER || process.env.SMTP_PASSWORD));
 }
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (char) => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' })[char]);
@@ -23,7 +24,11 @@ export async function sendPlatformMail(to, { subject, title, intro, button, url,
   const safeUrl = url?.startsWith(origin() + '/') ? url : null;
   const text = [title, intro, safeUrl ? `${button}: ${safeUrl}` : '', note].filter(Boolean).join('\n\n');
   const html = `<!doctype html><html lang="${lang === 'en' ? 'en' : 'pt-BR'}"><head><meta charset="UTF-8"></head><body style="margin:0;background:#f4f6f9;font-family:Arial,sans-serif;color:#14203d"><table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background:#f4f6f9;padding:32px 12px"><tr><td align="center"><table role="presentation" width="560" cellspacing="0" cellpadding="0" style="max-width:560px;width:100%;background:#ffffff;border-radius:16px;overflow:hidden"><tr><td style="background:#141d39;color:#cbea2b;padding:22px 32px;font-size:13px;font-weight:700;letter-spacing:1px">BRAZILIAN PHARMA &amp; HEALTH</td></tr><tr><td style="padding:32px"><h1 style="font-size:25px;line-height:1.25;margin:0 0 18px;color:#141d39">${esc(title)}</h1><p style="font-size:16px;line-height:1.6;white-space:pre-line;margin:0 0 24px">${esc(intro)}</p>${safeUrl ? `<table role="presentation" cellspacing="0" cellpadding="0"><tr><td style="background:#cbea2b;border-radius:8px"><a href="${esc(safeUrl)}" style="display:inline-block;padding:14px 24px;color:#141d39;font-size:15px;font-weight:700;text-decoration:none">${esc(button)}</a></td></tr></table>` : ''}${note ? `<p style="margin:25px 0 0;color:#667085;font-size:13px;line-height:1.5">${esc(note)}</p>` : ''}</td></tr></table></td></tr></table></body></html>`;
-  await transport().sendMail({ from:process.env.SMTP_FROM, to, replyTo: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(replyTo || '') ? replyTo : undefined, subject, text, html });
+  const testRedirect = String(process.env.EMAIL_TEST_REDIRECT || '').trim();
+  if (testRedirect && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(testRedirect)) throw new Error('Invalid EMAIL_TEST_REDIRECT');
+  const responseAddress = replyTo || process.env.TEAM_NOTIFICATION_EMAIL || 'investment@abiquifi.org.br';
+  await transport().sendMail({ from:process.env.SMTP_FROM, to:testRedirect || to,
+    replyTo: /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(responseAddress) ? responseAddress : undefined, subject, text, html });
 }
 
 export async function sendAuthMail(to, kind, token) {

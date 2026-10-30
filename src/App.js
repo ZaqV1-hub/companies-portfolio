@@ -1,23 +1,24 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261027-company-help1';
+import * as api from './services/api.js?v=20261030-intake1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261026-layout2';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261022-verify-tabs1';
 import { AppShell } from './components/AppShell.js?v=20261027-company-help1';
 import { CompanyFeedbackModal } from './components/CompanyFeedbackModal.js?v=20261027-company-help1';
-import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261014-api-recovery3';
+import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261030-intake1';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261026-profile-layout3';
 import { LoginPage } from './pages/LoginPage.js?v=20261026-layout2';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261026-accept-initial1';
-import { InvitationPage } from './pages/company/InvitationPage.js?v=20261026-layout2';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261030-intake1';
+import { InvitationPage } from './pages/company/InvitationPage.js?v=20261030-intake1';
+import { CompanySignupPage, CompanyEmailVerificationPage } from './pages/company/CompanySignupPage.js?v=20261030-intake1';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261026-profile-layout3';
-import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261026-tags-feedback1';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261030-intake1';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';
-import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261026-team-pages1';
+import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261030-intake1';
 import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-phone1';
 
 const investorIntentKey = 'portfolio:investor-intent';
@@ -106,6 +107,8 @@ function Routes() {
   if (first === 'company' || first === 'team') {
     const role = first === 'company' ? 'company_user' : 'team';
     if (first === 'company' && route.query.invite) return html`<${InvitationPage} token=${route.query.invite} onLoggedIn=${setUser} />`;
+    if (first === 'company' && second === 'signup') return html`<${CompanySignupPage} />`;
+    if (first === 'company' && ['verify-email','confirmar-email'].includes(second)) return html`<${CompanyEmailVerificationPage} token=${route.query.token} onLoggedIn=${setUser} />`;
     if (second === 'login' || !user || user.role !== role) {
       return html`<${LoginPage} key=${first} role=${role === 'team' ? 'team' : 'company'} next=${second && second !== 'login' ? route.path : null} onLoggedIn=${setUser} />`;
     }

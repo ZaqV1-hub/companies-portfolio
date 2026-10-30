@@ -93,11 +93,20 @@ button { font-family: var(--font-body); }
 
 /* ---------- home hero ---------- */
 .hero { position: relative; overflow: hidden; background: #141a3b; padding: 72px 32px 150px; color: #fff; }
+@media (min-width: 901px) {
+  .hero::before { content: ''; position: absolute; inset: 0 0 0 auto; width: min(66%, 960px); background-image: linear-gradient(rgba(20, 26, 59, .42), rgba(20, 26, 59, .42)), url('../../assets/img/brasil-conectado.webp'); background-position: center right; background-size: contain; background-repeat: no-repeat; opacity: .34; pointer-events: none; }
+}
 .deco-ring { position: absolute; border-radius: 50%; }
 .hero-inner { position: relative; max-width: 1200px; margin: 0 auto; }
+.hero-company-action { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 0 0 42px; }
+.hero-company-action span { color: var(--on-navy); font-size: 13px; }
+.hero-company-signup { display: inline-flex; align-items: center; }
+.hero-company-signup:hover { color: var(--navy); }
+.company-signup-form .input.invalid { border-color: #c93c2d; background: #fff7f5; }
+.company-signup-form .input.valid { border-color: #228754; }
 .hero-kicker { display: inline-block; font-size: 12px; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--lime); margin-bottom: 20px; }
 .hero h1 { font-family: var(--font-display); font-weight: 800; font-size: clamp(36px, 5.4vw, 64px); line-height: 1.04; margin: 0 0 24px; max-width: 15.5em; letter-spacing: -.015em; text-wrap: balance; }
-.hero p { font-size: 18.5px; color: var(--on-navy); max-width: 38em; line-height: 1.65; margin: 0 0 44px; text-wrap: pretty; }
+.hero p { font-size: 18.5px; color: var(--on-navy); max-width: 38em; line-height: 1.65; margin: 0 0 28px; text-wrap: pretty; }
 .hero-stats { display: flex; gap: 0; flex-wrap: wrap; }
 .hero-stats > div { padding: 0 40px; border-left: 1px solid #2c356a; }
 .hero-stats > div:first-child { padding-left: 0; border-left: 0; }
@@ -597,6 +606,9 @@ a.profile-fact-value { display: inline-block; border-bottom: 2px solid var(--lim
 .team-tag-create { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 17px; }
 .team-tag-create .input { flex: 1 1 240px; max-width: 430px; }
 .team-tag-list, .team-org-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.team-tag-removable { display: inline-flex; align-items: center; gap: 7px; }
+.team-tag-removable button { border: 0; border-radius: 50%; background: transparent; color: inherit; font-size: 17px; line-height: 1; cursor: pointer; }
+.team-tag-removable button:hover { background: rgba(20,27,52,.12); }
 .team-org-tags { margin-top: 8px; }
 .tag-checklist { max-height: 330px; overflow-y: auto; display: grid; gap: 8px; margin: 20px 0; }
 .tag-check { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; cursor: pointer; }

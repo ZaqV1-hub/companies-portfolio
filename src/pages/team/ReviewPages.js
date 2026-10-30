@@ -1,6 +1,6 @@
 // Team panel · review queue and review screen (spec 1, 4.3).
 import { cx, html, useEffect, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261026-tags-feedback1';
+import * as api from '../../services/api.js?v=20261030-intake1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href, navigate } from '../../lib/router.js';
@@ -69,7 +69,7 @@ export function ReviewPage({ versionId }) {
   const [onlyChanges, setOnlyChanges] = useState(false);
   const [tab, setTab] = useState('compare');
   const [previewLang, setPreviewLang] = useState('en');
-  const [returning, setReturning] = useState(false);
+  const [returning, setReturning] = useState('');
   const [comment, setComment] = useState('');
   const [message, setMessage] = useState(null);
 
@@ -106,8 +106,11 @@ export function ReviewPage({ versionId }) {
     if (res.ok) navigate('/team/review');
   };
   const doReturn = async () => {
-    const res = await api.returnReview(versionId, content, comment);
-    if (res.ok) navigate('/team/review'); else setMessage(t('review.comment_required'));
+    if (!comment.trim()) { setMessage(lang === 'pt' ? 'Escreva um comentário para explicar a decisão.' : 'Add a comment explaining this decision.'); return; }
+    try {
+      const res = returning === 'reject' ? await api.rejectReview(versionId, comment.trim()) : await api.returnReview(versionId, content, comment.trim());
+      if (res.ok) navigate('/team/review'); else setMessage(t('review.comment_required'));
+    } catch { setMessage(lang === 'pt' ? 'Não foi possível registrar a decisão.' : 'Could not save the decision.'); }
   };
 
   return html`<div class="review-page">
@@ -119,17 +122,18 @@ export function ReviewPage({ versionId }) {
           · ${data.organization.public_state === 'hidden' ? t('review.online_hidden') : t('review.online_published')}</div>
       </div>
       ${editable && html`<div class="review-actions">
-        <button type="button" class="btn btn-navy-outline btn-lg" onClick=${() => setReturning(true)}>${t('review.return')}</button>
+        <button type="button" class="btn btn-navy-outline btn-lg" onClick=${() => {setComment('');setReturning('return');}}>${t('review.return')}</button>
+        <button type="button" class="btn btn-outline btn-lg" onClick=${() => {setComment('');setReturning('reject');}}>${lang === 'pt' ? 'Recusar' : 'Reject'}</button>
         <button type="button" class="btn btn-lime btn-lg" onClick=${approve}>${t('review.approve')}</button>
       </div>`}
     </div>
     ${message && html`<div class="notice">${message}</div>`}
     ${returning && html`<div class="return-box">
-      <label class="form-label" for="return-comment">${t('review.return_comment')} (${lang === 'pt' ? 'opcional' : 'optional'})</label>
-      <textarea id="return-comment" class="input input-sm" rows="3" value=${comment} onInput=${(e) => setComment(e.target.value)}></textarea>
+      <label class="form-label" for="return-comment">${returning === 'reject' ? (lang === 'pt' ? 'Motivo da recusa' : 'Reason for rejection') : t('review.return_comment')} *</label>
+      <textarea id="return-comment" class="input input-sm" rows="3" maxlength="2000" required value=${comment} onInput=${(e) => setComment(e.target.value)}></textarea>
       <div class="review-actions">
-        <button type="button" class="btn btn-outline" onClick=${() => setReturning(false)}>${t('review.cancel')}</button>
-        <button type="button" class="btn btn-lime" onClick=${doReturn}>${t('review.confirm_return')}</button>
+        <button type="button" class="btn btn-outline" onClick=${() => setReturning('')}>${t('review.cancel')}</button>
+        <button type="button" class="btn btn-lime" onClick=${doReturn}>${returning === 'reject' ? (lang === 'pt' ? 'Confirmar recusa' : 'Confirm rejection') : t('review.confirm_return')}</button>
       </div>
     </div>`}
     <div class="notice">${t('review.online_note')}</div>
@@ -157,7 +161,7 @@ function PreviewOne({ org }) {
 }
 
 // ------------------------------------------------------------------ organizations and their status (spec 1, 4.4)
-const STATUSES = ['awaiting_validation', 'filling', 'in_review', 'returned', 'published', 'provisional', 'offline'];
+const STATUSES = ['email_pending','invited','accepted','filling','in_review','returned','rejected','published','provisional','offline'];
 
 export function OrganizationsPage() {
   const i18n = useI18n();
@@ -169,6 +173,7 @@ export function OrganizationsPage() {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
+  const [newInviteOpen, setNewInviteOpen] = useState(false);
   const [editingEmail, setEditingEmail] = useState(null);
   const [emailValue, setEmailValue] = useState('');
   const [notice, setNotice] = useState('');
@@ -194,8 +199,13 @@ export function OrganizationsPage() {
   };
   const create = async (event) => {
     event.preventDefault(); setNotice('');
-    try { const org = await api.createOrganization(newName,newEmail); navigate('/team/orgs/' + org.id); }
-    catch { setNotice(lang === 'pt' ? 'Confira o nome e o e-mail da empresa.' : 'Check the company name and email.'); }
+    setNewInviteOpen(true);
+  };
+  const createInvitation = async (language) => {
+    setInviteBusy(true);setInviteError('');
+    try { await api.createCompanyInvitation(newName.trim(),newEmail.trim(),language);setNewInviteOpen(false);setCreating(false);setNewName('');setNewEmail('');await load();setNotice(lang === 'pt' ? 'Convite criado e colocado na fila de envio.' : 'Invitation created and queued for delivery.'); }
+    catch (error) { setInviteError(error.message === 'organization_exists' ? (lang === 'pt' ? 'A empresa já existe. Use o cadastro atual.' : 'The company already exists. Use its current record.') : (lang === 'pt' ? 'Não foi possível criar o convite.' : 'Could not create the invitation.')); }
+    finally { setInviteBusy(false); }
   };
   const saveEmail = async (r) => {
     try { await api.updateOrganizationEmail(r.id,emailValue); setEditingEmail(null); await load(); setNotice(lang === 'pt' ? 'E-mail atualizado.' : 'Email updated.'); }
@@ -212,51 +222,65 @@ export function OrganizationsPage() {
     try { await api.createProfileTag(newTag);setNewTag('');await load();setNotice(lang === 'pt' ? 'Tag criada. Agora você pode atribuí-la às empresas.' : 'Tag created. You can now assign it to companies.'); }
     catch (error) { setNotice(error.message === 'duplicate_tag' ? (lang === 'pt' ? 'Essa tag já existe.' : 'This tag already exists.') : (lang === 'pt' ? 'Não foi possível criar a tag.' : 'Could not create the tag.')); }
   };
+  const deleteTag = async (tag) => {
+    if (!window.confirm(lang === 'pt' ? `Excluir a tag “${tag}” de todas as empresas?` : `Remove the tag “${tag}” from every company?`)) return;
+    try { await api.deleteProfileTag(tag); await load(); setNotice(lang === 'pt' ? 'Tag excluída.' : 'Tag deleted.'); }
+    catch { setNotice(lang === 'pt' ? 'Não foi possível excluir a tag.' : 'Could not delete the tag.'); }
+  };
   const saveTags = async () => {
     setTagBusy(true);
     try { await api.setOrganizationTags(tagTarget.id,selectedTags);setTagTarget(null);await load();setNotice(lang === 'pt' ? 'Tags da empresa atualizadas.' : 'Company tags updated.'); }
     catch { setNotice(lang === 'pt' ? 'Não foi possível salvar as tags.' : 'Could not save the tags.'); }
     finally { setTagBusy(false); }
   };
+  const statusText = (value, row) => ({
+    email_pending:lang === 'pt' ? 'Aguardando confirmação do e-mail' : 'Awaiting email confirmation',
+    invited:row?.invitation_sent ? (lang === 'pt' ? 'Convite enviado' : 'Invitation sent') : (lang === 'pt' ? 'Aguardando envio' : 'Awaiting delivery'),
+    accepted:lang === 'pt' ? 'Convite aceito' : 'Invitation accepted',
+    filling:lang === 'pt' ? 'Em preenchimento' : 'In progress',
+    in_review:lang === 'pt' ? 'Em revisão' : 'Under review',
+    rejected:lang === 'pt' ? 'Recusada' : 'Rejected',
+  })[value] || i18n.label('org_status',value);
   return html`<div class="team-list-page">
     <div class="team-list-head"><div><h1 class="page-title">${t('orgs.title')}</h1>
       <div class="page-subtitle">${t('orgs.subtitle')}</div></div>
-      <button type="button" class="btn btn-lime btn-lg" onClick=${() => setCreating(!creating)}>${lang === 'pt' ? '+ Criar organização' : '+ Create organization'}</button></div>
+      <button type="button" class="btn btn-lime btn-lg" onClick=${() => setCreating(!creating)}>${lang === 'pt' ? '+ Convidar empresa' : '+ Invite company'}</button></div>
     ${creating && html`<form class="table-card" style=${{ padding:'20px',marginTop:'16px' }} onSubmit=${create}>
       <div style=${{ display:'flex',gap:'12px',flexWrap:'wrap',alignItems:'end' }}>
         <label class="form-label">${lang === 'pt' ? 'Nome da empresa' : 'Company name'}<input class="input input-sm" required maxLength="80" value=${newName} onInput=${(e) => setNewName(e.target.value)} /></label>
         <label class="form-label">${lang === 'pt' ? 'E-mail que receberá o convite' : 'Email that will receive the invitation'}<input class="input input-sm" type="email" required value=${newEmail} onInput=${(e) => setNewEmail(e.target.value)} /></label>
-        <button class="btn btn-lime" type="submit">${lang === 'pt' ? 'Criar e preencher perfil' : 'Create and fill profile'}</button>
+        <button class="btn btn-lime" type="submit">${lang === 'pt' ? 'Escolher idioma e enviar' : 'Choose language and send'}</button>
       </div></form>`}
     ${notice && html`<div class="notice" role="status">${notice}</div>`}
     <section class="table-card team-tag-manager" aria-labelledby="team-tags-title">
       <div><h2 id="team-tags-title" class="block-title">${lang === 'pt' ? 'Tags do portfólio' : 'Portfolio tags'}</h2>
         <p class="page-subtitle">${lang === 'pt' ? 'Crie tags próprias da Abiquifi e escolha em quais empresas elas aparecem.' : 'Create custom tags and choose which companies display them.'}</p></div>
       <form class="team-tag-create" onSubmit=${createTag}><input class="input input-sm" aria-label=${lang === 'pt' ? 'Texto da nova tag' : 'New tag text'} placeholder=${lang === 'pt' ? 'Escreva uma nova tag' : 'Type a new tag'} maxLength="80" required value=${newTag} onInput=${(e) => setNewTag(e.target.value)} /><button class="btn btn-lime" type="submit">${lang === 'pt' ? 'Criar tag' : 'Create tag'}</button></form>
-      <div class="team-tag-list">${catalog.length ? catalog.map((tag) => html`<span class="tag" key=${tag}>${tag}</span>`) : html`<span class="cell-sub">${lang === 'pt' ? 'Nenhuma tag criada ainda.' : 'No tags created yet.'}</span>`}</div>
+      <div class="team-tag-list">${catalog.length ? catalog.map((tag) => html`<span class="tag team-tag-removable" key=${tag}>${tag}<button type="button" aria-label=${(lang === 'pt' ? 'Excluir tag ' : 'Delete tag ') + tag} title=${lang === 'pt' ? 'Excluir tag' : 'Delete tag'} onClick=${() => deleteTag(tag)}>×</button></span>`) : html`<span class="cell-sub">${lang === 'pt' ? 'Nenhuma tag criada ainda.' : 'No tags created yet.'}</span>`}</div>
     </section>
     <div class="table-card team-table">
       <div class="table-tools"><input class="input input-sm" type="search" placeholder=${t('orgs.search')} value=${q} onInput=${(e) => setQ(e.target.value)} />
-        <select class="input input-sm" value=${status} onChange=${(e) => setStatus(e.target.value)}><option value="">${lang === 'pt' ? 'Todos os status' : 'All statuses'}</option>${STATUSES.map((s) => html`<option value=${s}>${i18n.label('org_status',s)}</option>`)}</select></div>
+        <select class="input input-sm" value=${status} onChange=${(e) => setStatus(e.target.value)}><option value="">${lang === 'pt' ? 'Todos os status' : 'All statuses'}</option>${STATUSES.map((s) => html`<option value=${s}>${statusText(s)}</option>`)}</select></div>
       <div class="trow thead" style=${cols}><div>${t('review.col_org')}</div><div>${t('orgs.col_status')}</div><div>${t('orgs.col_updated')}</div><div>${t('review.col_online')}</div><div></div></div>
       ${list.map((r) => html`<div class="trow" key=${r.id} style=${cols}>
         <div data-label=${t('review.col_org')}><strong>${r.name}</strong>${r.demo && html` <span class="pill">demo</span>`}
           <div class="cell-sub">${r.focal_point?.name || ''}</div>
           ${Boolean(r.custom_tags?.length) && html`<div class="team-org-tags">${r.custom_tags.map((tag) => html`<span class="tag" key=${tag}>${tag}</span>`)}</div>`}
           ${editingEmail === r.id ? html`<div style=${{ display:'flex',gap:'6px',marginTop:'8px' }}><input class="input input-sm" type="email" aria-label=${lang === 'pt' ? 'E-mail do convite' : 'Invitation email'} value=${emailValue} onInput=${(e) => setEmailValue(e.target.value)} /><button type="button" class="btn btn-outline" onClick=${() => saveEmail(r)}>${lang === 'pt' ? 'Salvar' : 'Save'}</button></div>` : html`<div class="cell-sub">${lang === 'pt' ? 'Convite: ' : 'Invitation: '}${r.invitation_email || '—'} <button type="button" class="btn-link" onClick=${() => { setEditingEmail(r.id);setEmailValue(r.invitation_email || ''); }}>${lang === 'pt' ? 'Editar e-mail' : 'Edit email'}</button></div>`}</div>
-        <div data-label=${t('orgs.col_status')}><span class=${'status-pill s-' + r.status}>${r.status === 'provisional' ? (lang === 'pt' ? 'Aguardando validação' : 'Awaiting validation') : i18n.label('org_status', r.status)}</span></div>
+        <div data-label=${t('orgs.col_status')}><span class=${'status-pill s-' + r.status}>${r.status === 'provisional' ? (lang === 'pt' ? 'Aguardando validação' : 'Awaiting validation') : statusText(r.status,r)}</span></div>
         <div data-label=${t('orgs.col_updated')}>${r.last_updated_at ? formatDate(r.last_updated_at, lang) : '—'}
           ${r.outdated && html`<div class="cell-alert">${t('orgs.outdated', { n: r.days_since_update })}</div>`}</div>
         <div data-label=${t('review.col_online')}><span class=${'air-state ' + (r.public_state === 'hidden' ? 'off' : 'on')}>${r.public_state === 'hidden' ? t('review.online_hidden') : t('review.online_published')}</span></div>
         <div style=${{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
-          <a class="btn btn-outline" href=${href('/team/orgs/' + r.id)}>${lang === 'pt' ? 'Editar perfil' : 'Edit profile'}</a>
+          ${r.intake_mode === 'legacy' && html`<a class="btn btn-outline" href=${href('/team/orgs/' + r.id)}>${lang === 'pt' ? 'Editar perfil' : 'Edit profile'}</a>`}
           <button type="button" class="btn btn-outline" onClick=${() => { setTagTarget(r);setSelectedTags(r.custom_tags || []); }}>${lang === 'pt' ? 'Gerenciar tags' : 'Manage tags'}</button>
-          <button type="button" class="btn btn-outline" onClick=${() => { setInviteError(''); setInviteTarget(r); }}>${lang === 'pt' ? 'Enviar convite' : 'Send invitation'}</button>
+          ${r.intake_mode === 'legacy' || r.status === 'invited' ? html`<button type="button" class="btn btn-outline" onClick=${() => { setInviteError(''); setInviteTarget(r); }}>${r.status === 'invited' ? (lang === 'pt' ? 'Reenviar convite' : 'Resend invitation') : (lang === 'pt' ? 'Enviar convite' : 'Send invitation')}</button>` : null}
           ${r.public_state !== 'hidden' && html`<a class="btn btn-outline" href=${href('/org/' + r.id)} target="_blank">↗</a>`}
           <button type="button" class="btn btn-outline" disabled=${r.public_state === 'hidden' && !r.last_approved_at} title=${r.public_state === 'hidden' && !r.last_approved_at ? (lang === 'pt' ? 'A empresa precisa validar o perfil antes da publicação.' : 'The company must validate the profile before publication.') : ''} onClick=${() => toggleOnline(r)}>${r.public_state === 'hidden' ? (lang === 'pt' ? 'Colocar no ar' : 'Publish') : t('orgs.take_offline')}</button>
         </div>
       </div>`)}
     </div>
+    ${newInviteOpen && html`<${InviteLanguageModal} email=${newEmail} busy=${inviteBusy} error=${inviteError} onClose=${() => {setNewInviteOpen(false);setInviteError('');}} onConfirm=${createInvitation} />`}
     ${inviteTarget && html`<${InviteLanguageModal} email=${inviteTarget.invitation_email} busy=${inviteBusy} error=${inviteError} onClose=${() => { setInviteTarget(null); setInviteError(''); }} onConfirm=${(language) => invite(inviteTarget,language)} />`}
     ${tagTarget && html`<div class="modal-backdrop invite-modal-backdrop" onClick=${(event) => { if (event.target === event.currentTarget && !tagBusy) setTagTarget(null); }}>
       <section class="modal invite-modal" role="dialog" aria-modal="true" aria-labelledby="tag-assignment-title">

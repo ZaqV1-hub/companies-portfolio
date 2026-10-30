@@ -177,8 +177,11 @@ try {
   Write-Step 'Installing API dependencies (npm ci)'
   Invoke-Node @($NpmCli, 'ci', '--omit=dev', '--include=optional', '--no-audit', '--no-fund') (Join-Path $AppRoot 'server')
 
-  Write-Step 'Applying pending database migrations (npm run migrate)'
+  Write-Step 'Backing up the Companies Portfolio database before migration'
   $env:ENV_FILE = $EnvFile
+  Invoke-Node @((Join-Path $AppRoot 'server\db\backup.js'), (Join-Path $backup 'companiesportfolio-db.json.gz')) (Join-Path $AppRoot 'server')
+
+  Write-Step 'Applying pending database migrations (npm run migrate)'
   Invoke-Node @($NpmCli, 'run', 'migrate') (Join-Path $AppRoot 'server')
 
   Write-Step "Starting $ServiceName"
