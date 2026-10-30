@@ -3,6 +3,7 @@
 import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
 import { UFS } from '../../lib/formSchema.js?v=20261026-profile-layout2';
+import { BRAZIL_CITIES } from '../../lib/brazilCities.js';
 import { uploadImage } from '../../services/api.js';
 
 // ---------------------------------------------------------------- USD (spec 1, 5.2)
@@ -248,9 +249,14 @@ export function FieldInput(props) {
     case 'gallery': return html`<${GalleryInput} ...${props} />`;
     case 'place': {
       const v = value || {};
+      const cities = BRAZIL_CITIES[v.state] || [];
+      const options = v.city && !cities.includes(v.city) ? [v.city, ...cities] : cities;
       return html`<div class="row-fields">
-        <${Mini} label=${t('city')} grow=${true}><input id=${id} class="input input-sm" value=${v.city || ''} disabled=${disabled} onInput=${(e) => onChange({ ...v, city: e.target.value })} /><//>
-        <${Mini} label=${t('state')}><${Select} options=${UFS} value=${v.state} onChange=${(s) => onChange({ ...v, state: s })} i18n=${i18n} disabled=${disabled} /><//>
+        <${Mini} label=${t('state')}><${Select} options=${UFS} value=${v.state} onChange=${(s) => onChange({ ...v, state: s, city: s === v.state ? v.city : '' })} i18n=${i18n} disabled=${disabled} /><//>
+        <${Mini} label=${t('city')} grow=${true}><select id=${id} class="input input-sm" value=${v.city || ''} disabled=${disabled || !v.state} onChange=${(e) => onChange({ ...v, city:e.target.value })}>
+          <option value="">${v.state ? t('choose') : (i18n.lang === 'pt' ? 'Selecione o estado primeiro' : 'Select a state first')}</option>
+          ${options.map((city)=>html`<option key=${city} value=${city}>${city}</option>`)}
+        </select><//>
       </div>`;
     }
     case 'focal': {

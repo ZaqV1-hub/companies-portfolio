@@ -10,7 +10,7 @@ import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, r
 import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261026-profile-layout2';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261026-image-upload1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261030-cities1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout3';
 
