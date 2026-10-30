@@ -17,7 +17,7 @@ $settings = [ordered]@{
   SMTP_USER = 'investment@abiquifi.org.br'
   SMTP_PASSWORD = $password
   TEAM_NOTIFICATION_EMAIL = 'investment@abiquifi.org.br'
-  EMAIL_TEST_REDIRECT = 'investment@abiquifi.org.br'
+  EMAIL_TEST_REDIRECT = ''
 }
 $lines = [System.Collections.Generic.List[string]]::new()
 $seen = [System.Collections.Generic.HashSet[string]]::new([StringComparer]::OrdinalIgnoreCase)
