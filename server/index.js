@@ -777,7 +777,12 @@ app.get('/api/team/contacts/dashboard', requireRole('team'), async (req,res) => 
 const upload = multer({ storage:multer.memoryStorage(), limits:{ fileSize:20*1024*1024, files:1 } });
 const uploadRoot = path.resolve(process.env.UPLOAD_ROOT || 'C:/CompaniesPortfolioData/uploads');
 const documentRoot = path.resolve(process.env.DOCUMENT_ROOT || path.join(uploadRoot, '..', 'documents'));
-const documentUpload = multer({ storage:multer.memoryStorage(), limits:{ fileSize:25*1024*1024, files:1 } });
+const documentUpload = multer({ storage:multer.memoryStorage(), limits:{ fileSize:100*1024*1024, files:1 } });
+const receiveDocument = (req,res,next) => documentUpload.single('file')(req,res,(error)=>{
+  if (error?.code === 'LIMIT_FILE_SIZE') return res.status(413).json({error:'document_too_big'});
+  if (error) return next(error);
+  next();
+});
 const documentFields = 'id,title_pt,title_en,original_name,language,published,created_at,updated_at';
 const documentView = (row, lang = 'pt') => ({ ...row, published:Boolean(row.published), url:`/api/public/documents/${row.id}/file?lang=${lang}` });
 const documentLanguage = (req) => req.query.lang === 'en' ? 'en' : 'pt';
@@ -804,7 +809,7 @@ app.get('/api/team/documents', requireRole('team'), async (_req,res) => {
   catch(error){ routeError(res,error); }
 });
 app.get('/api/team/documents/:id/file', requireRole('team'), (req,res) => sendDocument(req,res,false));
-app.post('/api/team/documents', requireRole('team'), documentUpload.single('file'), async (req,res) => {
+app.post('/api/team/documents', requireRole('team'), receiveDocument, async (req,res) => {
   const titlePt=String(req.body?.title_pt||'').trim();
   const titleEn=String(req.body?.title_en||'').trim();
   const language=String(req.body?.language||'pt');

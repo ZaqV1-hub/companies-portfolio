@@ -1,6 +1,7 @@
 import { html, useEffect, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js?v=20261030-intake1';
 import { useI18n } from '../../lib/i18n.js';
+const MAX_DOCUMENT_BYTES = 100 * 1024 * 1024;
 
 function DocumentLanguage({ value, onChange }) {
   const { lang } = useI18n();
@@ -67,10 +68,11 @@ export function DocumentsPage() {
   useEffect(() => { load().catch(()=>setError(t('documents.error'))); }, []);
   const upload = async (event) => {
     event.preventDefault();
+    if (file?.size > MAX_DOCUMENT_BYTES) { setError(t('documents.too_big')); return; }
     if (!file || (language !== 'en' && !titlePt.trim()) || (language !== 'pt' && !titleEn.trim())) return;
     setBusy(true); setError('');
     try { await api.uploadDocument(file,titlePt.trim(),titleEn.trim(),language); setTitlePt(''); setTitleEn(''); setLanguage('pt'); setFile(null); event.target.reset(); await load(); }
-    catch { setError(t('documents.error')); }
+    catch (error) { setError(t(error.message === 'document_too_big' ? 'documents.too_big' : 'documents.error')); }
     finally { setBusy(false); }
   };
   return html`<div class="crm-page documents-page">
@@ -80,10 +82,10 @@ export function DocumentsPage() {
       <div class="document-section-head"><span class="document-step">01</span><div><h2 class="block-title">${t('documents.add')}</h2><p class="form-help">${lang === 'pt' ? 'Escolha o idioma, envie o PDF e preencha o título correspondente.' : 'Choose the language, select a PDF and enter the corresponding title.'}</p></div></div>
       <form onSubmit=${upload} class="document-upload">
         <${DocumentLanguage} value=${language} onChange=${setLanguage} />
-        <label class="document-file-picker"><input type="file" accept="application/pdf,.pdf" required onChange=${(e)=>setFile(e.target.files[0]||null)} /><span class="document-file-picker-title">${file ? file.name : (lang === 'pt' ? 'Escolher arquivo PDF' : 'Choose PDF file')}</span><span class="document-file-picker-hint">${file ? `${(file.size / 1048576).toFixed(1)} MB` : t('documents.limit')}</span></label>
+        <label class="document-file-picker"><input type="file" accept="application/pdf,.pdf" required onChange=${(e)=>{const selected=e.target.files[0]||null;setFile(selected);setError(selected?.size > MAX_DOCUMENT_BYTES ? t('documents.too_big') : '');}} /><span class="document-file-picker-title">${file ? file.name : (lang === 'pt' ? 'Escolher arquivo PDF' : 'Choose PDF file')}</span><span class="document-file-picker-hint">${file ? `${(file.size / 1048576).toFixed(1)} MB · ${t('documents.max_size')}` : t('documents.limit')}</span></label>
         <${DocumentTitles} language=${language} titlePt=${titlePt} titleEn=${titleEn} setTitlePt=${setTitlePt} setTitleEn=${setTitleEn} />
         ${error && html`<p class="field-error" role="alert">${error}</p>`}
-        <button class="btn btn-lime btn-lg" type="submit" disabled=${busy || !file}>${busy ? (lang === 'pt' ? 'Enviando...' : 'Uploading...') : t('documents.upload')}</button>
+        <button class="btn btn-lime btn-lg" type="submit" disabled=${busy || !file || file.size > MAX_DOCUMENT_BYTES}>${busy ? (lang === 'pt' ? 'Enviando...' : 'Uploading...') : t('documents.upload')}</button>
       </form>
     </section>
     <section class="form-card crm-block document-list-card"><div class="document-section-head"><span class="document-step">02</span><div><h2 class="block-title">${t('documents.list')}</h2><p class="form-help">${lang === 'pt' ? 'Controle os títulos e a publicação de cada arquivo.' : 'Manage titles and publication of each file.'}</p></div></div>
