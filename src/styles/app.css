@@ -952,3 +952,4 @@ h3.section-label { margin-top: 18px; }
 .focal-field { min-width: 170px; }
 .focal-field .field-error { display: block; font-size: 12px; line-height: 1.5; letter-spacing: 0; text-transform: none; font-weight: 500; }
 .focal-invalid .input { border-color: #b42318; background: #fff8f7; }
+.step-problem-link { color: #8c1d13; text-decoration: underline; font-size: inherit; line-height: 1.6; }

@@ -78,6 +78,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const [reviewed, setReviewed] = useState({});
   const [toast, setToast] = useState(null);
   const [showErrors, setShowErrors] = useState(false);
+  const [blockedStep, setBlockedStep] = useState(null);
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteNotice, setInviteNotice] = useState(null);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -99,14 +100,39 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const stepIndex = Math.max(0, steps.findIndex((s) => s.id === stepParam));
   const step = steps[stepIndex];
   const check = validateDraft(content, reviewed);
+  const stepProblems = check.problems.filter((p)=>p.stepId===step.id);
+  const completed = (s) => s.kind !== 'preview' && !!reviewed[s.id] && !check.problems.some((p)=>p.stepId===s.id);
+  const completedCount = steps.filter(completed).length;
+  const focusProblem = (problem) => {
+    const base = 'f-' + problem.stepId.replace(':','-') + '-' + problem.field;
+    const input = document.getElementById(base+'-input'+(problem.part ? '-'+problem.part : ''));
+    (input || document.getElementById(base))?.scrollIntoView({block:'center',behavior:'smooth'});
+    input?.focus({preventScroll:true});
+  };
   const markFor = (projectId, key) => data.imports.find((r) => (r.project_id || null) === (projectId || null) && r.field === key);
   const goStep = (i) => {
+    if (i > stepIndex && !locked && !teamOrgId && !unchangedInitial) {
+      const missing = steps.slice(0,i).find((s)=>!completed(s));
+      if (missing) {
+        setShowErrors(true); setBlockedStep(missing.id);
+        if (missing.id !== step.id) { saveDraft(); onNavigateStep(missing.id); }
+        setTimeout(()=>document.getElementById('current-step-problems')?.scrollIntoView({block:'center',behavior:'smooth'}),0);
+        return;
+      }
+    }
     if (!locked) saveDraft();
+    setBlockedStep(null);
     onNavigateStep(steps[i].id);
     window.scrollTo(0, 0);
   };
 
-  const setReviewedStep = (id, value) => setReviewed({ ...reviewed, [id]: value });
+  const setReviewedStep = (id, value) => {
+    if (value && check.problems.some((p)=>p.stepId===id)) {
+      setReviewed({...reviewed,[id]:false}); setShowErrors(true); setBlockedStep(id); return;
+    }
+    setReviewed({ ...reviewed, [id]: value });
+    setBlockedStep(null);
+  };
   const updateOrg = (field, value) => setContent({ ...content, organization: writeField(content.organization, field, value) });
   const updateProject = (pid, field, value) => setContent({
     ...content,
@@ -235,10 +261,10 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     ${inviteOpen && html`<${InviteLanguageModal} email=${data.organization.invitation_email} busy=${inviteBusy} error=${inviteNotice && !inviteNotice.ok ? inviteNotice.text : null} onClose=${() => { setInviteOpen(false); setInviteNotice(null); }} onConfirm=${saveAndInvite} />`}
 
     <div class="progress" aria-label=${t('form.progress', { n: stepIndex + 1, total: steps.length })}>
-      <div class="progress-bar"><span style=${{ width: Math.round(((stepIndex + 1) / steps.length) * 100) + '%' }}></span></div>
+      <div class="progress-bar"><span style=${{ width: Math.round((completedCount / Math.max(1,steps.length-1)) * 100) + '%' }}></span></div>
       <ol class="progress-steps">${steps.map((s, i) => html`<li key=${s.id}>
-        <button type="button" class=${cx(i === stepIndex && 'on', reviewed[s.id] && 'done')} onClick=${() => goStep(i)}>
-          <span class="step-n">${reviewed[s.id] ? '✓' : i + 1}</span>${stepTitle(s, content, i18n)}
+        <button type="button" class=${cx(i === stepIndex && 'on', completed(s) && 'done')} onClick=${() => goStep(i)}>
+          <span class="step-n">${completed(s) ? '✓' : i + 1}</span>${stepTitle(s, content, i18n)}
         </button></li>`)}
       </ol>
     </div>
@@ -250,9 +276,14 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
       </div>
       ${step.kind !== 'preview' && step.kind !== 'images' && html`<p class="form-help lang-note">${t('form.en_reviewed_by_team')}</p>`}
       ${step.kind === 'project' && html`<p class="notice currency-note">${t('form.currency_note')}</p>`}
+      ${blockedStep===step.id && (stepProblems.length || !reviewed[step.id]) && html`<div class="submit-blockers" id="current-step-problems" role="alert">
+        <strong>${i18n.lang==='pt' ? 'Antes de continuar, revise esta etapa:' : 'Before continuing, review this step:'}</strong>
+        <ul>${stepProblems.map((p,index)=>html`<li key=${index}><button type="button" class="btn-link step-problem-link" onClick=${()=>focusProblem(p)}>${t('fields.'+p.field+'.label')}: ${problemText(i18n,p)}</button></li>`)}
+          ${!stepProblems.length && !reviewed[step.id] && html`<li>${t('form.unreviewed_step',{step:stepTitle(step,content,i18n)})}</li>`}</ul>
+      </div>`}
       ${body}
       ${step.kind !== 'preview' && html`<label class="reviewed-check">
-        <input type="checkbox" checked=${!!reviewed[step.id]} disabled=${locked} onChange=${(e) => setReviewedStep(step.id, e.target.checked)} />
+        <input type="checkbox" checked=${completed(step)} disabled=${locked} onChange=${(e) => setReviewedStep(step.id, e.target.checked)} />
         ${t('form.reviewed_step')}
       </label>`}
       <div class="form-nav">
