@@ -4,6 +4,7 @@ import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
 import { UFS } from '../../lib/formSchema.js?v=20261026-profile-layout2';
 import { BRAZIL_CITIES } from '../../lib/brazilCities.js';
+import { fieldProblems } from '../../lib/profileValidation.js?v=20261102-focal1';
 import { uploadImage } from '../../services/api.js';
 
 // ---------------------------------------------------------------- USD (spec 1, 5.2)
@@ -232,6 +233,23 @@ function GalleryInput({ value, onChange, i18n, disabled }) {
   </div>`;
 }
 
+function FocalInput({ field, value, onChange, i18n, disabled, id, showErrors }) {
+  const v = value || {};
+  const [touched,setTouched] = useState({});
+  const problems = fieldProblems(field,v);
+  return html`<div class="row-fields wrap focal-fields">${['name','role','email','phone'].map((part)=>{
+    const error = (showErrors || touched[part]) && problems.find((p)=>p.part===part);
+    return html`<label class=${cx('mini','grow','focal-field',error && 'focal-invalid')}>
+      <span>${i18n.t('form.'+part)}${field.req && html`<span class="req"> *</span>`}</span>
+      <input id=${id+'-'+part} class="input input-sm" type=${part==='email' ? 'email' : part==='phone' ? 'tel' : 'text'}
+        required=${!!field.req} aria-required=${!!field.req} aria-invalid=${!!error} aria-describedby=${error ? id+'-'+part+'-error' : undefined}
+        placeholder=${part==='phone' ? '+55 11 91234-5678' : undefined} value=${v[part] || ''} disabled=${disabled}
+        onBlur=${()=>setTouched((current)=>({...current,[part]:true}))} onInput=${(e)=>onChange({...v,[part]:e.target.value})} />
+      ${error && html`<small class="field-error" id=${id+'-'+part+'-error'} role="status">${i18n.t('form.errors.'+error.code,error)}</small>`}
+    </label>`;
+  })}</div>`;
+}
+
 // ---------------------------------------------------------------- dispatcher
 export function FieldInput(props) {
   const { field, value, onChange, i18n, disabled, id } = props;
@@ -259,16 +277,7 @@ export function FieldInput(props) {
         </select><//>
       </div>`;
     }
-    case 'focal': {
-      const v = value || {};
-      const set = (k) => (e) => onChange({ ...v, [k]: e.target.value });
-      return html`<div class="row-fields wrap">
-        <${Mini} label=${t('name')} grow=${true}><input id=${id} class="input input-sm" value=${v.name || ''} disabled=${disabled} onInput=${set('name')} /><//>
-        <${Mini} label=${t('role')} grow=${true}><input class="input input-sm" value=${v.role || ''} disabled=${disabled} onInput=${set('role')} /><//>
-        <${Mini} label=${t('email')} grow=${true}><input class="input input-sm" type="email" value=${v.email || ''} disabled=${disabled} onInput=${set('email')} /><//>
-        <${Mini} label=${t('phone')} grow=${true}><input class="input input-sm" type="tel" placeholder="+55 11 91234-5678" value=${v.phone || ''} disabled=${disabled} onInput=${set('phone')} /><//>
-      </div>`;
-    }
+    case 'focal': return html`<${FocalInput} ...${props} />`;
     case 'usd_range': {
       const v = value || {};
       return html`<div class="row-fields">

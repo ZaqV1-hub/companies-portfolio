@@ -948,3 +948,7 @@ h3.section-label { margin-top: 18px; }
 .review-media-caption p { margin: 0; font-size: 13px; line-height: 20px; white-space: pre-wrap; overflow-wrap: anywhere; }
 .review-media-empty { padding: 24px 16px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); background: var(--bg); }
 @media (max-width:900px) { .cmp-media-row { gap: 20px; } .review-media-grid.single { grid-template-columns: minmax(0,1fr); } }
+.focal-fields { align-items: flex-start; }
+.focal-field { min-width: 170px; }
+.focal-field .field-error { display: block; font-size: 12px; line-height: 1.5; letter-spacing: 0; text-transform: none; font-weight: 500; }
+.focal-invalid .input { border-color: #b42318; background: #fff8f7; }

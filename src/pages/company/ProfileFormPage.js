@@ -7,15 +7,15 @@ import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
 import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261026-profile-layout2';
-import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261026-profile-layout2';
+import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261102-focal1';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261030-cities1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261102-focal1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
 
 function problemText(i18n, p) {
-  return i18n.t('form.errors.' + p.code, p);
+  return (p.part ? i18n.t('form.'+p.part)+': ' : '') + i18n.t('form.errors.' + p.code, p);
 }
 
 function Field({ field, value, onChange, i18n, disabled, mark, showErrors, stepId }) {
@@ -23,16 +23,16 @@ function Field({ field, value, onChange, i18n, disabled, mark, showErrors, stepI
   const problems = showErrors ? fieldProblems(field, value) : [];
   return html`<div class=${cx('form-field', field.group && 'grouped', problems.length && 'has-error')} id=${domId}>
     <div class="form-field-head">
-      <label class="form-label" for=${domId + '-input'}>${i18n.t('fields.' + field.key + '.label')}${field.req && html`<span class="req" aria-label="required"> *</span>`}</label>
+      <label class="form-label" for=${domId + '-input' + (field.type==='focal' ? '-name' : '')}>${i18n.t('fields.' + field.key + '.label')}${field.req && html`<span class="req" aria-label="required"> *</span>`}</label>
       ${mark && mark.mode === 'prefilled' && html`<span class="import-badge">${i18n.t('form.imported')}</span>`}
       ${field.internal && html`<span class="internal-badge">🔒</span>`}
     </div>
     <div class="form-help">${i18n.t('fields.' + field.key + '.help')}</div>
     <div class="form-control-row">
-      <div class="form-control"><${FieldInput} field=${field} value=${value} onChange=${onChange} i18n=${i18n} disabled=${disabled} id=${domId + '-input'} /></div>
+      <div class="form-control"><${FieldInput} field=${field} value=${value} onChange=${onChange} i18n=${i18n} disabled=${disabled} showErrors=${showErrors} id=${domId + '-input'} /></div>
       ${mark && mark.mode === 'reference' && mark.previous_answer && html`<div class="previous-answer">${i18n.t('form.previous_answer', { answer: mark.previous_answer })}</div>`}
     </div>
-    ${problems.map((p, i) => html`<div class="field-error" key=${i}>${problemText(i18n, p)}</div>`)}
+    ${field.type !== 'focal' && problems.map((p, i) => html`<div class="field-error" key=${i}>${problemText(i18n, p)}</div>`)}
   </div>`;
 }
 

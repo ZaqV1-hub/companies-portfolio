@@ -50,9 +50,9 @@ export function fieldProblems(field, value) {
       break;
     case 'focal': {
       const v = value || {};
-      if (req && (blank(v.name) || blank(v.role) || blank(v.email) || blank(v.phone))) out.push({ code: 'required' });
-      if (!blank(v.email) && !EMAIL_RE.test(v.email)) out.push({ code: 'email' });
-      if (!blank(v.phone) && !PHONE_RE.test(v.phone)) out.push({ code: 'phone' });
+      if (req) for (const part of ['name','role','email','phone']) if (blank(v[part])) out.push({ code: 'required', part });
+      if (!blank(v.email) && !EMAIL_RE.test(v.email)) out.push({ code: 'email', part:'email' });
+      if (!blank(v.phone) && !PHONE_RE.test(v.phone)) out.push({ code: 'phone', part:'phone' });
       break;
     }
     case 'percent':
