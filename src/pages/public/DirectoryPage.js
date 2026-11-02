@@ -50,6 +50,9 @@ export function DirectoryPage() {
     <div class="search-wrap discovery-layout">
       <div class="search-card">
         <input class="input" type="search" value=${query} placeholder=${t('home.search_placeholder')} onInput=${(e) => setQuery(e.target.value)} />
+        <label class="mobile-profile-filter"><span>${lang === 'pt' ? 'Tipo de empresa' : 'Company type'}</span><select class="input" value=${profile || ''} onChange=${(event)=>setFilter('profile',event.target.value)}>
+          <option value="">${t('home.all')}</option>${PROFILE_TYPES.map((p)=>html`<option key=${p} value=${p}>${t('profile_type.' + p)}</option>`)}
+        </select></label>
         <div class="chips">
           <button type="button" class="chip" aria-pressed=${!profile} onClick=${() => setFilter('profile', '')}>${t('home.all')}</button>
           ${PROFILE_TYPES.map((p) => html`<button key=${p} type="button" class="chip" aria-pressed=${profile === p} onClick=${() => setFilter('profile', p)}>${t('profile_type.' + p)}</button>`)}

@@ -12,7 +12,7 @@ import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
 import { FieldInput } from '../../components/form/inputs.js?v=20261030-cities1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-profile-layout3';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
 
 function problemText(i18n, p) {
   return i18n.t('form.errors.' + p.code, p);

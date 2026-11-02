@@ -5,7 +5,7 @@ import { formatDate } from '../../lib/format.js';
 import { useI18n } from '../../lib/i18n.js';
 import { present, stage, subtitle } from '../../lib/profileModel.js';
 import { LogoPlate } from '../ui.js';
-import { LookingForCard, mainBlocks, otherSideCards } from './blocks.js?v=20261026-profile-layout2';
+import { LookingForCard, mainBlocks, otherSideCards } from './blocks.js?v=20261102-mobile1';
 
 function StageChart({ project, i18n }) {
   const s = stage(project);

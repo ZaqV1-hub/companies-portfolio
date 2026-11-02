@@ -1,6 +1,7 @@
 // Content blocks of the public profile, per profile type, in the order of spec 1, table 6.3.
 // Each block returns null when it has nothing to show (spec 1, 6.4).
-import { html } from '../../lib/html.js';
+import { html, useState } from '../../lib/html.js';
+import { ImageLightbox } from '../ImageLightbox.js';
 import { formatNumber, formatPeriod, formatUSD, formatUSDRange } from '../../lib/format.js';
 import { labels, milestoneStatus, present, sortedMilestones, sumRaised } from '../../lib/profileModel.js';
 import { ReadMore, Tags } from '../ui.js';
@@ -155,6 +156,14 @@ function TargetMarketsCard({ f, i18n }) {
   return html`<${SideCard} title=${i18n.t('block.target_markets')}><${Tags} items=${labels(i18n, 'markets', f.target_markets)} /><//>`;
 }
 
+function ProductPhoto({ src, i18n }) {
+  const [open, setOpen] = useState(false);
+  const label = i18n.t('profile.product_photo');
+  return html`<button class="profile-product-photo" type="button" aria-label=${i18n.lang === 'pt' ? 'Ampliar foto do produto' : 'Enlarge product photo'}
+    onClick=${()=>setOpen(true)}><img src=${src} alt=${label} loading="lazy" /><span>${i18n.lang === 'pt' ? 'Ampliar imagem' : 'Enlarge image'}</span></button>
+    ${open && html`<${ImageLightbox} src=${src} label=${label} closeLabel=${i18n.t('common.close')} onClose=${()=>setOpen(false)} />`}`;
+}
+
 function mainA(org, f, i18n) {
   const t = i18n.t;
   return [
@@ -162,8 +171,7 @@ function mainA(org, f, i18n) {
       <div class="eyebrow">${t('block.lead_product')}</div>
       <div class="profile-product">
         <div><h2>${f.lead_product_name}</h2><p>${i18n.tx(f.lead_product_moa)}</p></div>
-        ${(f.product_image_url || org.cover_url) && html`<div class="profile-product-photo" role="img" aria-label=${t('profile.product_photo')}
-          style=${{ backgroundImage: `url("${f.product_image_url || org.cover_url}")` }}></div>`}
+        ${(f.product_image_url || org.cover_url) && html`<${ProductPhoto} src=${f.product_image_url || org.cover_url} i18n=${i18n} />`}
       </div>
     </section>`,
     present(f.pipeline) && html`<${Block} key="pl" id="pipeline" title=${t('block.pipeline')}>

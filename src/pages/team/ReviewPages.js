@@ -7,7 +7,7 @@ import { href, navigate } from '../../lib/router.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField } from '../../lib/formSchema.js';
 import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js';
 import { draftToPublic } from '../../lib/draftPreview.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261026-tags-feedback1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 
 export function ReviewQueuePage() {
