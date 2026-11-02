@@ -953,3 +953,14 @@ h3.section-label { margin-top: 18px; }
 .focal-field .field-error { display: block; font-size: 12px; line-height: 1.5; letter-spacing: 0; text-transform: none; font-weight: 500; }
 .focal-invalid .input { border-color: #b42318; background: #fff8f7; }
 .step-problem-link { color: #8c1d13; text-decoration: underline; font-size: inherit; line-height: 1.6; }
+.document-accordion > summary { list-style: none; cursor: pointer; margin-bottom: 0; flex-wrap: nowrap; }
+.document-accordion > summary::-webkit-details-marker { display: none; }
+.document-accordion > summary::marker { content: ''; }
+.document-accordion > summary:focus-visible { outline: 2px solid var(--navy); outline-offset: 6px; border-radius: 6px; }
+.document-accordion .document-identity { flex: 1; }
+.document-accordion .document-identity > div { min-width: 0; }
+.document-chevron { flex: none; font-size: 24px; line-height: 1; color: var(--text-2); transition: transform .15s ease; }
+.document-accordion[open] > summary .document-chevron { transform: rotate(180deg); }
+.document-edit-fields { display: grid; gap: 18px; padding-top: 22px; }
+.document-titles { min-width: 0; }
+@media (max-width: 600px) { .document-accordion > summary { gap: 8px; } .document-accordion .document-icon { display: none; } .document-accordion .status-pill { font-size: 9px; } }

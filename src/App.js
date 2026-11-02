@@ -18,7 +18,7 @@ import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/Rev
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';
-import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261030-intake1';
+import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261102-documents2';
 import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-phone1';
 
 const investorIntentKey = 'portfolio:investor-intent';
