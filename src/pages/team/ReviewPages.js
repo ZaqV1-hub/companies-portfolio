@@ -268,7 +268,7 @@ export function OrganizationsPage() {
     <div class="team-list-head"><div><h1 class="page-title">${t('orgs.title')}</h1>
       <div class="page-subtitle">${t('orgs.subtitle')}</div></div>
       <button type="button" class="btn btn-lime btn-lg" onClick=${() => setCreating(!creating)}>${lang === 'pt' ? '+ Convidar empresa' : '+ Invite company'}</button></div>
-    ${creating && html`<form class="table-card" style=${{ padding:'20px',marginTop:'16px' }} onSubmit=${create}>
+    ${creating && html`<form class="table-card" style=${{ padding:'20px',marginTop:'16px',marginBottom:'20px' }} onSubmit=${create}>
       <div style=${{ display:'flex',gap:'12px',flexWrap:'wrap',alignItems:'end' }}>
         <label class="form-label">${lang === 'pt' ? 'Nome da empresa' : 'Company name'}<input class="input input-sm" required maxLength="80" value=${newName} onInput=${(e) => setNewName(e.target.value)} /></label>
         <label class="form-label">${lang === 'pt' ? 'E-mail que receberá o convite' : 'Email that will receive the invitation'}<input class="input input-sm" type="email" required value=${newEmail} onInput=${(e) => setNewEmail(e.target.value)} /></label>
