@@ -1,5 +1,5 @@
 // Directory / home: program presentation, search and filters, documents, company cards.
-import { html, useEffect, useMemo, useState } from '../../lib/html.js';
+import { html, useEffect, useMemo, useRef, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js?v=20261030-intake1';
 import { useI18n } from '../../lib/i18n.js';
 import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js';
@@ -14,11 +14,21 @@ export function DirectoryPage() {
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState(EMPTY_FILTERS);
+  const filterCard = useRef(null);
+  const [filterHeight,setFilterHeight] = useState(0);
   const profile = filters.profile;
   const setFilter = (key, value) => setFilters({ ...filters, [key]: value });
 
   useEffect(() => { api.listPublicOrganizations().then(setOrgs); }, []);
   useEffect(() => { setSelectedDocument(null); api.listPublicDocuments(lang).then(setDocuments).catch(()=>setDocuments([])); }, [lang]);
+  useEffect(() => {
+    if (!filterCard.current) return;
+    const measure = () => setFilterHeight(Math.ceil(filterCard.current.getBoundingClientRect().height));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(filterCard.current);
+    return () => observer.disconnect();
+  }, [orgs !== null]);
 
   const filtered = useMemo(() => {
     if (!orgs) return [];
@@ -47,8 +57,8 @@ export function DirectoryPage() {
       </div>
     </section>
 
-    <div class="search-wrap discovery-layout">
-      <div class="search-card">
+    <div class="search-wrap discovery-layout" style=${filterHeight ? {'--filter-card-height':filterHeight+'px'} : undefined}>
+      <div class="search-card" ref=${filterCard}>
         <input class="input" type="search" value=${query} placeholder=${t('home.search_placeholder')} onInput=${(e) => setQuery(e.target.value)} />
         <label class="mobile-profile-filter"><span>${lang === 'pt' ? 'Tipo de empresa' : 'Company type'}</span><select class="input" value=${profile || ''} onChange=${(event)=>setFilter('profile',event.target.value)}>
           <option value="">${t('home.all')}</option>${PROFILE_TYPES.map((p)=>html`<option key=${p} value=${p}>${t('profile_type.' + p)}</option>`)}
@@ -71,7 +81,7 @@ export function DirectoryPage() {
       <aside class="home-documents" aria-label=${t('documents.title')}>
         <div class="home-documents-head"><span class="home-documents-icon" aria-hidden="true">PDF</span><h2>${t('documents.title')}</h2></div>
         <p>${t('documents.intro')}</p>
-        ${documents.length ? html`<div class="home-document-list">${documents.map((document)=>html`<button type="button" class="home-document" key=${document.id} onClick=${()=>setSelectedDocument(document)}><span class="home-document-name">${lang==='pt' ? document.title_pt || document.title_en : document.title_en || document.title_pt}</span><span class="home-document-view">${t('documents.view')} ↗</span></button>`)}</div>` : html`<p class="home-documents-empty">${t('documents.empty')}</p>`}
+        ${documents.length ? html`<div class="home-document-list" role="region" aria-label=${t('documents.title')} tabIndex="0">${documents.map((document)=>html`<button type="button" class="home-document" key=${document.id} onClick=${()=>setSelectedDocument(document)}><span class="home-document-name">${lang==='pt' ? document.title_pt || document.title_en : document.title_en || document.title_pt}</span><span class="home-document-view">${t('documents.view')} ↗</span></button>`)}</div>` : html`<p class="home-documents-empty">${t('documents.empty')}</p>`}
       </aside>
     </div>
 

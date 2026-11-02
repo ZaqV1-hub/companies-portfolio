@@ -964,3 +964,10 @@ h3.section-label { margin-top: 18px; }
 .document-edit-fields { display: grid; gap: 18px; padding-top: 22px; }
 .document-titles { min-width: 0; }
 @media (max-width: 600px) { .document-accordion > summary { gap: 8px; } .document-accordion .document-icon { display: none; } .document-accordion .status-pill { font-size: 9px; } }
+/* Keep document lists within the adjacent filter card. */
+.home-documents { display: flex; flex-direction: column; max-height: var(--filter-card-height,440px); min-height: 0; overflow: hidden; }
+.home-documents-head, .home-documents > p { flex-shrink: 0; }
+.home-document-list { min-height: 0; overflow-y: auto; overscroll-behavior-y: contain; scrollbar-gutter: stable; padding-right: 4px; }
+.home-document-list:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px; border-radius: 8px; }
+.home-document { flex-shrink: 0; }
+@media (max-width:760px) { .home-documents { max-height: 400px; } }
