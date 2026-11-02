@@ -105,8 +105,9 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const completedCount = steps.filter(completed).length;
   const focusProblem = (problem) => {
     const base = 'f-' + problem.stepId.replace(':','-') + '-' + problem.field;
-    const input = document.getElementById(base+'-input'+(problem.part ? '-'+problem.part : ''));
-    (input || document.getElementById(base))?.scrollIntoView({block:'center',behavior:'smooth'});
+    const container = document.getElementById(base);
+    const input = document.getElementById(base+'-input'+(problem.part ? '-'+problem.part : '')) || container?.querySelector('input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled])');
+    (container || input)?.scrollIntoView({block:'center',behavior:'smooth'});
     input?.focus({preventScroll:true});
   };
   const markFor = (projectId, key) => data.imports.find((r) => (r.project_id || null) === (projectId || null) && r.field === key);
@@ -127,8 +128,11 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   };
 
   const setReviewedStep = (id, value) => {
-    if (value && check.problems.some((p)=>p.stepId===id)) {
-      setReviewed({...reviewed,[id]:false}); setShowErrors(true); setBlockedStep(id); return;
+    const firstProblem = check.problems.find((p)=>p.stepId===id);
+    if (value && firstProblem) {
+      setReviewed({...reviewed,[id]:false}); setShowErrors(true); setBlockedStep(id);
+      setTimeout(()=>focusProblem(firstProblem),0);
+      return;
     }
     setReviewed({ ...reviewed, [id]: value });
     setBlockedStep(null);
@@ -288,7 +292,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
       </label>`}
       <div class="form-nav">
         ${stepIndex > 0 ? html`<button type="button" class="btn btn-outline" onClick=${() => goStep(stepIndex - 1)}>${t('form.prev')}</button>` : html`<span></span>`}
-        ${stepIndex < steps.length - 1 && html`<button type="button" class="btn btn-lime btn-lg" onClick=${() => goStep(stepIndex + 1)}>${t('form.next')}</button>`}
+        ${stepIndex < steps.length - 1 && html`<button type="button" class="btn btn-lime btn-lg" disabled=${!locked && !teamOrgId && !unchangedInitial && !completed(step)} onClick=${() => goStep(stepIndex + 1)}>${t('form.next')}</button>`}
       </div>
     </section>
   </div>`;
