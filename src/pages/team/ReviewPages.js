@@ -9,6 +9,7 @@ import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
+import { ImageLightbox } from '../../components/ImageLightbox.js';
 
 export function ReviewQueuePage() {
   const { t, lang } = useI18n();
@@ -36,9 +37,35 @@ export function ReviewQueuePage() {
   </div>`;
 }
 
+function ReviewImages({ field, value, i18n }) {
+  const [open, setOpen] = useState(null);
+  const gallery = field.type === 'gallery';
+  const images = gallery ? (value || []) : value ? [{url:value}] : [];
+  const pt = i18n.lang === 'pt';
+  if (!images.length) return html`<div class="review-media-empty">${pt ? 'Nenhuma imagem informada' : 'No image provided'}</div>`;
+  return html`<div class=${cx('review-media-grid', !gallery && 'single', field.key === 'logo_url' && 'logo')}>
+    ${images.map((item,index) => {
+      const caption = typeof item.caption === 'string' ? {pt:item.caption} : (item.caption || {});
+      const label = gallery ? `${pt ? 'Imagem' : 'Image'} ${index+1}` : i18n.t('fields.' + field.key + '.label');
+      return html`<figure class="review-media-card" key=${index}>
+        <button type="button" class="review-media-open" onClick=${()=>setOpen({url:item.url,label})} aria-label=${`${pt ? 'Ampliar' : 'Enlarge'}: ${label}`}>
+          <img src=${item.url} alt=${caption[i18n.lang] || caption.pt || caption.en || label} loading="lazy" /><span>${pt ? 'Ampliar imagem' : 'Enlarge image'}</span>
+        </button>
+        <figcaption><strong>${label}</strong>${gallery && html`<div class="review-media-caption"><span>PT</span><p>${caption.pt || '—'}</p></div><div class="review-media-caption"><span>EN</span><p>${caption.en || '—'}</p></div>`}</figcaption>
+      </figure>`;
+    })}
+    ${open && html`<${ImageLightbox} src=${open.url} label=${open.label} closeLabel=${i18n.t('common.close')} onClose=${()=>setOpen(null)} />`}
+  </div>`;
+}
+
 function CompareRow({ field, before, after, i18n, reference, onlyChanges, isNew }) {
   const changed = !isNew && !sameValue(before, after);
   if (onlyChanges && !changed && !isNew) return null;
+  if (field.type === 'image' || field.type === 'gallery') return html`<div class=${cx('cmp-row','cmp-media-row',changed && 'changed')}>
+    <div class="cmp-label">${i18n.t('fields.' + field.key + '.label')}${changed && html`<span class="changed-chip">${i18n.t('review.changed')}</span>`}</div>
+    <div class="cmp-col"><div class="review-media-version">${i18n.lang === 'pt' ? 'Versão anterior' : 'Previous version'}</div><${ReviewImages} field=${field} value=${before} i18n=${i18n} />${reference && html`<div class="previous-answer">${i18n.t('review.forms_answer')}: ${reference}</div>`}</div>
+    <div class="cmp-col"><div class="review-media-version">${i18n.lang === 'pt' ? 'Nova versão' : 'New version'}</div><${ReviewImages} field=${field} value=${after} i18n=${i18n} /></div>
+  </div>`;
   const prev = displayLines(field, before, i18n);
   const next = displayLines(field, after, i18n);
   const extraEnglish = (value) => field.type === 'text' ? [] : collectTexts(value).filter((entry) => entry.en)
@@ -48,16 +75,12 @@ function CompareRow({ field, before, after, i18n, reference, onlyChanges, isNew 
       ${changed && html`<span class="changed-chip">${i18n.t('review.changed')}</span>`}</div>
     <div class="cmp-col">
       ${prev.length ? prev.map((l, i) => html`<div key=${i} class="cmp-line">${l}</div>`) : html`<div class="cmp-empty">—</div>`}
-      ${field.type === 'image' && before && html`<div class="image-preview" style=${{ backgroundImage: "url('" + before + "')" }}></div>`}
-      ${field.type === 'gallery' && (before || []).map((item, i) => html`<div class="image-preview" key=${i} style=${{ backgroundImage: "url('" + item.url + "')" }}></div>`)}
       ${extraEnglish(before).map((line, i) => html`<div class="cmp-line cmp-english" key=${'en' + i}>${line}</div>`)}
       ${reference && html`<div class="previous-answer">${i18n.t('review.forms_answer')}: ${reference}</div>`}
     </div>
     <div class="cmp-col">
       ${next.length ? next.map((l, i) => html`<div key=${i} class="cmp-line">${l}</div>`) : html`<div class="cmp-empty">—</div>`}
       ${extraEnglish(after).map((line, i) => html`<div class="cmp-line cmp-english" key=${'en' + i}>${line}</div>`)}
-      ${field.type === 'image' && after && html`<div class="image-preview" style=${{ backgroundImage: "url('" + after + "')" }}></div>`}
-      ${field.type === 'gallery' && (after || []).map((item, i) => html`<div class="image-preview" key=${i} style=${{ backgroundImage: "url('" + item.url + "')" }}></div>`)}
     </div>
   </div>`;
 }

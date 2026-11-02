@@ -927,3 +927,24 @@ h3.section-label { margin-top: 18px; }
   .profile-product-photo img { min-height: 0; height: 100%; }
   .product-lightbox { padding: 72px 12px 20px; }
 }
+
+/* Image fields in the read-only before/after comparison. */
+.cmp-media-row { padding-top: 20px; padding-bottom: 20px; }
+.cmp-media-row .cmp-col { min-width: 0; }
+.review-media-version { margin-bottom: 10px; font-size: 11px; text-transform: uppercase; letter-spacing: .5px; font-weight: 800; color: var(--muted); }
+.review-media-grid { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,180px),1fr)); gap: 14px; align-items: start; }
+.review-media-grid.single { grid-template-columns: minmax(0,360px); }
+.review-media-card { margin: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; background: #fff; }
+.review-media-open { position: relative; display: block; width: 100%; padding: 0; border: 0; background: #f0f2f6; cursor: zoom-in; aspect-ratio: 4/3; }
+.review-media-grid.single .review-media-open { aspect-ratio: 16/9; }
+.review-media-open img { display: block; width: 100%; height: 100%; object-fit: contain; }
+.review-media-grid.logo .review-media-open img { padding: 18px; }
+.review-media-open span { position: absolute; right: 8px; bottom: 8px; color: #fff; background: rgba(20,26,59,.9); border-radius: 6px; padding: 5px 8px; font-size: 11px; font-weight: 700; }
+.review-media-open:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+.review-media-card figcaption { padding: 12px; color: var(--text-2); }
+.review-media-card figcaption > strong { display: block; font-size: 12px; color: var(--text); margin-bottom: 8px; }
+.review-media-caption { display: grid; grid-template-columns: 24px minmax(0,1fr); gap: 8px; margin-top: 6px; }
+.review-media-caption span { font-size: 10px; font-weight: 800; color: var(--muted); line-height: 20px; }
+.review-media-caption p { margin: 0; font-size: 13px; line-height: 20px; white-space: pre-wrap; overflow-wrap: anywhere; }
+.review-media-empty { padding: 24px 16px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); background: var(--bg); }
+@media (max-width:900px) { .cmp-media-row { gap: 20px; } .review-media-grid.single { grid-template-columns: minmax(0,1fr); } }
