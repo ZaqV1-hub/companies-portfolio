@@ -469,7 +469,6 @@ app.post('/api/organizations/:id/contact-requests', requireRole('investor'), con
     if (existing.length) {
       await db.execute('UPDATE relationships SET contact_request_at=COALESCE(contact_request_at,?) WHERE id=?', [localDate(),existing[0].id]);
       if (!existing[0].contact_request_at) {
-        await emailEvent('contact_request_team', 'team', { organization_id:req.params.id,relationship_id:existing[0].id }, db);
         await emailEvent('contact_request_company', 'company', { organization_id:req.params.id,relationship_id:existing[0].id }, db);
       }
       await db.commit();
@@ -482,7 +481,6 @@ app.post('/api/organizations/:id/contact-requests', requireRole('investor'), con
     if (projectId) { const [project] = await db.execute('SELECT id FROM projects WHERE id=? AND organization_id=?',[projectId,req.params.id]); if(!project.length) projectId=null; }
     await db.execute('INSERT INTO interactions (id,relationship_id,date,description,type,apex_product,event,project_id,auto,created_by,created_at) VALUES (?,?,?,?,?,?,NULL,?,1,?,UTC_TIMESTAMP())',
       [`it-${crypto.randomUUID()}`, relationshipId, localDate(), 'Pedido de contato pela plataforma', 'other', 'investment_portfolio', projectId, investor.id]);
-    await emailEvent('contact_request_team', 'team', { organization_id: req.params.id, relationship_id: relationshipId }, db);
     await emailEvent('contact_request_company', 'company', { organization_id: req.params.id, relationship_id: relationshipId }, db);
     await db.commit();
     res.status(201).json({ ok: true, relationship_id: relationshipId, reused: false });
@@ -928,7 +926,7 @@ async function emailEvent(template, audience, data, db = pool) {
     const point = typeof focal === 'string' ? JSON.parse(focal) : focal;
     to = organizations[0]?.invitation_email || users[0]?.email || point?.email || '';
   }
-  const ready = ['profile_submitted','profile_accepted','profile_returned','profile_rejected','profile_approved','company_invitation','company_signup_verify','company_feedback','contact_request_team','contact_request_company'].includes(template);
+  const ready = ['profile_submitted','profile_accepted','profile_returned','profile_rejected','profile_approved','company_invitation','company_signup_verify','company_feedback','contact_request_company'].includes(template);
   return db.execute('INSERT INTO email_outbox (id,template,`to`,data,created_at,ready_to_send) VALUES (?,?,?,?,UTC_TIMESTAMP(),?)',
     [`m-${crypto.randomUUID()}`, template, to, jsonColumn(data),Number(ready)]);
 }
@@ -938,7 +936,7 @@ async function deliverOutbox() {
   if (sendingOutbox || !mailAvailable()) return;
   sendingOutbox = true;
   try {
-    const [items] = await pool.query("SELECT * FROM email_outbox WHERE ready_to_send=TRUE AND sent=FALSE AND attempts<8 AND TIMESTAMPDIFF(MINUTE,created_at,UTC_TIMESTAMP())>=attempts*5 ORDER BY created_at LIMIT 10");
+    const [items] = await pool.query("SELECT * FROM email_outbox WHERE ready_to_send=TRUE AND sent=FALSE AND template<>'contact_request_team' AND attempts<8 AND TIMESTAMPDIFF(MINUTE,created_at,UTC_TIMESTAMP())>=attempts*5 ORDER BY created_at LIMIT 10");
     for (const item of items) {
       const data = typeof item.data === 'string' ? JSON.parse(item.data) : item.data;
       const [orgs] = data.organization_id ? await pool.execute('SELECT name FROM organizations WHERE id=?', [data.organization_id]) : [[]];
@@ -958,17 +956,16 @@ async function deliverOutbox() {
         company_signup_verify: data.lang === 'en' ? { lang:'en', subject:`Confirm your company email | ${name}`, title:'Confirm your email', intro:`Confirm your business email to finish creating the ${name} account. Then complete the company profile and submit it for Abiquifi approval. Your company will not be published automatically. This link expires in 24 hours.`, button:'Confirm email', url:`${base}/company/verify-email?token=${encodeURIComponent(data.token)}` }
           : { lang:'pt', subject:`Confirme o e-mail da empresa | ${name}`, title:'Confirme seu e-mail', intro:`Confirme seu e-mail empresarial para concluir o cadastro de ${name}. Depois, preencha o perfil e envie a inscrição para análise da Abiquifi. A empresa não será publicada automaticamente. O link expira em 24 horas.`, button:'Confirmar e-mail', url:`${base}/empresa/confirmar-email?token=${encodeURIComponent(data.token)}` },
       };
-      if (['contact_request_team','contact_request_company'].includes(item.template)) {
+      if (item.template === 'contact_request_company') {
         const [contacts] = await pool.execute('SELECT c.name,c.email,c.phone,i.name AS institution_name FROM relationships r JOIN contacts c ON c.id=r.contact_id LEFT JOIN institutions i ON i.id=c.institution_id WHERE r.id=? AND r.organization_id=?',[data.relationship_id || '',data.organization_id || '']);
         if (contacts.length) {
           const contact = contacts[0];
-          const company = item.template === 'contact_request_company';
           templates[item.template] = {
             subject:`Novo pedido de contato | ${name}`,title:'Novo pedido de contato',
-            intro:company ? `${contact.name} solicitou contato com ${name} pelo portfólio. Acesse o CRM para consultar os dados e dar continuidade à conversa.` : `${contact.name} solicitou contato com ${name} pelo portfólio. O pedido está disponível no CRM da empresa e no painel da Abiquifi.`,
+            intro:`${contact.name} solicitou contato com ${name} pelo portfólio. Acesse o CRM para consultar os dados e dar continuidade à conversa.`,
             fields:[['Empresa',name],['Investidor',contact.name],['Instituição',contact.institution_name],['E-mail',contact.email],['Telefone',contact.phone]],
-            button:company ? 'Ver contato no CRM' : 'Acompanhar pedido',
-            url:`${base}/${company ? 'empresa/contacts' : 'painel/crm'}/${encodeURIComponent(data.relationship_id)}`,
+            button:'Ver contato no CRM',
+            url:`${base}/empresa/contacts/${encodeURIComponent(data.relationship_id)}`,
             replyTo:contact.email,
           };
         }
