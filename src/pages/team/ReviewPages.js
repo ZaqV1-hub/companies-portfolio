@@ -224,10 +224,26 @@ export function OrganizationsPage() {
     event.preventDefault(); setNotice('');
     setNewInviteOpen(true);
   };
+  const invitationError = (error) => {
+    const messages = lang === 'pt' ? {
+      email_has_account:'Este e-mail já possui uma conta na plataforma. Para convidar uma nova empresa, use outro e-mail. Se a empresa já tem acesso, ela pode entrar ou recuperar a senha.',
+      organization_exists:'Esta empresa já está cadastrada. Localize-a na lista de organizações para gerenciar o acesso.',
+      email_unavailable:'O envio de e-mail está indisponível no momento. Tente novamente mais tarde.',
+      invalid:'Confira o nome da empresa e informe um e-mail válido antes de enviar o convite.',
+      invalid_email:'Configure um e-mail válido para a empresa antes de enviar o convite.',
+    } : {
+      email_has_account:'This email already has an account on the platform. Use another email to invite a new company. If the company already has access, it can sign in or reset its password.',
+      organization_exists:'This company is already registered. Find it in the organizations list to manage access.',
+      email_unavailable:'Email delivery is currently unavailable. Please try again later.',
+      invalid:'Check the company name and enter a valid email before sending the invitation.',
+      invalid_email:'Set a valid company email before sending the invitation.',
+    };
+    return messages[error.message] || (lang === 'pt' ? 'Não foi possível enviar o convite. Tente novamente.' : 'Could not send the invitation. Please try again.');
+  };
   const createInvitation = async (language) => {
     setInviteBusy(true);setInviteError('');
     try { await api.createCompanyInvitation(newName.trim(),newEmail.trim(),language);setNewInviteOpen(false);setCreating(false);setNewName('');setNewEmail('');await load();setNotice(lang === 'pt' ? 'Convite criado e colocado na fila de envio.' : 'Invitation created and queued for delivery.'); }
-    catch (error) { setInviteError(error.message === 'organization_exists' ? (lang === 'pt' ? 'A empresa já existe. Use o cadastro atual.' : 'The company already exists. Use its current record.') : (lang === 'pt' ? 'Não foi possível criar o convite.' : 'Could not create the invitation.')); }
+    catch (error) { setInviteError(invitationError(error)); }
     finally { setInviteBusy(false); }
   };
   const saveEmail = async (r) => {
@@ -237,7 +253,7 @@ export function OrganizationsPage() {
   const invite = async (r,language) => {
     setInviteBusy(true); setInviteError('');
     try { const result = await api.inviteOrganization(r.id,language); setNotice(lang === 'pt' ? `Convite preparado para ${result.email}.` : `Invitation queued for ${result.email}.`); setInviteTarget(null); await load(); }
-    catch (error) { setInviteError(error.message === 'email_has_account' ? (lang === 'pt' ? 'Este e-mail já tem acesso. Use a recuperação de senha.' : 'This email already has access. Use password reset.') : (lang === 'pt' ? 'Não foi possível enviar o convite.' : 'Could not send the invitation.')); }
+    catch (error) { setInviteError(invitationError(error)); }
     finally { setInviteBusy(false); }
   };
   const createTag = async (event) => {
