@@ -3,7 +3,9 @@
 import { createContext, html, useContext, useEffect, useMemo, useState } from './html.js';
 
 export const LANGS = ['en', 'pt'];
-const LANG_KEY = 'cp.lang.v2';
+// Only an explicit choice in the language selector is remembered. Older versions
+// also saved automatic/route choices, which could pin foreign browsers to PT.
+const LANG_KEY = 'cp.lang.manual.v3';
 const dictionaries = {};
 
 export async function loadDictionaries() {
@@ -51,11 +53,16 @@ const LangContext = createContext(null);
 export function LangProvider({ children, forced }) {
   const [chosen, setChosen] = useState(initialLang);
   const lang = forced || chosen;
-  const setLang = forced ? () => {} : setChosen;
+  const setLang = forced ? () => {} : (next, { persist = true } = {}) => {
+    if (!LANGS.includes(next)) return;
+    if (persist) {
+      try { localStorage.setItem(LANG_KEY, next); } catch (err) { /* storage blocked */ }
+    }
+    setChosen(next);
+  };
   useEffect(() => {
     if (forced) return;
     document.documentElement.lang = lang === 'pt' ? 'pt-BR' : 'en';
-    try { localStorage.setItem(LANG_KEY, lang); } catch (err) { /* ignore */ }
   }, [lang, forced]);
   const value = useMemo(() => ({
     lang,

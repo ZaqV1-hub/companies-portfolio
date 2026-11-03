@@ -101,7 +101,7 @@ function TeamArea({ user, route, onLogout }) {
 function Routes() {
   const route = useRoute();
   const { setLang } = useI18n();
-  useEffect(() => { if (route.areaLang) setLang(route.areaLang); }, [route.areaLang]);
+  useEffect(() => { if (route.areaLang) setLang(route.areaLang, { persist: false }); }, [route.areaLang]);
   const [user, setUser] = useState(undefined);
   useEffect(() => { api.getCurrentUser().then(setUser).catch(() => setUser(null)); }, []);
   if (user === undefined) return html`<div class="section">Carregando...</div>`;
