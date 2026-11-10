@@ -544,7 +544,7 @@
     },
     "rounds": {
       "label": "Investimento buscado",
-      "help": "Uma linha por rodada: estágio, período previsto, valor em USD e finalidade."
+      "help": "Informe quanto sua empresa busca captar, em dólares americanos (USD), e o estágio e período da rodada. Se o valor ainda estiver pendente ou zerado, salve o rascunho e complete esta informação antes de enviar alterações para revisão."
     },
     "use_of_funds": {
       "label": "Uso dos recursos",
@@ -556,7 +556,7 @@
     },
     "revenue": {
       "label": "Faturamento anual",
-      "help": "Valor inteiro em USD e o ano."
+      "help": "Informe o faturamento realizado pela sua empresa no ano indicado, em dólares americanos (USD). Não inclua investimento captado nem previsão de vendas."
     },
     "gtm_models": {
       "label": "Go-to-market",
@@ -789,7 +789,7 @@
     "add": "+ Adicionar",
     "remove": "Remover",
     "none_raised": "Nenhum valor captado",
-    "pre_revenue": "Pré-receita",
+    "pre_revenue": "Minha empresa ainda não teve faturamento (pré-receita)",
     "no_exports": "Não exporta",
     "year": "Ano",
     "month": "Mês",
@@ -852,8 +852,16 @@
       "raised_required": "Inclua uma fonte ou marque \"Nenhum valor captado\".",
       "year_required": "Informe o ano.",
       "max_items": "Máximo de {max} itens.",
-      "caption_required": "A imagem {item} precisa de legenda."
-    }
+      "caption_required": "A imagem {item} precisa de legenda.",
+      "rounds_required": "Informe quanto sua empresa busca captar. Clique em “Adicionar” e preencha o estágio, o período e o valor da rodada em USD. Se ainda não definiu o valor, salve o rascunho para completar depois.",
+      "round_stage_required": "Na rodada {item}, selecione o estágio do investimento que sua empresa está buscando.",
+      "round_period_required": "Na rodada {item}, informe o ano ou período previsto para a captação.",
+      "round_amount_required": "Na rodada {item}, informe o valor que sua empresa busca captar em USD, maior que zero. Se ainda não definiu esse valor, salve o rascunho e preencha antes de enviar alterações para revisão.",
+      "revenue_amount_required": "Você informou o ano, mas falta o faturamento da sua empresa nesse período. Preencha o valor em USD. Se não houve faturamento, informe 0.",
+      "revenue_year_required": "Informe a qual ano se refere o faturamento da sua empresa, por exemplo, 2025."
+    },
+    "revenue_pending_pre": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se a empresa ainda não começou a faturar, marque a opção de pré-receita acima.",
+    "revenue_pending": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se não houve faturamento nesse ano, informe 0."
   },
   "review": {
     "queue_title": "Fila de revisão",

@@ -7,10 +7,10 @@ import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
 import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261026-profile-layout2';
-import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261102-focal1';
+import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261110-financial-help1';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261102-focal1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261110-financial-help1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
 

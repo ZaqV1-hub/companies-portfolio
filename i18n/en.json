@@ -544,7 +544,7 @@
     },
     "rounds": {
       "label": "Investment sought",
-      "help": "One line per round: stage, expected period, amount in USD and purpose."
+      "help": "Enter how much your company seeks to raise in US dollars (USD), along with the round stage and expected period. If the amount is pending or zero, save your draft and complete it before submitting changes for review."
     },
     "use_of_funds": {
       "label": "Use of funds",
@@ -556,7 +556,7 @@
     },
     "revenue": {
       "label": "Annual revenue",
-      "help": "Whole amount in USD and the year."
+      "help": "Enter your company’s actual revenue for the specified year in US dollars (USD). Do not include funding raised or sales forecasts."
     },
     "gtm_models": {
       "label": "Go-to-market",
@@ -789,7 +789,7 @@
     "add": "+ Add",
     "remove": "Remove",
     "none_raised": "No funds raised",
-    "pre_revenue": "Pre-revenue",
+    "pre_revenue": "My company has not generated revenue yet (pre-revenue)",
     "no_exports": "Does not export",
     "year": "Year",
     "month": "Month",
@@ -852,8 +852,16 @@
       "raised_required": "Add a source or tick \"No funds raised\".",
       "year_required": "Enter the year.",
       "max_items": "At most {max} items.",
-      "caption_required": "Image {item} needs a caption."
-    }
+      "caption_required": "Image {item} needs a caption.",
+      "rounds_required": "Enter how much your company seeks to raise. Click “Add” and enter the round stage, period and amount in USD. If the amount is not defined yet, save your draft and complete it later.",
+      "round_stage_required": "For round {item}, select the funding stage your company is seeking.",
+      "round_period_required": "For round {item}, enter the expected funding year or period.",
+      "round_amount_required": "For round {item}, enter the amount your company seeks to raise in USD, greater than zero. If it is not defined yet, save your draft and complete it before submitting changes for review.",
+      "revenue_amount_required": "You entered a year, but your company’s revenue for that period is missing. Enter the amount in USD. If there was no revenue, enter 0.",
+      "revenue_year_required": "Enter the year your company’s revenue relates to, for example, 2025."
+    },
+    "revenue_pending_pre": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If the company has not started generating revenue, select the pre-revenue option above.",
+    "revenue_pending": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If there was no revenue that year, enter 0."
   },
   "review": {
     "queue_title": "Review queue",

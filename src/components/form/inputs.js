@@ -311,6 +311,7 @@ export function FieldInput(props) {
       const v = value || {};
       return html`<div>
         ${field.allowPre && html`<label class="check-line"><input type="checkbox" checked=${!!v.pre_revenue} disabled=${disabled} onChange=${(e) => onChange(e.target.checked ? { pre_revenue: true } : {})} /> ${t('pre_revenue')}</label>`}
+        ${!v.pre_revenue && v.amount_usd == null && html`<p class="form-help">${t(field.allowPre ? 'revenue_pending_pre' : 'revenue_pending')}</p>`}
         ${!v.pre_revenue && html`<div class="row-fields">
           <${Mini} label=${t('amount_usd')}><${UsdInput} value=${v.amount_usd} i18n=${i18n} disabled=${disabled} onChange=${(n) => onChange({ ...v, amount_usd: n })} /><//>
           <${Mini} label=${t('year')}><${IntInput} value=${v.year} min=${2000} max=${2100} disabled=${disabled} onChange=${(y) => onChange({ ...v, year: y })} /><//>

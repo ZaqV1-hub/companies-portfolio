@@ -78,9 +78,11 @@ export function fieldProblems(field, value) {
     }
     case 'rounds': {
       const items = value || [];
-      if (req && items.length < (field.min || 1)) out.push({ code: 'min_items', min: field.min || 1 });
+      if (req && items.length < (field.min || 1)) out.push({ code: 'rounds_required' });
       items.forEach((r, i) => {
-        if (blank(r.stage) || !r.period || !r.period.year || r.amount_usd == null || r.amount_usd === '') out.push({ code: 'item_incomplete', item: i + 1 });
+        if (blank(r.stage)) out.push({ code: 'round_stage_required', item: i + 1 });
+        if (!r.period || !r.period.year) out.push({ code: 'round_period_required', item: i + 1 });
+        if (r.amount_usd == null || r.amount_usd === '' || r.amount_usd === 0) out.push({ code: 'round_amount_required', item: i + 1 });
         if (!isWholeUSD(r.amount_usd)) out.push({ code: 'usd', item: i + 1 });
         if (textPt(r.purpose).length > 100) out.push({ code: 'too_long', max: 100, item: i + 1 });
       });
@@ -97,9 +99,10 @@ export function fieldProblems(field, value) {
     }
     case 'revenue': {
       const v = value || {};
+      if (!v.pre_revenue && v.year && (v.amount_usd == null || v.amount_usd === '')) out.push({ code: 'revenue_amount_required' });
       if (!v.pre_revenue && (v.amount_usd != null && v.amount_usd !== '')) {
         if (!isWholeUSD(v.amount_usd)) out.push({ code: 'usd' });
-        if (!v.year) out.push({ code: 'year_required' });
+        if (!v.year) out.push({ code: 'revenue_year_required' });
       }
       break;
     }
