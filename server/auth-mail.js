@@ -27,7 +27,7 @@ export function renderPlatformMail({ title, intro, button, url, note, lang = 'pt
   const safeUrl = url?.startsWith(origin() + '/') ? url : null;
   const font = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;";
   const lines = (value) => esc(value).replace(/\r?\n/g, '<br />');
-  const paragraphs = (value) => String(value || '').split(/\r?\n\s*\r?\n/).filter(Boolean).map((part)=>`<p style="${font}font-size:15px;line-height:24px;margin:0 0 18px;color:#344054;">${lines(part)}</p>`).join('');
+  const paragraphs = (value) => String(value || '').split(/\r?\n\s*\r?\n/).filter(Boolean).map((part)=>{ const feature = part.match(/^• ([^:]+): ([\s\S]+)$/); const content = feature ? `• <strong>${esc(feature[1])}:</strong> ${lines(feature[2])}` : lines(part); return `<p style="${font}font-size:15px;line-height:24px;margin:0 0 18px;color:#344054;">${content}</p>`; }).join('');
   const details = fields.filter(([,value])=>value !== undefined && value !== null && value !== '');
   const text = [title,intro,details.map(([label,value])=>`${label}: ${value}`).join('\n'),message ? `${messageLabel || (lang === 'en' ? 'Message' : 'Mensagem')}\n${message}` : '',safeUrl ? `${button}: ${safeUrl}` : '',note].filter(Boolean).join('\n\n');
   const html = `<!doctype html>
