@@ -42,13 +42,11 @@ export function renderPlatformMail({ title, intro, button, url, note, lang = 'pt
 <!--[if mso]><table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0"><tr><td><![endif]-->
 <table role="presentation" width="600" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="width:100%;max-width:600px;border:1px solid #e2e7ef;border-radius:18px;overflow:hidden;">
 <tr><td height="5" bgcolor="#cbea2b" style="height:5px;font-size:0;line-height:0;">&nbsp;</td></tr>
-<tr><td class="email-pad" bgcolor="#141d39" style="padding:30px 36px 16px;${font}">
+<tr><td class="email-pad" bgcolor="#141d39" style="padding:28px 36px;${font}">
 <img src="cid:bph-logo@companiesportfolio" width="180" alt="Brazilian Pharma &amp; Health" style="display:block;width:180px;max-width:100%;height:auto;border:0;color:#ffffff;font-size:16px;" />
 </td></tr>
-<tr><td class="email-pad" bgcolor="#141d39" style="padding:14px 36px 32px;${font}">
-<h1 class="email-title" style="${font}font-size:28px;line-height:36px;font-weight:600;margin:0;color:#ffffff;">${esc(title)}</h1>
-</td></tr>
 <tr><td class="email-pad" style="${font}padding:32px 36px 12px;">
+<h1 class="email-title" style="${font}font-size:28px;line-height:36px;font-weight:600;margin:0 0 24px;color:#171717;">${esc(title)}</h1>
 ${paragraphs(intro)}
 ${details.length ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="margin:8px 0 24px;">${details.map(([label,value])=>`<tr><td style="${font}padding:12px 0;border-bottom:1px solid #e4e7ec;font-size:14px;line-height:23px;color:#344054;"><strong>${esc(label)}</strong><br />${lines(value)}</td></tr>`).join('')}</table>` : ''}
 ${message ? `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" bgcolor="#f4f6f9" style="margin:0 0 24px;border-left:3px solid #cbea2b;"><tr><td style="${font}padding:20px;font-size:15px;line-height:25px;color:#344054;word-break:break-word;"><strong>${esc(messageLabel || (lang === 'en' ? 'Message' : 'Mensagem'))}</strong><br /><br />${lines(message)}</td></tr></table>` : ''}
