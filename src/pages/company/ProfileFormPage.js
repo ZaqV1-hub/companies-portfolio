@@ -1,16 +1,17 @@
 // Company area · step-by-step profile form (spec 1, sections 4.2 and 5).
 // Steps: Organization → one per project → Leadership → Images → Preview & submit.
-import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
+import { cx, html, useEffect, useMemo, useRef, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js?v=20261116-company-profile1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
-import { navigate } from '../../lib/router.js';
+import { href, navigate } from '../../lib/router.js';
 import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
 import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261117-about1';
 import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261117-about1';
 import { draftToPublic } from '../../lib/draftPreview.js?v=20261117-about1';
 import { subtitle } from '../../lib/profileModel.js?v=20261117-about1';
-import { FieldInput } from '../../components/form/inputs.js?v=20261117-about1';
+import { FieldInput, ProfileEditorFields } from '../../components/form/inputs.js?v=202611-profile-editor1';
+import { EditorDialog } from '../../components/form/EditorDialog.js';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261117-about1';
 
@@ -43,6 +44,30 @@ function stepTitle(step, content, i18n) {
     return i18n.t('form.step_project') + (content.projects.length > 1 ? ' ' + n : '') + ' · ' + i18n.t('profile_type_short.' + p.profile_type);
   }
   return i18n.t('form.step_' + step.kind);
+}
+
+const organizationGroups = {
+  identity:['name','logo_url','about_short','description','website'],
+  location:['place','size'],
+  activity:['segments','partnership_types'],
+  focal:['focal_point'],
+};
+const projectGroups = {
+  product:['segment','trl','regulatory_phase','lead_product_name','lead_product_moa','product_image_url','platform_type','maturity','platform_description'],
+  research:['pipeline','patents_filed','patents_granted','fto','milestones'],
+  finance:['rounds','use_of_funds','raised','revenue','investment_types','investment_range','investment_description'],
+  market:['gtm_models','gtm_text','target_markets','exports','export_markets','export_markets_text','markets_served','markets_text','market_share'],
+};
+
+function sectionsFor(fields, groups, fallback) {
+  const remaining = new Set(fields);
+  const sections = Object.entries(groups).map(([key, keys]) => {
+    const matched = fields.filter((field) => keys.includes(field.key));
+    matched.forEach((field) => remaining.delete(field));
+    return { key, fields:matched };
+  }).filter(({ fields }) => fields.length);
+  if (remaining.size) sections.unshift({ key:fallback, fields:[...remaining] });
+  return sections;
 }
 
 /** Preview in both languages: renders ProfileView inside a nested language provider. */
@@ -85,6 +110,16 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const [inviteOpen, setInviteOpen] = useState(false);
   const [acceptBusy, setAcceptBusy] = useState(false);
   const [acceptError, setAcceptError] = useState('');
+  const [sideBySide, setSideBySide] = useState(false);
+  const [savedSnapshot, setSavedSnapshot] = useState('');
+  const [savedAt, setSavedAt] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(false);
+  const [submitOpen, setSubmitOpen] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(false);
+  const saveInProgress = useRef(false);
+  const pendingFocus = useRef(null);
 
   const load = async () => {
     setLoadError(false);
@@ -95,6 +130,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
       const organization = draftContent.organization;
       const contentWithAbout = Object.hasOwn(organization, 'about_short') ? draftContent
         : { ...draftContent, organization: { ...organization, about_short: d.draft.content.organization.about_short ?? null } };
+      setSavedSnapshot(JSON.stringify([d.draft.content,d.draft.reviewed_steps || {}]));
       setData(d); setContent(contentWithAbout); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
     } catch {
       setLoadError(true);
@@ -103,10 +139,25 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   useEffect(() => { load(); }, []);
 
   const steps = useMemo(() => (content ? formSteps(content) : []), [content]);
+  const snapshot = content && JSON.stringify([content,reviewed]);
+  const dirty = !!snapshot && snapshot !== savedSnapshot;
+  useEffect(() => {
+    if (!dirty) return;
+    const warn = (event) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [dirty]);
+  useEffect(() => {
+    if (!pendingFocus.current) return;
+    const problem = pendingFocus.current;
+    pendingFocus.current = null;
+    focusProblem(problem);
+  }, [stepParam]);
   if (loadError && !content) return html`<div class="empty-state" role="alert"><strong>${t('form.load_error')}</strong><button type="button" class="btn btn-lime" onClick=${load}>${t('orgs.retry')}</button></div>`;
   if (!data || !content) return html`<div>${t('common.loading')}</div>`;
 
   const locked = ['in_review','rejected'].includes(data.draft.status);
+  const busy = saving || inviteBusy || acceptBusy || submitting;
   const unchangedInitial = !teamOrgId && data.firstValidation && JSON.stringify(content) === JSON.stringify(data.initialContent);
   const saveDraft = () => teamOrgId ? api.saveTeamOrganizationForm(teamOrgId, content) : api.saveMyProfileDraft(content, reviewed);
   const stepIndex = Math.max(0, steps.findIndex((s) => s.id === stepParam));
@@ -118,22 +169,21 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const focusProblem = (problem) => {
     const base = 'f-' + problem.stepId.replace(':','-') + '-' + problem.field;
     const container = document.getElementById(base);
-    const input = document.getElementById(base+'-input'+(problem.part ? '-'+problem.part : '')) || container?.querySelector('input:not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled])');
+    const preferred = document.getElementById(base+'-input'+(problem.part ? '-'+problem.part : ''));
+    const controls = container?.querySelectorAll('input:not([type=file]):not([disabled]),select:not([disabled]),textarea:not([disabled]),button:not([disabled])');
+    const input = preferred?.getClientRects().length ? preferred : Array.from(controls || []).find((control) => control.getClientRects().length);
     (container || input)?.scrollIntoView({block:'center',behavior:'smooth'});
     input?.focus({preventScroll:true});
   };
   const markFor = (projectId, key) => data.imports.find((r) => (r.project_id || null) === (projectId || null) && r.field === key);
-  const goStep = (i) => {
-    if (i > stepIndex && !locked && !teamOrgId && !unchangedInitial) {
-      const missing = steps.slice(0,i).find((s)=>!completed(s));
-      if (missing) {
-        setShowErrors(true); setBlockedStep(missing.id);
-        if (missing.id !== step.id) { saveDraft(); onNavigateStep(missing.id); }
-        setTimeout(()=>document.getElementById('current-step-problems')?.scrollIntoView({block:'center',behavior:'smooth'}),0);
-        return;
-      }
+  const goStep = async (i, problem) => {
+    if (busy) return;
+    if (!locked && !teamOrgId && dirty && i !== stepIndex && !await save(false)) return;
+    if (problem) {
+      setShowErrors(true);
+      if (i === stepIndex) { focusProblem(problem); return; }
+      pendingFocus.current = problem;
     }
-    if (!locked) saveDraft();
     setBlockedStep(null);
     onNavigateStep(steps[i].id);
     window.scrollTo(0, 0);
@@ -159,11 +209,25 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     }),
   }));
 
-  const save = async () => {
-    const res = await saveDraft();
-    setToast(res.ok ? t('form.saved') : res.error);
-    setTimeout(() => setToast(null), 2500);
-    if (res.ok) { clearCompanyPreview(); if (teamOrgId) await load(); else setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } }); }
+  const save = async (showToast = true) => {
+    if (saveInProgress.current || locked) return false;
+    saveInProgress.current = true;
+    setSaving(true); setSaveError(false);
+    try {
+      const res = await saveDraft();
+      if (!res.ok) throw new Error(res.error);
+      clearCompanyPreview();
+      setSavedSnapshot(snapshot); setSavedAt(new Date());
+      if (!teamOrgId) setData({ ...data, draft: res.draft, organization: { ...data.organization, status: 'filling' } });
+      if (showToast) {
+        setToast(t('form.saved'));
+        setTimeout(() => setToast(null), 2500);
+      }
+      return true;
+    } catch {
+      setSaveError(true);
+      return false;
+    } finally { saveInProgress.current = false; setSaving(false); }
   };
   const saveAndInvite = async (language) => {
     if (!teamOrgId || inviteBusy) return;
@@ -196,8 +260,15 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   };
   const submit = async () => {
     setShowErrors(true);
-    const res = await api.submitMyProfileForReview(content, reviewed);
-    if (res.ok) { clearCompanyPreview(); await load(); setToast(i18n.lang === 'pt' ? 'Sua inscrição foi enviada para análise da Abiquifi.' : 'Your application was submitted for Abiquifi review.'); }
+    setSubmitting(true); setSubmitError(false);
+    try {
+      const res = await api.submitMyProfileForReview(content, reviewed);
+      if (!res.ok) throw new Error(res.error);
+      clearCompanyPreview(); await load(); setSubmitOpen(false);
+      setToast(t('form.editor_submitted'));
+      setTimeout(() => setToast(null), 3000);
+    } catch { setSubmitError(true); }
+    finally { setSubmitting(false); }
   };
   const acceptInitial = async () => {
     if (acceptBusy) return;
@@ -216,19 +287,25 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   };
 
   const renderFields = (fields, container, onChange, projectId) => fields.map((f) => html`<${Field} key=${f.key} field=${f} stepId=${step.id}
-    value=${readField(container, f)} onChange=${(v) => onChange(f, v)} i18n=${i18n} disabled=${locked}
+    value=${readField(container, f)} onChange=${(v) => onChange(f, v)} i18n=${i18n} disabled=${locked || busy}
     mark=${data.firstValidation ? markFor(projectId, f.key) : null} showErrors=${showErrors} />`);
 
   let body;
+  let sections = [];
+  const renderSections = (container,onChange,projectId) => sections.map(({key,fields}) => html`<section class="profile-editor-section" id=${'editor-section-'+key} key=${key}>
+    <h3>${t('form.editor_group_'+key)}</h3>${renderFields(fields,container,onChange,projectId)}
+  </section>`);
   if (step.kind === 'organization') {
-    body = renderFields(ORG_FIELDS, content.organization, updateOrg, null);
+    sections = sectionsFor(ORG_FIELDS,organizationGroups,'details');
+    body = renderSections(content.organization,updateOrg,null);
   } else if (step.kind === 'project') {
     const p = content.projects.find((x) => x.id === step.projectId);
+    sections = sectionsFor(projectFields(p,content.projects.length),projectGroups,'details');
     body = html`<div class="project-step-head">
         <span class="hero-chip">${t('profile_type.' + p.profile_type)}</span>
         <span class="form-help">${subtitle(p, i18n)}</span>
       </div>
-      ${renderFields(projectFields(p, content.projects.length), { ...p.fields, summary: p.summary }, (f, v) => updateProject(p.id, f, v), p.id)}`;
+      ${renderSections({ ...p.fields, summary:p.summary }, (f,v) => updateProject(p.id,f,v), p.id)}`;
   } else if (step.kind === 'leadership') {
     body = renderFields([LEADERSHIP_FIELD], content.organization, updateOrg, null);
   } else if (step.kind === 'images') {
@@ -249,42 +326,57 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
               ${stepTitle(stepById[p.stepId], content, i18n)} › ${t('fields.' + p.field + '.label')}: ${problemText(i18n, p)}</a></li>`)}
           </ul>
         </div>`}
-        ${!teamOrgId && !unchangedInitial && html`<button type="button" class="btn btn-lime btn-xl" disabled=${!check.ok || locked} onClick=${submit}>${t('form.submit')}</button>`}
-        ${teamOrgId && !locked && html`<button type="button" class="btn btn-lime btn-xl" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${() => { setInviteNotice(null); setInviteOpen(true); }}>${i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation'}</button>`}
+        ${!teamOrgId && !unchangedInitial && html`<button type="button" class="btn btn-lime btn-xl" disabled=${!check.ok || locked || busy} onClick=${() => { setSubmitError(false); setSubmitOpen(true); }}>${t('form.submit')}</button>`}
       </div>`;
   }
 
   const org = data.organization;
-  const status = data.draft.status === 'in_review' ? 'in_review' : org.status;
-  return html`<div class="form-page">
+  const underReview = data.draft.status === 'in_review' && (!teamOrgId || org.review_version_id);
+  const status = underReview ? 'in_review' : org.status;
+  const percent = Math.round(completedCount / Math.max(1,steps.length-1)*100);
+  const progressProblems = step.kind === 'preview' ? check.problems : stepProblems;
+  const saveLabel = saving ? t('form.editor_saving') : dirty ? t('form.editor_unsaved') :
+    savedAt ? t('form.editor_saved_at',{time:new Intl.DateTimeFormat(i18n.lang,{hour:'2-digit',minute:'2-digit'}).format(savedAt)}) : t('form.editor_synced');
+  return html`<div class="form-page profile-editor">
+    <header class="profile-editor-heading">
     <div class="form-top">
       <div>
-        <h1 class="page-title">${org.name}</h1>
-        <div class="page-subtitle">
-          ${t('form.status')}: <span class=${'status-pill s-' + status}>${i18n.label('org_status', status)}</span>
-          ${!teamOrgId && html` · <button type="button" class="btn-link" onClick=${openPreview}>${t('form.view_public')} ↗</button>`}
-          ${org.public_state === 'provisional' && html` · ${t('form.updating_public')}`}
+        <div class="profile-editor-title"><h1 class="page-title">${content.organization.name || org.name}</h1>
+          <span class=${'status-pill s-' + status}>${i18n.label('org_status', status)}</span>
         </div>
+        ${!locked && html`<div class=${cx('profile-editor-save-status',dirty && 'unsaved')} role="status">${saveLabel}</div>`}
       </div>
-      ${!locked && (teamOrgId ? html`<div class="team-draft-actions"><div class="team-draft-recipient">${i18n.lang === 'pt' ? 'Convite para' : 'Invitation to'} <strong>${data.organization.invitation_email || '—'}</strong></div><div class="review-actions"><button type="button" class="btn btn-outline btn-lg" disabled=${inviteBusy} onClick=${save}>${i18n.lang === 'pt' ? 'Salvar sem enviar' : 'Save without sending'}</button><button type="button" class="btn btn-lime btn-lg" disabled=${inviteBusy || !data.organization.invitation_email} onClick=${() => { setInviteNotice(null); setInviteOpen(true); }}>${i18n.lang === 'pt' ? 'Salvar e enviar convite' : 'Save and send invitation'}</button></div></div>` : html`<button type="button" class="btn btn-outline btn-lg" onClick=${save}>${t('form.save_draft')}</button>`)}
+      <div class="profile-editor-header-actions">
+        <button type="button" class="btn btn-outline" disabled=${busy} onClick=${teamOrgId ? () => goStep(steps.length-1) : openPreview}>${t(teamOrgId ? 'form.editor_preview' : 'form.view_public')}</button>
+        ${teamOrgId && org.review_version_id && html`<a class="btn btn-outline" href=${href('/team/review/'+org.review_version_id)}>${t('form.editor_open_review')}</a>`}
+        ${!locked && html`<button type="button" class="btn profile-editor-save" disabled=${busy || (!dirty && !saveError)} onClick=${() => save()}>${t('form.save_draft')}</button>`}
+        ${teamOrgId && !locked && html`<button type="button" class="btn btn-lime" disabled=${busy || !org.invitation_email} onClick=${() => { setInviteNotice(null); setInviteOpen(true); }}>${t('form.editor_save_invite')}</button>`}
+      </div>
     </div>
-    ${data.draft.status === 'in_review' && html`<div class="notice">${t('form.locked_review')}</div>`}
+    <nav class="progress" aria-label=${t('form.progress', { n: stepIndex + 1, total: steps.length })}>
+      <ol class="progress-steps">${steps.map((s, i) => html`<li key=${s.id}>
+        <button type="button" class=${cx(i === stepIndex && 'on', completed(s) && 'done')} aria-current=${i === stepIndex ? 'step' : undefined} disabled=${busy} onClick=${() => goStep(i)}>
+          <span class="step-n" aria-hidden="true">${completed(s) ? '✓' : i + 1}</span><span>${stepTitle(s, content, i18n)}</span>
+        </button></li>`)}
+      </ol>
+    </nav>
+    </header>
+    <div class="profile-editor-grid">
+    <div class="profile-editor-main">
+    ${underReview && html`<div class="notice">${t('form.locked_review')}</div>`}
     ${data.draft.status === 'rejected' && html`<div class="notice warn" role="status"><strong>${i18n.lang === 'pt' ? 'Inscrição recusada pela Abiquifi.' : 'Application rejected by Abiquifi.'}</strong> ${data.draft.review_comment}</div>`}
     ${data.draft.status === 'returned' && data.draft.review_comment && html`<div class="notice warn"><strong>${t('form.returned')}</strong> ${data.draft.review_comment}
       ${data.draft.reviewed_at && html`<small> (${formatDate(data.draft.reviewed_at, i18n.lang)})</small>`}</div>`}
     ${toast && html`<div class="toast" role="status">${toast}</div>`}
+    ${saveError && html`<div class="notice warn" role="alert">${t('form.editor_save_error')}</div>`}
     ${inviteNotice && html`<div class=${inviteNotice.ok ? 'notice' : 'notice warn'} role=${inviteNotice.ok ? 'status' : 'alert'}>${inviteNotice.text}</div>`}
     ${inviteOpen && html`<${InviteLanguageModal} email=${data.organization.invitation_email} busy=${inviteBusy} error=${inviteNotice && !inviteNotice.ok ? inviteNotice.text : null} onClose=${() => { setInviteOpen(false); setInviteNotice(null); }} onConfirm=${saveAndInvite} />`}
 
-    <div class="progress" aria-label=${t('form.progress', { n: stepIndex + 1, total: steps.length })}>
-      <div class="progress-bar"><span style=${{ width: Math.round((completedCount / Math.max(1,steps.length-1)) * 100) + '%' }}></span></div>
-      <ol class="progress-steps">${steps.map((s, i) => html`<li key=${s.id}>
-        <button type="button" class=${cx(i === stepIndex && 'on', completed(s) && 'done')} onClick=${() => goStep(i)}>
-          <span class="step-n">${completed(s) ? '✓' : i + 1}</span>${stepTitle(s, content, i18n)}
-        </button></li>`)}
-      </ol>
-    </div>
-
+    ${submitOpen && html`<${EditorDialog} title=${t('form.editor_confirm_submit')} action=${t('form.submit')} busy=${submitting}
+      onConfirm=${submit} onClose=${() => setSubmitOpen(false)}>
+      <p>${t('form.editor_submit_prompt')}</p>
+      ${submitError && html`<div class="notice warn" role="alert">${t('form.preview_submit_error')}</div>`}
+    <//>`}
     <section class="form-card">
       <div class="form-card-head">
         <h2 class="block-title">${stepTitle(step, content, i18n)}</h2>
@@ -297,15 +389,36 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
         <ul>${stepProblems.map((p,index)=>html`<li key=${index}><button type="button" class="btn-link step-problem-link" onClick=${()=>focusProblem(p)}>${t('fields.'+p.field+'.label')}: ${problemText(i18n,p)}</button></li>`)}
           ${!stepProblems.length && !reviewed[step.id] && html`<li>${t('form.unreviewed_step',{step:stepTitle(step,content,i18n)})}</li>`}</ul>
       </div>`}
-      ${body}
+      <${ProfileEditorFields.Provider} value=${{sideBySide}}>${body}<//>
       ${step.kind !== 'preview' && html`<label class="reviewed-check">
-        <input type="checkbox" checked=${completed(step)} disabled=${locked} onChange=${(e) => setReviewedStep(step.id, e.target.checked)} />
+        <input type="checkbox" checked=${completed(step)} disabled=${locked || busy} onChange=${(e) => setReviewedStep(step.id, e.target.checked)} />
         ${t('form.reviewed_step')}
       </label>`}
       <div class="form-nav">
-        ${stepIndex > 0 ? html`<button type="button" class="btn btn-outline" onClick=${() => goStep(stepIndex - 1)}>${t('form.prev')}</button>` : html`<span></span>`}
-        ${stepIndex < steps.length - 1 && html`<button type="button" class="btn btn-lime btn-lg" disabled=${!locked && !teamOrgId && !unchangedInitial && !completed(step)} onClick=${() => goStep(stepIndex + 1)}>${t('form.next')}</button>`}
+        ${stepIndex > 0 ? html`<button type="button" class="btn btn-outline" disabled=${busy} onClick=${() => goStep(stepIndex - 1)}>${t('form.prev')}</button>` : html`<span></span>`}
+        ${stepIndex < steps.length - 1 && html`<button type="button" class="btn btn-lime btn-lg" disabled=${busy || (!locked && !teamOrgId && !unchangedInitial && !completed(step))} onClick=${() => goStep(stepIndex + 1)}>${t('form.next')}</button>`}
       </div>
     </section>
+    </div>
+    <aside class="profile-editor-rail">
+      <div class="profile-editor-rail-card">
+        <h2>${t('form.editor_progress')}</h2>
+        <div class="profile-editor-meter"><progress value=${percent} max="100" aria-label=${t('form.editor_progress')}></progress><strong>${percent}%</strong></div>
+        ${progressProblems.length && !locked ? html`<h3>${t('form.editor_missing')}</h3><ul>
+          ${[...new Map(progressProblems.map((p) => [p.stepId+'/'+p.field,p])).values()].map((p) => html`<li key=${p.stepId+'/'+p.field}><button type="button" class="btn-link" disabled=${busy}
+            onClick=${() => goStep(steps.findIndex((s) => s.id === p.stepId),p)}>${t('fields.'+p.field+'.label')}</button></li>`)}
+        </ul>` : !locked && step.kind !== 'preview' && html`<p>${t(completed(step) ? 'form.editor_step_done' : 'form.editor_step_ready')}</p>`}
+      </div>
+      ${sections.length > 1 && html`<nav class="profile-editor-rail-card" aria-label=${t('form.editor_this_step')}>
+        <h2>${t('form.editor_this_step')}</h2>
+        <ul>${sections.map(({key}) => html`<li key=${key}><a class="btn-link" href=${'#editor-section-'+key} onClick=${(event) => { event.preventDefault(); document.getElementById('editor-section-'+key)?.scrollIntoView({block:'start'}); }}>${t('form.editor_group_'+key)}</a></li>`)}</ul>
+      </nav>`}
+      ${['organization','project'].includes(step.kind) && html`<div class="profile-editor-rail-card">
+        <label class="profile-editor-language-toggle"><input type="checkbox" checked=${sideBySide} onChange=${(event) => setSideBySide(event.target.checked)} />${t('form.editor_side_by_side')}</label>
+      </div>`}
+      ${!teamOrgId && !unchangedInitial && !locked && html`<div class="profile-editor-rail-card"><h2>${t('form.editor_review_title')}</h2><p>${t('form.editor_review_help')}</p></div>`}
+      ${teamOrgId && !locked && org.invitation_email && html`<div class="profile-editor-rail-card"><h2>${t('form.editor_invite_to')}</h2><p>${org.invitation_email}</p></div>`}
+    </aside>
+    </div>
   </div>`;
 }

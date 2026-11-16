@@ -1,11 +1,15 @@
 // Input widgets of the company form, one per field type of src/lib/formSchema.js.
 // Every widget receives {field, value, onChange, i18n, disabled} and calls onChange(newValue).
-import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
+import { createContext, cx, html, useContext, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
 import { UFS } from '../../lib/formSchema.js?v=20261117-about1';
 import { BRAZIL_CITIES } from '../../lib/brazilCities.js';
 import { fieldProblems } from '../../lib/profileValidation.js?v=20261117-about1';
 import { uploadImage } from '../../services/api.js';
+import { EditorDialog } from './EditorDialog.js';
+import { useI18n } from '../../lib/i18n.js';
+
+export const ProfileEditorFields = createContext(null);
 
 // ---------------------------------------------------------------- USD (spec 1, 5.2)
 const USD_ALLOWED = { pt: /^[\d.]*$/, en: /^[\d,]*$/ }; // digits + the language's thousands separator
@@ -59,16 +63,29 @@ function Counter({ n, max }) {
 
 /** Both language versions are edited together and kept in the same draft. */
 export function TextInput({ field, value, onChange, disabled, id }) {
+  const { t, lang } = useI18n();
+  const editor = useContext(ProfileEditorFields);
+  const [selectedLanguage, setSelectedLanguage] = useState(null);
+  const activeLanguage = selectedLanguage || lang;
   const v = value && typeof value === 'object' ? value : { pt: value || '', en: '' };
   const multiline = !field.max || field.max > 100;
-  return html`<div class="bilingual-input">${['pt', 'en'].map((language) => {
+  const chooseLanguage = (language) => setSelectedLanguage(language);
+  return html`<div class=${cx('editor-language-field', editor && 'editor-language-field-themed')}
+    onFocus=${(event) => { if (event.target.dataset.language) chooseLanguage(event.target.dataset.language); }}>
+    ${editor && !editor.sideBySide && html`<div class="editor-language-tabs" role="group" aria-label=${t('form.editor_text_language')}>
+      ${['pt','en'].map((language) => html`<button type="button" key=${language} aria-pressed=${activeLanguage === language}
+        onClick=${() => chooseLanguage(language)}><span class=${cx('editor-language-dot', v[language]?.trim() && 'filled')} aria-hidden="true"></span>${language.toUpperCase()}</button>`)}
+    </div>`}
+    <div class=${cx('bilingual-input', editor && !editor.sideBySide && 'one-language')}>${['pt', 'en'].map((language) => {
     const text = v[language] || '';
-    const props = { id: language === 'pt' ? id : undefined, class: 'input input-sm', value: text, disabled,
+    const props = { id: language === 'pt' ? id : id && id + '-en', class: 'input input-sm', value: text, disabled,
+      'aria-label': t('fields.'+field.key+'.label')+' ('+language.toUpperCase()+')',
+      'data-language': language,
       maxLength: field.hardLimit ? field.max : field.max ? field.max + 50 : undefined, onInput: (e) => onChange({ ...v, [language]: e.target.value }) };
-    return html`<div class="text-wrap" key=${language}><span class="language-label">${language.toUpperCase()}</span>
+    return html`<div class="text-wrap" key=${language} hidden=${!!editor && !editor.sideBySide && activeLanguage !== language}><span class="language-label">${language.toUpperCase()}</span>
       ${multiline ? html`<textarea rows=${Math.min(6, Math.max(2, Math.ceil((field.max || 200) / 120)))} ...${props}></textarea>` : html`<input ...${props} />`}
       <${Counter} n=${text.length} max=${field.max} /></div>`;
-  })}</div>`;
+  })}</div></div>`;
 }
 
 function PlainInput({ field, value, onChange, disabled, type, id }) {
@@ -148,15 +165,67 @@ function PeriodInput({ value, onChange, i18n, disabled }) {
 }
 
 // ---------------------------------------------------------------- repeatable rows
-function Rows({ items, onChange, disabled, i18n, max, blank, render }) {
+function Rows({ items, field, onChange, disabled, i18n, max, blank, render }) {
+  const editor = useContext(ProfileEditorFields);
+  const [editing, setEditing] = useState(null);
+  const [error, setError] = useState(null);
+  const t = i18n.t;
   const list = items || [];
   const set = (i, item) => onChange(list.map((x, j) => (j === i ? item : x)));
+  const remove = (i) => onChange(list.filter((_, j) => j !== i));
+  const canAdd = !disabled && (!max || list.length < max);
+  if (editor) {
+    const label = t('fields.'+field.key+'.label');
+    const open = (index, removing = false) => {
+      setError(null);
+      setEditing({ index, value:index === list.length ? blank() : list[index], removing });
+    };
+    const confirm = () => {
+      if (editing.removing) remove(editing.index);
+      else {
+        const item = editing.value;
+        const entry = field.type === 'raised' ? {items:[item]} : [item];
+        const problems = fieldProblems({ ...field, req:false }, entry);
+        if (problems.length || (['text_list','plain_list'].includes(field.type) && !i18n.tx(item).trim())) {
+          setError(problems[0] ? t('form.errors.'+problems[0].code, problems[0]) : t('form.errors.required'));
+          return;
+        }
+        if (editing.index === list.length) onChange(list.concat([item]));
+        else set(editing.index, item);
+      }
+      setEditing(null);
+    };
+    return html`<div class="profile-editor-list">
+      ${!list.length && html`<p class="form-help">${t('form.editor_no_items')}</p>`}
+      ${list.map((item,i) => {
+        const title = typeof item === 'string' ? item : item.name || i18n.tx(item.category || item.area || item.description || item.indication || item);
+        const detail = item.amount_usd == null ? i18n.tx(item.role) : formatUSD(item.amount_usd,i18n.lang);
+        const fallback = item.stage ? i18n.label('round_stage',item.stage) : item.source ? i18n.label('raised_source',item.source) : t('form.editor_item',{n:i+1});
+        return html`<div class="profile-editor-list-row" key=${i}>
+          <div><strong>${title || fallback}</strong>${detail && html`<small>${detail}</small>`}</div>
+          ${!disabled && html`<div class="profile-editor-item-actions">
+            <button type="button" class="btn btn-outline" onClick=${() => open(i)}>${t('form.editor_edit')}</button>
+            <button type="button" class="btn-link" onClick=${() => open(i,true)}>${t('form.remove')}</button>
+          </div>`}
+        </div>`;
+      })}
+      ${canAdd && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => open(list.length)}>+ ${t('form.add')}</button>`}
+      ${editing && html`<${EditorDialog}
+        title=${editing.removing ? t('form.editor_remove_item') : label}
+        action=${editing.removing ? t('form.remove') : t('form.editor_apply')}
+        onConfirm=${confirm} onClose=${() => setEditing(null)}>
+        ${editing.removing ? html`<p>${t('form.editor_remove_prompt')}</p>`
+          : html`<div class="row-fields">${render(editing.value, (value) => { setError(null); setEditing({...editing,value}); })}</div>`}
+        ${error && html`<div class="field-error" role="alert">${error}</div>`}
+      <//>`}
+    </div>`;
+  }
   return html`<div class="rows">
     ${list.map((item, i) => html`<div class="row-item" key=${i}>
       <div class="row-fields">${render(item, (next) => set(i, next), i)}</div>
-      ${!disabled && html`<button type="button" class="btn-link row-remove" onClick=${() => onChange(list.filter((_, j) => j !== i))}>${i18n.t('form.remove')}</button>`}
+      ${!disabled && html`<button type="button" class="btn-link row-remove" onClick=${() => remove(i)}>${i18n.t('form.remove')}</button>`}
     </div>`)}
-    ${!disabled && (!max || list.length < max) && html`<button type="button" class="btn btn-outline add-row" onClick=${() => onChange(list.concat([blank()]))}>${i18n.t('form.add')}</button>`}
+    ${canAdd && html`<button type="button" class="btn btn-outline add-row" onClick=${() => onChange(list.concat([blank()]))}>${i18n.t('form.add')}</button>`}
   </div>`;
 }
 
@@ -203,9 +272,16 @@ function ImagePreview({ url, i18n }) {
   </div>`;
 }
 
-function ImagePicker({ types, busy, label, onChange }) {
-  return html`<label class=${cx('btn btn-outline image-picker', busy && 'uploading')}>
-    <input type="file" class="image-file-input" aria-label=${label} disabled=${busy} accept=${types.join(',')} onChange=${onChange} />${label}
+function ImagePicker({ types, busy, label, onFile, dropZone = false }) {
+  const { t } = useI18n();
+  const [dragging, setDragging] = useState(false);
+  return html`<label class=${cx('btn btn-outline image-picker', busy && 'uploading', dropZone && 'editor-drop-zone', dragging && 'dragging')}
+    onDragOver=${(event) => { event.preventDefault(); if (!busy && dropZone) setDragging(true); }}
+    onDragLeave=${() => setDragging(false)}
+    onDrop=${(event) => { event.preventDefault(); setDragging(false); if (!busy && dropZone) onFile(event.dataTransfer.files[0]); }}>
+    <input type="file" class="image-file-input" aria-label=${label} disabled=${busy} accept=${types.join(',')}
+      onChange=${(event) => { onFile(event.currentTarget.files[0]); event.currentTarget.value = ''; }} />
+    <span>${label}</span>${dropZone && !busy && html`<small>${t('form.editor_drop_image')}</small>`}
   </label>`;
 }
 
@@ -213,16 +289,15 @@ function ImageInput({ field, value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
   const rules = IMAGE_RULES[field.kind];
-  const pick = async (e) => {
-    if (!e.target.files[0]) return;
+  const pick = async (file) => {
+    if (!file) return;
     setBusy(true); setErr(null);
-    try { onChange(await readImage(e.target.files[0], rules, field.kind)); } catch (x) { setErr(x.message === 'invalid_svg' ? 'image_type' : ['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
+    try { onChange(await readImage(file, rules, field.kind)); } catch (x) { setErr(x.message === 'invalid_svg' ? 'image_type' : ['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
     finally { setBusy(false); }
-    e.target.value = '';
   };
   return html`<div class=${cx('image-input', field.kind)}>
     ${value && html`<${ImagePreview} key=${value} url=${value} i18n=${i18n} />`}
-    ${!disabled && html`<${ImagePicker} types=${rules.types} busy=${busy} onChange=${pick} label=${busy ? i18n.t('form.uploading') : value ? i18n.t('form.replace') : i18n.t('form.upload')} />`}
+    ${!disabled && html`<${ImagePicker} types=${rules.types} busy=${busy} onFile=${pick} dropZone=${true} label=${busy ? i18n.t('form.uploading') : value ? i18n.t('form.replace') : i18n.t('form.upload')} />`}
     ${value && !disabled && !field.req && html`<button type="button" class="btn-link" disabled=${busy} onClick=${() => onChange(null)}>${i18n.t('form.remove')}</button>`}
     ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
   </div>`;
@@ -233,16 +308,15 @@ function GalleryInput({ value, onChange, i18n, disabled }) {
   const [uploadIndex, setUploadIndex] = useState(null);
   const busy = uploadIndex !== null;
   const list = value || [];
-  const pick = (index) => async (e) => {
-    if (!e.target.files[0]) return;
+  const pick = (index) => async (file) => {
+    if (!file) return;
     setUploadIndex(index); setErr(null);
     try {
-      const url = await readImage(e.target.files[0], IMAGE_RULES.gallery, 'gallery');
+      const url = await readImage(file, IMAGE_RULES.gallery, 'gallery');
       onChange(index === list.length ? list.concat([{ url, caption: { pt: '', en: '' } }])
         : list.map((item, position) => position === index ? { ...item, url } : item));
     } catch (x) { setErr(['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
     finally { setUploadIndex(null); }
-    e.target.value = '';
   };
   return html`<div class="rows gallery-input">
     ${list.map((g, i) => html`<div class="row-item" key=${i}>
@@ -250,11 +324,11 @@ function GalleryInput({ value, onChange, i18n, disabled }) {
       <div class="row-fields"><${Mini} label=${i18n.t('form.caption') + ' *'} grow=${true}>
         <${TextMini} value=${g.caption} disabled=${disabled || busy} max=${120} onChange=${(c) => onChange(list.map((x, j) => (j === i ? { ...x, caption: c } : x)))} /><//></div>
       ${!disabled && html`<div class="gallery-image-actions">
-        <${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onChange=${pick(i)} label=${i === uploadIndex ? i18n.t('form.uploading') : i18n.t('form.replace')} />
+        <${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onFile=${pick(i)} label=${i === uploadIndex ? i18n.t('form.uploading') : i18n.t('form.replace')} />
         <button type="button" class="btn-link" disabled=${busy} onClick=${() => onChange(list.filter((_, j) => j !== i))}>${i18n.t('form.remove')}</button>
       </div>`}
     </div>`)}
-    ${!disabled && list.length < 6 && html`<${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onChange=${pick(list.length)} label=${uploadIndex === list.length ? i18n.t('form.uploading') : i18n.t('form.upload')} />`}
+    ${!disabled && list.length < 6 && html`<${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onFile=${pick(list.length)} dropZone=${true} label=${uploadIndex === list.length ? i18n.t('form.uploading') : i18n.t('form.upload')} />`}
     ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
   </div>`;
 }
@@ -311,13 +385,13 @@ export function FieldInput(props) {
         <${Mini} label=${t('max_usd')}><${UsdInput} value=${v.max} i18n=${i18n} disabled=${disabled} onChange=${(n) => onChange({ ...v, max: n })} /><//>
       </div>`;
     }
-    case 'pipeline': return html`<${Rows} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', indication: { pt: '', en: '' } })}
+    case 'pipeline': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', indication: { pt: '', en: '' } })}
       render=${(it, set) => html`<${Mini} label=${t('name')}><input class="input input-sm" value=${it.name} disabled=${disabled} onInput=${(e) => set({ ...it, name: e.target.value })} /><//>
         <${Mini} label=${t('indication')} grow=${true}><${TextMini} value=${it.indication} disabled=${disabled} onChange=${(x) => set({ ...it, indication: x })} /><//>`} />`;
-    case 'milestones': return html`<${Rows} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ period: {}, description: { pt: '', en: '' } })}
+    case 'milestones': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ period: {}, description: { pt: '', en: '' } })}
       render=${(it, set) => html`<${Mini} label=${t('period')}><${PeriodInput} value=${it.period} i18n=${i18n} disabled=${disabled} onChange=${(p) => set({ ...it, period: p })} /><//>
         <${Mini} label=${t('description')} grow=${true}><${TextMini} value=${it.description} max=${150} disabled=${disabled} onChange=${(x) => set({ ...it, description: x })} /><//>`} />`;
-    case 'rounds': return html`<${Rows} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ stage: '', period: {}, amount_usd: null, purpose: { pt: '', en: '' } })}
+    case 'rounds': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ stage: '', period: {}, amount_usd: null, purpose: { pt: '', en: '' } })}
       render=${(it, set) => html`<${Mini} label=${t('stage')}><${Select} list="round_stage" options=${LIST_OPTIONS.round_stage} value=${it.stage} i18n=${i18n} disabled=${disabled} onChange=${(s) => set({ ...it, stage: s })} /><//>
         <${Mini} label=${t('period')}><${PeriodInput} value=${it.period} i18n=${i18n} disabled=${disabled} onChange=${(p) => set({ ...it, period: p })} /><//>
         <${Mini} label=${t('amount_usd')}><${UsdInput} value=${it.amount_usd} i18n=${i18n} disabled=${disabled} onChange=${(n) => set({ ...it, amount_usd: n })} /><//>
@@ -327,7 +401,7 @@ export function FieldInput(props) {
       const total = v.items.reduce((s, r) => s + (r.amount_usd || 0), 0);
       return html`<div>
         <label class="check-line"><input type="checkbox" checked=${v.none} disabled=${disabled} onChange=${(e) => onChange({ items: e.target.checked ? [] : v.items, none: e.target.checked })} /> ${t('none_raised')}</label>
-        ${!v.none && html`<${Rows} items=${v.items} onChange=${(items) => onChange({ ...v, items })} disabled=${disabled} i18n=${i18n} blank=${() => ({ source: '', amount_usd: null })}
+        ${!v.none && html`<${Rows} field=${field} items=${v.items} onChange=${(items) => onChange({ ...v, items })} disabled=${disabled} i18n=${i18n} blank=${() => ({ source: '', amount_usd: null })}
           render=${(it, set) => html`<${Mini} label=${t('source')}><${Select} list="raised_source" options=${LIST_OPTIONS.raised_source} value=${it.source} i18n=${i18n} disabled=${disabled} onChange=${(s) => set({ ...it, source: s })} /><//>
             <${Mini} label=${t('amount_usd')}><${UsdInput} value=${it.amount_usd} i18n=${i18n} disabled=${disabled} onChange=${(n) => set({ ...it, amount_usd: n })} /><//>`} />
           <div class="total-line">${t('total')}: <strong>${formatUSD(total, i18n.lang)}</strong></div>`}
@@ -378,15 +452,15 @@ export function FieldInput(props) {
     case 'portfolio':
     case 'interests': {
       const a = field.type === 'portfolio' ? 'category' : 'area';
-      return html`<${Rows} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ [a]: { pt: '', en: '' }, description: { pt: '', en: '' } })}
+      return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ [a]: { pt: '', en: '' }, description: { pt: '', en: '' } })}
         render=${(it, set) => html`<${Mini} label=${t(a)}><${TextMini} value=${it[a]} disabled=${disabled} onChange=${(x) => set({ ...it, [a]: x })} /><//>
           <${Mini} label=${t('description')} grow=${true}><${TextMini} value=${it.description} max=${200} disabled=${disabled} onChange=${(x) => set({ ...it, description: x })} /><//>`} />`;
     }
-    case 'text_list': return html`<${Rows} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ pt: '', en: '' })}
+    case 'text_list': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ pt: '', en: '' })}
       render=${(it, set) => html`<${Mini} label=${t('name')} grow=${true}><${TextMini} value=${it} disabled=${disabled} onChange=${set} /><//>`} />`;
-    case 'plain_list': return html`<${Rows} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ''}
+    case 'plain_list': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ''}
       render=${(it, set) => html`<${Mini} label=${t('name')} grow=${true}><input class="input input-sm" value=${it} disabled=${disabled} onInput=${(e) => set(e.target.value)} /><//>`} />`;
-    case 'leaders': return html`<${Rows} items=${value} max=${4} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', role: { pt: '', en: '' }, experience: { pt: '', en: '' } })}
+    case 'leaders': return html`<${Rows} field=${field} items=${value} max=${4} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', role: { pt: '', en: '' }, experience: { pt: '', en: '' } })}
       render=${(it, set) => html`<${Mini} label=${t('name') + ' *'}><input class="input input-sm" value=${it.name} disabled=${disabled} onInput=${(e) => set({ ...it, name: e.target.value })} /><//>
         <${Mini} label=${t('role') + ' *'}><${TextMini} value=${it.role} disabled=${disabled} onChange=${(x) => set({ ...it, role: x })} /><//>
         <${Mini} label=${t('experience')} grow=${true}><${TextMini} value=${it.experience} max=${150} disabled=${disabled} onChange=${(x) => set({ ...it, experience: x })} /><//>`} />`;

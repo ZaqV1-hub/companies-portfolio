@@ -1312,8 +1312,9 @@ app.get('/api/team/organizations/:id/profile-form', requireRole('team'), async (
     if (!orgs.length) return res.status(404).json({ error:'not_found' });
     const [projects] = await pool.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [req.params.id]);
     const org = orgs[0];
-    res.json({ organization:{ id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,invitation_email:org.invitation_email,invited_at:org.invited_at,custom_tags:org.custom_tags || [] },
-      draft:{ id:'team-base',status:org.public_state==='hidden' && !org.last_approved_at ? 'filling' : 'in_review',content:profileSnapshot(org,projects),reviewed_steps:{} },
+    const [reviews] = await pool.execute("SELECT id FROM profile_versions WHERE organization_id=? AND kind='draft' AND status='in_review' LIMIT 1", [org.id]);
+    res.json({ organization:{ id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,invitation_email:org.invitation_email,invited_at:org.invited_at,custom_tags:org.custom_tags || [],review_version_id:reviews[0]?.id },
+      draft:{ id:'team-base',status:org.public_state==='hidden' && !org.last_approved_at && !reviews.length ? 'filling' : 'in_review',content:profileSnapshot(org,projects),reviewed_steps:{} },
       imports:[],firstValidation:false });
   } catch (error) { routeError(res,error); }
 });
@@ -1330,7 +1331,6 @@ async function saveTeamOrganizationProfile(db, id, content) {
   const fields = profileOrgKeys.map((key) => `\`${key}\`=?`).join(',');
   await db.execute(`UPDATE organizations SET ${fields} WHERE id=?`, [...profileOrgKeys.map((key) => jsonColumn(org[key])),id]);
   for (const project of content.projects) await db.execute('UPDATE projects SET summary=?,fields=? WHERE id=? AND organization_id=?', [jsonColumn(project.summary),jsonColumn(project.fields),project.id,id]);
-  await db.execute("DELETE FROM profile_versions WHERE organization_id=? AND kind='draft' AND status IN ('filling','returned')", [id]);
   return { ok:true };
 }
 async function queueCompanyInvitation(db, id, lang = 'pt') {
