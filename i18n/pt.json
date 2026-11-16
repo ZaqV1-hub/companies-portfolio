@@ -948,7 +948,8 @@
     "editor_placeholder_pt": "Em português",
     "editor_placeholder_en": "Em inglês",
     "editor_gallery_needs_image": "Escolha uma imagem.",
-    "editor_gallery_needs_caption": "Informe a legenda em português."
+    "editor_gallery_needs_caption": "Informe a legenda em português.",
+    "editor_add_item": "Adicionar"
   },
   "review": {
     "queue_title": "Fila de revisão",

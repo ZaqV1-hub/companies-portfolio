@@ -948,7 +948,8 @@
     "editor_placeholder_pt": "In Portuguese",
     "editor_placeholder_en": "In English",
     "editor_gallery_needs_image": "Choose an image.",
-    "editor_gallery_needs_caption": "Enter a caption in Portuguese."
+    "editor_gallery_needs_caption": "Enter a caption in Portuguese.",
+    "editor_add_item": "Add"
   },
   "review": {
     "queue_title": "Review queue",

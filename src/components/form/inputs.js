@@ -213,11 +213,11 @@ function Rows({ items, field, onChange, disabled, i18n, max, blank, render }) {
           </div>`}
         </div>`;
       })}
-      ${canAdd && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => open(list.length)}>+ ${t('form.add')}</button>`}
+      ${canAdd && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => open(list.length)}>${t('form.add')}</button>`}
       ${editing && html`<${EditorDialog}
         title=${editing.removing ? t('form.editor_remove_item') : namedDialog ? t('form.editor_'+(editing.index === list.length ? 'add_' : 'edit_')+field.type) : label}
         description=${editing.removing ? t('form.editor_remove_prompt') : t('fields.'+field.key+'.help')}
-        action=${editing.removing ? t('form.remove') : t(editing.index === list.length ? 'form.add' : 'form.editor_save_item')}
+        action=${editing.removing ? t('form.remove') : t(editing.index === list.length ? 'form.editor_add_item' : 'form.editor_save_item')}
         compact=${editing.removing} danger=${editing.removing}
         onConfirm=${confirm} onClose=${() => setEditing(null)}>
         ${!editing.removing && html`<div class="row-fields">${render(editing.value, (value) => { setError(null); setEditing({...editing,value}); })}</div>`}
@@ -331,7 +331,7 @@ function GalleryPhotoDialog({ item, adding, i18n, onClose, onSave }) {
     }
   };
   return html`<${EditorDialog} title=${t(adding ? 'form.editor_add_gallery' : 'form.editor_edit_gallery')} description=${t('fields.gallery.help')}
-    action=${t(busy ? 'form.uploading' : adding ? 'form.add' : 'form.editor_save_item')} onConfirm=${save} onClose=${onClose} busy=${busy}>
+    action=${t(busy ? 'form.uploading' : adding ? 'form.editor_add_item' : 'form.editor_save_item')} onConfirm=${save} onClose=${onClose} busy=${busy}>
     <div class="row-fields">
       <div class="image-input gallery">
         ${(preview || item.url) && html`<${ImagePreview} key=${preview || item.url} url=${preview || item.url} i18n=${i18n} />`}
@@ -395,7 +395,7 @@ function RevenueInput({ field, value, onChange, i18n, disabled }) {
         ${!disabled && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => {setError(null);setDraft({});}}>+ ${t('form.editor_add_revenue')}</button>`}`}
     `}
     ${draft && html`<${EditorDialog} title=${t(hasRevenue ? 'form.editor_edit_revenue' : 'form.editor_add_revenue')} description=${t('fields.revenue.help')}
-      action=${t(hasRevenue ? 'form.editor_save_item' : 'form.add')} onConfirm=${save} onClose=${() => setDraft(null)}>
+      action=${t(hasRevenue ? 'form.editor_save_item' : 'form.editor_add_item')} onConfirm=${save} onClose=${() => setDraft(null)}>
       <div class="row-fields">
         <${Mini} label=${t('form.year')+' *'}><${IntInput} value=${draft.year} min=${2000} max=${2100} onChange=${(year) => {setError(null);setDraft({...draft,year});}} /><//>
         <${Mini} label=${t('form.amount_usd')+' *'}><${UsdInput} value=${draft.amount_usd} i18n=${i18n} onChange=${(amount_usd) => {setError(null);setDraft({...draft,amount_usd});}} /><//>
