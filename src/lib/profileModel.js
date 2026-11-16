@@ -100,6 +100,7 @@ export function searchText(org) {
     else if (Array.isArray(v)) v.forEach(add);
     else if (typeof v === 'object') Object.keys(v).forEach((k) => add(v[k]));
   };
+  add(org.about_short);
   add(org.description);
   org.projects.forEach((p) => { add(p.summary); add(p.fields); });
   return parts.join(' ').toLowerCase();

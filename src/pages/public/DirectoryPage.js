@@ -2,9 +2,9 @@
 import { html, useEffect, useMemo, useRef, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js?v=20261030-intake1';
 import { useI18n } from '../../lib/i18n.js';
-import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js';
+import { PROFILE_TYPES, searchText } from '../../lib/profileModel.js?v=20261117-about1';
 import { href } from '../../lib/router.js';
-import { OrgCard } from '../../components/OrgCard.js?v=20261014-api-recovery3';
+import { OrgCard } from '../../components/OrgCard.js?v=20261117-about1';
 import { EMPTY_FILTERS, FILTER_DEFS, activeFilterCount, matchesFilters, matchingProject } from '../../lib/directoryFilters.js';
 
 export function DirectoryPage() {

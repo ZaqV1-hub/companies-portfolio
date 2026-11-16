@@ -6,13 +6,13 @@ import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
 import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261026-profile-layout2';
-import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261110-financial-help1';
-import { draftToPublic } from '../../lib/draftPreview.js';
-import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261116-company-profile1';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261117-about1';
+import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261117-about1';
+import { draftToPublic } from '../../lib/draftPreview.js?v=20261117-about1';
+import { subtitle } from '../../lib/profileModel.js?v=20261117-about1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261117-about1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261117-about1';
 
 function problemText(i18n, p) {
   return (p.part ? i18n.t('form.'+p.part)+': ' : '') + i18n.t('form.errors.' + p.code, p);
@@ -92,7 +92,10 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
       const d = await (teamOrgId ? api.getTeamOrganizationForm(teamOrgId) : api.getMyProfileForm());
       const preview = teamOrgId ? null : getCompanyPreview();
       const draftContent = preview?.content || d.draft.content;
-      setData(d); setContent(draftContent); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
+      const organization = draftContent.organization;
+      const contentWithAbout = Object.hasOwn(organization, 'about_short') ? draftContent
+        : { ...draftContent, organization: { ...organization, about_short: d.draft.content.organization.about_short ?? null } };
+      setData(d); setContent(contentWithAbout); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
     } catch {
       setLoadError(true);
     }

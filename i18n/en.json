@@ -82,10 +82,13 @@
     "milestone_completed": "Completed",
     "milestone_in_progress": "In Progress",
     "milestone_upcoming": "Upcoming",
-    "website": "Website"
+    "website": "Website",
+    "about_short": "About",
+    "read_more": "Read more",
+    "read_less": "Read less"
   },
   "block": {
-    "description": "About",
+    "description": "Description",
     "lead_product": "Lead Product",
     "pipeline": "Pipeline",
     "ip_status": "IP Status",
@@ -473,7 +476,7 @@
     },
     "description": {
       "label": "Description",
-      "help": "What the organization does, in a few sentences. Shown at the top of the profile and on the card."
+      "help": "Provide more detail about the company and its work. This appears in the Description section of the profile."
     },
     "website": {
       "label": "Website",
@@ -750,6 +753,10 @@
     "gallery": {
       "label": "Photo gallery",
       "help": "Up to 6 images with captions. Recommended: 1600 px or more on the longest side. JPG, PNG or WebP, up to 20 MB per image. Photos are shown in full."
+    },
+    "about_short": {
+      "label": "About",
+      "help": "Introduce the company in up to 180 characters per language. Describe what it does and its field. Use the project fields for products."
     }
   },
   "form": {

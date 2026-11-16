@@ -25,10 +25,13 @@ export const MARKETS = 'markets';
 export const UFS = ['AC', 'AL', 'AP', 'AM', 'BA', 'CE', 'DF', 'ES', 'GO', 'MA', 'MT', 'MS', 'MG', 'PA', 'PB', 'PR', 'PE', 'PI',
   'RJ', 'RN', 'RS', 'RO', 'RR', 'SC', 'SP', 'SE', 'TO'];
 
+export const ABOUT_FIELD = { key: 'about_short', type: 'text', max: 180, hardLimit: true, req: false };
+
 export const ORG_FIELDS = [
   { key: 'name', type: 'plain', max: 80, req: true },
   { key: 'logo_url', type: 'image', kind: 'logo', req: true },
-  { key: 'description', type: 'text', max: 600, req: true },
+  ABOUT_FIELD,
+  { key: 'description', type: 'text', max: 3000, req: true },
   { key: 'website', type: 'url', req: true },
   { key: 'place', type: 'place', req: true },
   { key: 'size', type: 'select', list: 'size', req: true },

@@ -201,7 +201,7 @@ button { font-family: var(--font-body); }
 .hero-meta .meta-chip { font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.4px; background: rgba(255, 255, 255, 0.12); color: #fff; padding: 5px 10px; border-radius: 20px; }
 .profile-hero-about { margin-top: 44px; }
 .profile-hero-about .eyebrow { color: var(--lime); }
-.profile-hero-about p { color: #fff; font-family: var(--font-heading); font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; line-height: 1.4; max-width: 900px; margin: 0; white-space: pre-line; }
+.profile-hero-about p { color: #fff; font-family: var(--font-heading); font-size: clamp(18px, 2vw, 23px); font-weight: 600; line-height: 1.4; max-width: 720px; margin: 0; }
 .profile-hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 22px; }
 .profile-hero-tags span { border: 1px solid rgba(255,255,255,.25); border-radius: 999px; color: #fff; padding: 8px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; }
 .profile-facts { position: relative; z-index: 3; max-width: 1180px; padding: 0 20px; margin: -76px auto 0; }
@@ -393,6 +393,7 @@ a.profile-fact-value { display: inline-block; border-bottom: 2px solid var(--lim
 .clamp-3 { display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .see-more { background: none; border: none; padding: 0; margin-top: 6px; color: var(--accent); font-weight: 700; font-size: 13px; cursor: pointer; }
 .see-more:hover { color: var(--navy); }
+.profile-hero .see-more, .profile-product .see-more, .cta-card .see-more { color: var(--lime); }
 
 /* profile pieces */
 .sub { margin-top: 12px; }

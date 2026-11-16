@@ -3,9 +3,9 @@
 import { cx, html, useState } from '../../lib/html.js';
 import { formatDate } from '../../lib/format.js';
 import { useI18n } from '../../lib/i18n.js';
-import { present, stage, subtitle } from '../../lib/profileModel.js';
-import { LogoPlate } from '../ui.js';
-import { LookingForCard, mainBlocks, otherSideCards } from './blocks.js?v=20261102-mobile1';
+import { present, stage, subtitle } from '../../lib/profileModel.js?v=20261117-about1';
+import { LogoPlate, ReadMore, shortenText } from '../ui.js?v=20261117-about1';
+import { LookingForCard, mainBlocks, otherSideCards } from './blocks.js?v=20261117-about1';
 
 function StageChart({ project, i18n }) {
   const s = stage(project);
@@ -23,7 +23,8 @@ function StageChart({ project, i18n }) {
 
 function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
   const t = i18n.t;
-  const sub = subtitle(project, i18n);
+  const sub = project.profile_type === 'F' ? '' : subtitle(project, i18n);
+  const about = i18n.tx(org.about_short);
   return html`<div class="profile-hero">
     ${org.cover_url && html`<div class="profile-hero-cover" aria-hidden="true" style=${{ backgroundImage: `url("${org.cover_url}")` }}></div>`}
     <div class="profile-hero-inner">
@@ -37,11 +38,11 @@ function Header({ org, project, i18n, backHref, onFavorite, isFavorite }) {
         <div style=${{ flex: '1 1 340px', minWidth: 0 }}>
           <span class="hero-chip">${t('profile_type.' + project.profile_type)}</span>
           <h1>${org.name}</h1>
-          ${sub && html`<p class="subtitle">${sub}</p>`}
+          ${sub && html`<${ReadMore} key=${project.id} text=${sub} className="subtitle" limit=${180} />`}
         </div>
       </div>
-      ${Boolean(present(org.description) || org.size || org.segments?.length || org.custom_tags?.length) && html`<div class="profile-hero-about">
-        ${present(org.description) && html`<div class="eyebrow">${t('block.description')}</div><p>${i18n.tx(org.description)}</p>`}
+      ${Boolean(about || org.size || org.segments?.length || org.custom_tags?.length) && html`<div class="profile-hero-about">
+        ${about && html`<div class="eyebrow">${t('profile.about_short')}</div><p>${shortenText(about, 180)}</p>`}
         <div class="profile-hero-tags">
           ${org.size && html`<span>${i18n.label('size', org.size)}</span>`}
           ${(org.segments || []).map((segment) => html`<span key=${segment}>${i18n.label('segments', segment)}</span>`)}
@@ -65,7 +66,7 @@ function Facts({ org, project, i18n }) {
   </div>`);
   if (present(project.fields.segment) || present(project.fields.platform_type)) facts.push(html`<div class="profile-fact" key="area">
     <div class="profile-fact-label">${i18n.t('profile.focus_area')}</div>
-    <div class="profile-fact-value">${subtitle(project, i18n)}</div>
+    <div class="profile-fact-value"><${ReadMore} key=${project.id} text=${subtitle(project, i18n)} limit=${180} /></div>
   </div>`);
   if (place) facts.push(html`<div class="profile-fact" key="place"><div class="profile-fact-label">${i18n.t('profile.location')}</div><div class="profile-fact-value">${place}</div></div>`);
   if (site) facts.push(html`<div class="profile-fact" key="site"><div class="profile-fact-label">${i18n.t('profile.website')}</div><a class="profile-fact-value" href=${org.website} target="_blank" rel="noopener">${site}</a></div>`);
@@ -83,7 +84,7 @@ function ProjectSelector({ org, project, i18n, onSelect }) {
           class=${cx('project-tab', p.id === project.id && 'on')} onClick=${() => onSelect(p.id)}>
         <span class="project-tab-type">${i18n.t('profile_type_short.' + p.profile_type)}</span>
         <span class="project-tab-title">${subtitle(p, i18n)}</span>
-        ${present(p.summary) && html`<span class="project-tab-summary">${i18n.tx(p.summary)}</span>`}
+        ${present(p.summary) && html`<span class="project-tab-summary">${shortenText(i18n.tx(p.summary), 120)}</span>`}
       </button>`)}
     </div>
   </div>`;
@@ -97,7 +98,7 @@ function Leadership({ org, i18n }) {
       <div class="leader" key=${i}>
         <div class="leader-avatar">${p.name.split(' ').map((w) => w[0]).slice(0, 2).join('')}</div>
         <div><div class="leader-name">${p.name}</div><div class="leader-role">${i18n.tx(p.role)}</div>
-        ${present(p.experience) && html`<div class="leader-exp">${i18n.tx(p.experience)}</div>`}</div>
+        ${present(p.experience) && html`<${ReadMore} className="leader-exp" text=${i18n.tx(p.experience)} />`}</div>
       </div>`)}
     </div>
   </section>`;
@@ -142,7 +143,12 @@ export function ProfileView({ org, projectId, onSelectProject, onRequestContact,
     <div class="profile-body">
       ${cta && html`<div class="profile-cta-mobile">${cta}</div>`}
       <main class="profile-main">
+        ${present(org.description) && html`<section class="pblock" id="description">
+          <h2 class="block-title">${i18n.t('block.description')}</h2>
+          <${ReadMore} className="lead" text=${i18n.tx(org.description)} />
+        </section>`}
         <${ProjectSelector} org=${org} project=${project} i18n=${i18n} onSelect=${onSelectProject} />
+        ${org.projects.length > 1 && present(project.summary) && html`<div class="pblock"><${ReadMore} key=${project.id} text=${i18n.tx(project.summary)} /></div>`}
         ${blocks}
         <${Leadership} org=${org} i18n=${i18n} />
       </main>

@@ -8,6 +8,7 @@ export function draftToPublic(orgMeta, content, { publicState = 'published', app
     logo_url: o.logo_url,
     cover_url: o.cover_url,
     description: o.description,
+    about_short: Object.hasOwn(o, 'about_short') ? o.about_short : orgMeta.about_short,
     website: o.website,
     city: o.city,
     state: o.state,

@@ -2,9 +2,9 @@
 // stage (profiles A and B), "What we're looking for" summary and number of projects.
 import { html } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
-import { lookingForSummary, stage, subtitle } from '../lib/profileModel.js';
+import { lookingForSummary, stage, subtitle } from '../lib/profileModel.js?v=20261117-about1';
 import { href } from '../lib/router.js';
-import { LogoPlate } from './ui.js';
+import { LogoPlate } from './ui.js?v=20261117-about1';
 
 function CardStage({ project, i18n }) {
   const s = stage(project);
@@ -32,7 +32,7 @@ export function OrgCard({ org, project: shown }) {
         <div class="pill">${t('profile_type_short.' + project.profile_type)}</div>
       </div>
       <div class="card-subtitle">${subtitle(project, i18n)}</div>
-      <div class="card-desc">${tx(org.description)}</div>
+      <div class="card-desc">${tx(org.about_short)}</div>
       <${CardStage} project=${project} i18n=${i18n} />
       <div class="card-foot">
         <div>

@@ -3,8 +3,8 @@
 import { html, useState } from '../../lib/html.js';
 import { ImageLightbox } from '../ImageLightbox.js';
 import { formatNumber, formatPeriod, formatUSD, formatUSDRange } from '../../lib/format.js';
-import { labels, milestoneStatus, present, sortedMilestones, sumRaised } from '../../lib/profileModel.js';
-import { ReadMore, Tags } from '../ui.js';
+import { labels, milestoneStatus, present, sortedMilestones, sumRaised } from '../../lib/profileModel.js?v=20261117-about1';
+import { ReadMore, Tags } from '../ui.js?v=20261117-about1';
 
 function Block({ id, title, children }) {
   return html`<section class="pblock" id=${id}><h2 class="block-title">${title}</h2>${children}</section>`;
@@ -54,15 +54,6 @@ function Certifications({ f, i18n }) {
   <//>`;
 }
 
-function Description({ org, i18n, extra }) {
-  if (!present(org.description) && !present(extra)) return null;
-  return html`<section class="pblock" id="description">
-    <div class="eyebrow">${i18n.t('block.description')}</div>
-    ${present(org.description) && html`<${ReadMore} className="lead" text=${i18n.tx(org.description)} />`}
-    ${present(extra) && html`<div style=${{ marginTop: '14px' }}><${ReadMore} text=${i18n.tx(extra)} /></div>`}
-  </section>`;
-}
-
 function Milestones({ items, i18n }) {
   if (!present(items)) return null;
   return html`<div class="panel" id="key_milestones">
@@ -76,7 +67,7 @@ function Milestones({ items, i18n }) {
             <span class="timeline-date">${formatPeriod(m.period, i18n.lang)}</span>
             <span class=${'status-chip ' + st}>${i18n.t('profile.milestone_' + st)}</span>
           </div>
-          <div class="timeline-text">${i18n.tx(m.description)}</div>
+          <${ReadMore} className="timeline-text" text=${i18n.tx(m.description)} />
         </div>
       </div>`;
     })}</div>
@@ -90,7 +81,7 @@ function Rounds({ rounds, i18n }) {
     <div class="cta-round" key=${i}>
       <div class="cta-value">${formatUSD(r.amount_usd, i18n.lang)}</div>
       <div class="cta-round-meta">${[i18n.label('round_stage', r.stage), formatPeriod(r.period, i18n.lang)].filter(Boolean).join(' · ')}</div>
-      ${present(r.purpose) && html`<div class="cta-text">${i18n.tx(r.purpose)}</div>`}
+      ${present(r.purpose) && html`<${ReadMore} className="cta-text" limit=${180} text=${i18n.tx(r.purpose)} />`}
     </div>`)}</div>`;
 }
 
@@ -108,7 +99,7 @@ export function LookingForCard({ org, project, i18n, onRequestContact, contactSt
   if (type === 'A' || type === 'B') {
     specific = html`
       ${present(f.rounds) && html`<${CtaSection} title=${t('block.investment_sought')}><${Rounds} rounds=${f.rounds} i18n=${i18n} /><//>`}
-      ${present(f.use_of_funds) && html`<${CtaSection} title=${t('block.use_of_funds')}><p class="cta-text">${i18n.tx(f.use_of_funds)}</p><//>`}`;
+      ${present(f.use_of_funds) && html`<${CtaSection} title=${t('block.use_of_funds')}><${ReadMore} className="cta-text" limit=${180} text=${i18n.tx(f.use_of_funds)} /><//>`}`;
   } else if (type === 'C' || type === 'D') {
     const list = type === 'C' ? 'c_investment_types' : 'd_investment_types';
     specific = (present(f.investment_types) || present(f.investment_range)) && html`
@@ -122,7 +113,7 @@ export function LookingForCard({ org, project, i18n, onRequestContact, contactSt
       ${present(f.partnership_models) && html`<${CtaSection} title=${t('block.partnership_model')}><${Tags} variant="on-navy" items=${labels(i18n, list, f.partnership_models)} /><//>`}
       ${(present(f.investment_range) || present(f.investment_description)) && html`<${CtaSection} title=${t('block.investment_sought')}>
         ${present(f.investment_range) && html`<div class="cta-value">${formatUSDRange(f.investment_range, i18n.lang)}</div>`}
-        ${present(f.investment_description) && html`<p class="cta-text">${i18n.tx(f.investment_description)}</p>`}
+        ${present(f.investment_description) && html`<${ReadMore} className="cta-text" limit=${180} text=${i18n.tx(f.investment_description)} />`}
       <//>`}`;
   }
   return html`<div class="cta-card">
@@ -170,12 +161,12 @@ function mainA(org, f, i18n) {
     (present(f.lead_product_name) || present(f.lead_product_moa)) && html`<section key="lp" class="pblock" id="lead_product">
       <div class="eyebrow">${t('block.lead_product')}</div>
       <div class="profile-product">
-        <div><h2>${f.lead_product_name}</h2><p>${i18n.tx(f.lead_product_moa)}</p></div>
+        <div><h2>${f.lead_product_name}</h2><${ReadMore} text=${i18n.tx(f.lead_product_moa)} /></div>
         ${(f.product_image_url || org.cover_url) && html`<${ProductPhoto} src=${f.product_image_url || org.cover_url} i18n=${i18n} />`}
       </div>
     </section>`,
     present(f.pipeline) && html`<${Block} key="pl" id="pipeline" title=${t('block.pipeline')}>
-      <ul class="list">${f.pipeline.map((p, i) => html`<li key=${i}><strong>${p.name}</strong>${present(p.indication) ? ' — ' + i18n.tx(p.indication) : ''}</li>`)}</ul>
+      <ul class="list">${f.pipeline.map((p, i) => html`<li key=${i}><strong>${p.name}</strong>${present(p.indication) && html`<${Text} value=${p.indication} i18n=${i18n} />`}</li>`)}</ul>
     <//>`,
     (present(f.patents_filed) || present(f.patents_granted) || present(f.fto)) && html`<${Block} key="ip" id="ip_status" title=${t('block.ip_status')}>
       ${present(f.patents_filed) && html`<${Sub} title=${t('profile.patents_filed')}><${Text} value=${f.patents_filed} i18n=${i18n} /><//>`}
@@ -249,7 +240,7 @@ function mainD(org, f, i18n) {
     present(f.models) && html`<${Block} key="md" id="models" title=${t('block.models')}><${Text} value=${f.models} i18n=${i18n} /><//>`,
     html`<${Certifications} key="ct" f=${f} i18n=${i18n} />`,
     present(f.partner_sites) && html`<${Block} key="ps" id="partner_sites" title=${t('block.partner_sites')}>
-      <ul class="list">${f.partner_sites.map((s, i) => html`<li key=${i}>${i18n.tx(s)}</li>`)}</ul>
+      <ul class="list">${f.partner_sites.map((s, i) => html`<li key=${i}><${Text} value=${s} i18n=${i18n} /></li>`)}</ul>
     <//>`,
     clientLine(f, i18n) && html`<${Block} key="cl" id="client_profile" title=${t('block.client_profile')}><p class="prose">${clientLine(f, i18n)}</p><//>`,
     money.some(Boolean) && html`<${Block} key="re" id="revenue" title=${moneyTitles.filter((_, i) => money[i]).join(' / ')}>
@@ -262,7 +253,7 @@ function mainE(org, f, i18n) {
   const t = i18n.t;
   return [
     present(f.product_portfolio) && html`<${Block} key="pp" id="product_portfolio" title=${t('block.product_portfolio')}>
-      <ul class="list">${f.product_portfolio.map((p, i) => html`<li key=${i}><strong>${i18n.tx(p.category)}</strong>${present(p.description) ? ' — ' + i18n.tx(p.description) : ''}</li>`)}</ul>
+      <ul class="list">${f.product_portfolio.map((p, i) => html`<li key=${i}><strong>${i18n.tx(p.category)}</strong><${Text} value=${p.description} i18n=${i18n} /></li>`)}</ul>
     <//>`,
     present(f.production_capacity) && html`<${Block} key="pc" id="production_capacity" title=${t('block.production_capacity')}><${Text} value=${f.production_capacity} i18n=${i18n} /><//>`,
     (present(f.export_markets) || present(f.export_markets_text)) && html`<${Block} key="em" id="export_markets" title=${t('block.export_markets')}>
@@ -273,7 +264,7 @@ function mainE(org, f, i18n) {
     present(f.partnership_interests) && html`<div key="pi" class="panel highlight" id="partnership_interests">
       <div class="eyebrow" style=${{ marginBottom: '14px' }}>${t('block.partnership_interests')}</div>
       <div class="interest-grid">${f.partnership_interests.map((p, i) => html`
-        <div class="interest" key=${i}><div class="sub-title strong">${i18n.tx(p.area)}</div><div class="timeline-text">${i18n.tx(p.description)}</div></div>`)}
+        <div class="interest" key=${i}><div class="sub-title strong">${i18n.tx(p.area)}</div><${ReadMore} className="timeline-text" text=${i18n.tx(p.description)} /></div>`)}
       </div>
     </div>`,
     present(f.expansion_projects) && html`<${Block} key="ex" id="expansion_projects" title=${t('block.expansion_projects')}><${Text} value=${f.expansion_projects} i18n=${i18n} /><//>`,
@@ -287,7 +278,7 @@ function mainF(org, f, i18n) {
   const titles = [t('block.market_share'), t('block.revenue'), t('block.exports')];
   return [
     (present(f.products) || present(f.products_text)) && html`<${Block} key="pr" id="products" title=${t('block.products')}>
-      ${present(f.products) && html`<ul class="list" style=${{ marginTop: 0 }}>${f.products.map((p, i) => html`<li key=${i}>${i18n.tx(p)}</li>`)}</ul>`}
+      ${present(f.products) && html`<ul class="list" style=${{ marginTop: 0 }}>${f.products.map((p, i) => html`<li key=${i}><${Text} value=${p} i18n=${i18n} /></li>`)}</ul>`}
       ${present(f.products_text) && html`<div style=${{ marginTop: '10px' }}><${Text} value=${f.products_text} i18n=${i18n} /></div>`}
     <//>`,
     (present(f.markets_served) || present(f.markets_text)) && html`<${Block} key="mk" id="markets" title=${t('block.markets')}>

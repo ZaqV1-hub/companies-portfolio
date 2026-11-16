@@ -14,7 +14,8 @@ import { createPool, jsonColumn } from './db/connection.js';
 import { MySQLSessionStore } from './db/mysql-session-store.js';
 import { mailAvailable, sendAuthMail, sendPlatformMail } from './auth-mail.js';
 import { companyInvitationMail } from './invitation-mail.js';
-import { validateDraft } from '../src/lib/profileValidation.js';
+import { fieldProblems, validateDraft } from '../src/lib/profileValidation.js';
+import { ABOUT_FIELD } from '../src/lib/formSchema.js';
 import { businessDaysBetween } from '../src/lib/crm.js';
 
 const pool = createPool();
@@ -68,7 +69,7 @@ const loginLimiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 10, standardHe
 const signupLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false });
 const feedbackLimiter = rateLimit({ windowMs: 60 * 60 * 1000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false });
 
-const PUBLIC_ORG_FIELDS = ['id', 'name', 'logo_url', 'cover_url', 'description', 'website', 'city', 'state', 'size', 'segments',
+const PUBLIC_ORG_FIELDS = ['id', 'name', 'logo_url', 'cover_url', 'description', 'about_short', 'website', 'city', 'state', 'size', 'segments',
   'partnership_types', 'leadership', 'gallery', 'custom_tags', 'public_state', 'last_approved_at', 'is_featured'];
 
 function publicOrg(row) {
@@ -921,9 +922,14 @@ app.post('/api/uploads', requireRole('company_user','team'), (req,res,next) => u
   } catch (error) { if (svg && error.message?.startsWith('invalid_svg')) return res.status(400).json({ error:'invalid_svg' }); routeError(res,error); }
 });
 
-const profileOrgKeys = ['name','logo_url','cover_url','description','website','city','state','size','segments','partnership_types','leadership','gallery','focal_point'];
+const profileOrgKeys = ['name','logo_url','cover_url','description','website','city','state','size','segments','partnership_types','leadership','gallery','focal_point','about_short'];
 const profileSnapshot = (org, projects) => ({ organization: Object.fromEntries(profileOrgKeys.map((key) => [key, org[key] ?? null])),
   projects: projects.map((project) => ({ id: project.id, profile_type: project.profile_type, summary: project.summary, fields: project.fields })) });
+
+function withCompanyAbout(content, org) {
+  if (!content?.organization || Object.hasOwn(content.organization, 'about_short')) return content;
+  return { ...content, organization: { ...content.organization, about_short: org.about_short ?? null } };
+}
 function initialProfileSnapshot(org, projects, imports = []) {
   const content = profileSnapshot(org, projects);
   for (const row of imports.filter((item) => item.mode === 'reference')) {
@@ -1050,7 +1056,8 @@ app.get('/api/me/profile-form', requireRole('company_user'), async (req, res) =>
         [draft.id, orgId, draft.kind, draft.status, jsonColumn(content), jsonColumn({})]);
     }
     if (db) await db.commit();
-    res.json({ organization: { id: org.id,name: org.name,status: org.status,public_state: org.public_state,last_approved_at: org.last_approved_at,intake_mode:org.intake_mode,custom_tags:org.custom_tags || [] }, draft,
+    draft.content = withCompanyAbout(draft.content, org);
+    res.json({ organization: { id: org.id,name: org.name,status: org.status,public_state: org.public_state,last_approved_at: org.last_approved_at,intake_mode:org.intake_mode,custom_tags:org.custom_tags || [],about_short:org.about_short }, draft,
       imports: imports.map(({ project_id, field, mode, previous_answer }) => ({ project_id,field,mode,previous_answer })), firstValidation,
       initialContent: firstValidation ? initialContent : null });
   } catch (error) {
@@ -1112,7 +1119,7 @@ app.post('/api/me/profile-draft/accept-initial', requireRole('company_user'), as
     const [imports] = await db.execute('SELECT project_id,field,mode FROM form_imports WHERE organization_id=?', [req.user.organization_id]);
     const draft = await getOpenDraft(db, req.user.organization_id);
     const baseline = initialProfileSnapshot(orgs[0], projects, imports);
-    if (!draft || draft.status === 'in_review' || !isDeepStrictEqual(req.body?.content, baseline)) {
+    if (!draft || draft.status === 'in_review' || !isDeepStrictEqual(withCompanyAbout(req.body?.content, orgs[0]), baseline)) {
       await db.rollback(); return res.status(409).json({ error:'changes_require_review' });
     }
     await db.execute("UPDATE organizations SET status='published',public_state='published',last_approved_at=?,last_updated_at=? WHERE id=?", [localDate(),localDate(),req.user.organization_id]);
@@ -1140,6 +1147,7 @@ app.get('/api/team/reviews/:id', requireRole('team'), async (req, res) => {
     const org = orgs[0];
     const [projects] = await pool.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [org.id]);
     const [imports] = await pool.execute("SELECT project_id,field,previous_answer FROM form_imports WHERE organization_id=? AND mode='reference'", [org.id]);
+    draft.content = withCompanyAbout(draft.content, org);
     res.json({ organization: { id:org.id,name:org.name,status:org.status,public_state:org.public_state,last_approved_at:org.last_approved_at,custom_tags:org.custom_tags || [] }, draft,
       previous: org.public_state === 'hidden' && !org.last_approved_at ? null : profileSnapshot(org, projects), previousIsProvisional: org.public_state === 'provisional', imports });
   } catch (error) { routeError(res, error); }
@@ -1149,15 +1157,18 @@ app.put('/api/team/reviews/:id', requireRole('team'), async (req, res) => {
   catch (error) { routeError(res, error); }
 });
 app.post('/api/team/reviews/:id/approve', requireRole('team'), async (req, res) => {
-  const content = req.body.content;
+  let content = req.body.content;
   const db = await pool.getConnection();
   try {
     await db.beginTransaction();
     const [versions] = await db.execute("SELECT * FROM profile_versions WHERE id=? AND kind='draft' AND status='in_review' FOR UPDATE", [req.params.id]);
     if (!versions.length) { await db.rollback(); return res.json({ ok: false, error: 'not_in_review' }); }
     const version = versions[0];
+    const [orgs] = await db.execute('SELECT about_short FROM organizations WHERE id=?', [version.organization_id]);
+    content = withCompanyAbout(content, orgs[0]);
     const org = content?.organization || {};
-    const organizationFields = ['name','logo_url','cover_url','description','website','city','state','size','segments','partnership_types','leadership','gallery','focal_point'];
+    if (fieldProblems(ABOUT_FIELD, org.about_short).length) { await db.rollback(); return res.json({ ok:false,error:'invalid' }); }
+    const organizationFields = profileOrgKeys;
     const updates = organizationFields.map((key) => `\`${key}\`=?`).join(',');
     const orgValues = organizationFields.map((key) => jsonColumn(org[key]));
     await db.execute(`UPDATE organizations SET ${updates},status='published',public_state='published',last_approved_at=?,last_updated_at=? WHERE id=?`, [...orgValues,localDate(),localDate(),version.organization_id]);
@@ -1307,14 +1318,15 @@ app.get('/api/team/organizations/:id/profile-form', requireRole('team'), async (
   } catch (error) { routeError(res,error); }
 });
 async function saveTeamOrganizationProfile(db, id, content) {
-  const [orgs] = await db.execute('SELECT public_state,last_approved_at FROM organizations WHERE id=? FOR UPDATE', [id]);
+  const [orgs] = await db.execute('SELECT public_state,last_approved_at,about_short FROM organizations WHERE id=? FOR UPDATE', [id]);
   if (!orgs.length) return { status:404,error:'not_found' };
   if (orgs[0].public_state !== 'hidden' || orgs[0].last_approved_at) return { status:409,error:'published_profile' };
   const [active] = await db.execute("SELECT id FROM profile_versions WHERE organization_id=? AND kind='draft' AND status='in_review' LIMIT 1", [id]);
   if (active.length) return { status:409,error:'in_review' };
   const [projects] = await db.execute('SELECT id FROM projects WHERE organization_id=?', [id]);
   if (!content?.organization || !Array.isArray(content.projects) || projects.length !== content.projects.length || projects.some((p) => !content.projects.some((x) => x.id===p.id))) return { status:400,error:'invalid' };
-  const org = content.organization;
+  const org = withCompanyAbout(content, orgs[0]).organization;
+  if (fieldProblems(ABOUT_FIELD, org.about_short).length) return { status:400,error:'invalid' };
   const fields = profileOrgKeys.map((key) => `\`${key}\`=?`).join(',');
   await db.execute(`UPDATE organizations SET ${fields} WHERE id=?`, [...profileOrgKeys.map((key) => jsonColumn(org[key])),id]);
   for (const project of content.projects) await db.execute('UPDATE projects SET summary=?,fields=? WHERE id=? AND organization_id=?', [jsonColumn(project.summary),jsonColumn(project.fields),project.id,id]);

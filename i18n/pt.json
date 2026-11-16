@@ -82,10 +82,13 @@
     "milestone_completed": "Concluído",
     "milestone_in_progress": "Em andamento",
     "milestone_upcoming": "Previsto",
-    "website": "Site"
+    "website": "Site",
+    "about_short": "Sobre",
+    "read_more": "Ler mais",
+    "read_less": "Ler menos"
   },
   "block": {
-    "description": "Sobre",
+    "description": "Descrição",
     "lead_product": "Produto principal",
     "pipeline": "Pipeline",
     "ip_status": "Propriedade intelectual",
@@ -473,7 +476,7 @@
     },
     "description": {
       "label": "Descrição",
-      "help": "O que a organização faz, em poucas frases. Aparece no topo do perfil e no card."
+      "help": "Apresente a atuação e as informações institucionais em mais detalhes. Aparece na seção Descrição do perfil."
     },
     "website": {
       "label": "Site",
@@ -750,6 +753,10 @@
     "gallery": {
       "label": "Galeria de fotos",
       "help": "Até 6 imagens com legenda. Recomendação: 1600 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB por imagem. As fotos são exibidas inteiras."
+    },
+    "about_short": {
+      "label": "Sobre",
+      "help": "Apresente a empresa em até 180 caracteres por idioma. Diga o que ela faz e em que área atua. Use os campos do projeto para os produtos."
     }
   },
   "form": {

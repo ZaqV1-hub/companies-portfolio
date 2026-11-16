@@ -2,10 +2,10 @@ import { html, useEffect, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { useI18n } from '../../lib/i18n.js';
 import { navigate } from '../../lib/router.js';
-import { draftToPublic } from '../../lib/draftPreview.js';
-import { validateDraft } from '../../lib/profileValidation.js';
+import { draftToPublic } from '../../lib/draftPreview.js?v=20261117-about1';
+import { validateDraft } from '../../lib/profileValidation.js?v=20261117-about1';
 import { getCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=20261117-about1';
 
 export function CompanyPreviewPage() {
   const { t, lang } = useI18n();

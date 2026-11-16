@@ -2,12 +2,22 @@
 import { cx, html, useEffect, useRef, useState } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
 
-/** Long text: shows 3 lines and a "see more" toggle when it overflows (spec 1, 6.4). */
-export function ReadMore({ text, className }) {
+export function shortenText(text, limit) {
+  const value = text.trim();
+  if (value.length <= limit) return value;
+  const preview = value.slice(0, limit - 1);
+  const boundary = preview.search(/\s+\S*$/);
+  return (boundary >= limit * .7 ? preview.slice(0, boundary) : preview).trimEnd() + '…';
+}
+
+/** Keeps long prose compact by character count and by available space. */
+export function ReadMore({ text, className, limit = 280 }) {
   const { t } = useI18n();
   const ref = useRef(null);
   const [open, setOpen] = useState(false);
   const [overflows, setOverflows] = useState(false);
+  const preview = shortenText(text, limit);
+  const shortened = preview !== text.trim();
   useEffect(() => {
     const el = ref.current;
     if (!el || open) return undefined;
@@ -21,9 +31,9 @@ export function ReadMore({ text, className }) {
   }, [text, open]);
   return html`
     <div>
-      <p ref=${ref} class=${cx('prose', className, !open && 'clamp-3')}>${text}</p>
-      ${(overflows || open) && html`
-        <button type="button" class="see-more" onClick=${() => setOpen(!open)}>${open ? t('common.see_less') : t('common.see_more')}</button>`}
+      <p ref=${ref} class=${cx('prose', className, !open && 'clamp-3')}>${open ? text : preview}</p>
+      ${(shortened || overflows || open) && html`
+        <button type="button" class="see-more" aria-expanded=${open} onClick=${() => setOpen(!open)}>${open ? t('profile.read_less') : t('profile.read_more')}</button>`}
     </div>`;
 }
 

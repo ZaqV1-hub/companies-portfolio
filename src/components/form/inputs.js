@@ -2,9 +2,9 @@
 // Every widget receives {field, value, onChange, i18n, disabled} and calls onChange(newValue).
 import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
-import { UFS } from '../../lib/formSchema.js?v=20261026-profile-layout2';
+import { UFS } from '../../lib/formSchema.js?v=20261117-about1';
 import { BRAZIL_CITIES } from '../../lib/brazilCities.js';
-import { fieldProblems } from '../../lib/profileValidation.js?v=20261102-focal1';
+import { fieldProblems } from '../../lib/profileValidation.js?v=20261117-about1';
 import { uploadImage } from '../../services/api.js';
 
 // ---------------------------------------------------------------- USD (spec 1, 5.2)
@@ -64,7 +64,7 @@ export function TextInput({ field, value, onChange, disabled, id }) {
   return html`<div class="bilingual-input">${['pt', 'en'].map((language) => {
     const text = v[language] || '';
     const props = { id: language === 'pt' ? id : undefined, class: 'input input-sm', value: text, disabled,
-      maxLength: field.max ? field.max + 50 : undefined, onInput: (e) => onChange({ ...v, [language]: e.target.value }) };
+      maxLength: field.hardLimit ? field.max : field.max ? field.max + 50 : undefined, onInput: (e) => onChange({ ...v, [language]: e.target.value }) };
     return html`<div class="text-wrap" key=${language}><span class="language-label">${language.toUpperCase()}</span>
       ${multiline ? html`<textarea rows=${Math.min(6, Math.max(2, Math.ceil((field.max || 200) / 120)))} ...${props}></textarea>` : html`<input ...${props} />`}
       <${Counter} n=${text.length} max=${field.max} /></div>`;

@@ -1,6 +1,6 @@
 // Validation of a profile draft (spec 1, 5.2 and 5.6). Runs in the browser for instant feedback and
 // MUST run again on the server before accepting "Enviar para revisão" (see docs/HANDOFF_CODEX.md).
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField } from './formSchema.js?v=20261026-profile-layout2';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField } from './formSchema.js?v=20261117-about1';
 
 export const USD_MESSAGE_KEY = 'form.usd_error'; // "Informe o valor em dólares americanos, apenas números"
 
@@ -29,7 +29,9 @@ export function fieldProblems(field, value) {
   switch (t) {
     case 'text':
       if (req && blank(textPt(value))) out.push({ code: 'required' });
-      if (field.max && textPt(value).length > field.max) out.push({ code: 'too_long', max: field.max });
+      if (field.max && (textPt(value).length > field.max || (field.hardLimit && (value?.en || '').length > field.max))) {
+        out.push({ code: 'too_long', max: field.max });
+      }
       break;
     case 'plain':
       if (req && blank(value)) out.push({ code: 'required' });
