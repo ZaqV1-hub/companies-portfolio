@@ -32,6 +32,7 @@
 .profile-editor-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(210px, 268px); align-items: start; gap: clamp(14px, 2vw, 26px); }
 .profile-editor-main { min-width: 0; }
 .profile-editor-rail { display: grid; gap: 12px; }
+.profile-editor .profile-editor-rail-toggle { display: none; }
 .profile-editor-rail-card, .profile-editor .form-card { border: 1px solid var(--editor-line); box-shadow: 0 4px 18px #182c4d08; }
 .profile-editor-rail-card { background: #fff; border-radius: 14px; padding: 16px; overflow-wrap: anywhere; }
 .profile-editor-rail-card h2 { margin: 0 0 10px; font-size: 14px; color: var(--navy); }
@@ -39,7 +40,11 @@
 .profile-editor-rail-card ul { padding: 0; margin: 7px 0 0; list-style: none; display: grid; gap: 4px; }
 .profile-editor-rail-card .btn-link { display: inline-block; text-align: left; padding: 5px 0; color: #304579; }
 .profile-editor-meter { display: flex; align-items: center; gap: 10px; color: var(--navy); font-size: 13px; }
-.profile-editor-meter progress { width: 100%; height: 10px; accent-color: #85a11d; }
+.profile-editor-meter strong { flex: none; white-space: nowrap; }
+.profile-editor-meter progress { flex: 1; min-width: 0; height: 8px; appearance: none; border: 0; border-radius: 8px; overflow: hidden; background: #e9edf4; }
+.profile-editor-meter progress::-webkit-progress-bar { background: #e9edf4; }
+.profile-editor-meter progress::-webkit-progress-value { background: #85a11d; }
+.profile-editor-meter progress::-moz-progress-bar { background: #85a11d; }
 .profile-editor-language-toggle { display: flex; align-items: flex-start; gap: 9px; color: var(--navy); font-weight: 650; }
 .profile-editor-language-toggle input { accent-color: var(--navy); margin-top: 4px; }
 .profile-editor-section, .profile-editor .form-field { scroll-margin-top: 180px; }
@@ -87,7 +92,9 @@
 @media (max-width: 720px) {
   .profile-editor-heading { position: static; }
   .profile-editor-header-actions { width: 100%; }
-  .profile-editor-rail { grid-template-columns: minmax(0, 1fr); }
+  .profile-editor .profile-editor-rail-toggle { display: inline-flex; justify-content: flex-start; grid-row: 1; }
+  .profile-editor-rail { display: none; grid-row: 2; grid-template-columns: minmax(0, 1fr); }
+  .profile-editor-rail.mobile-open { display: grid; }
   .profile-editor .form-field, .profile-editor-section { scroll-margin-top: 24px; }
   .editor-language-field-themed .bilingual-input { grid-template-columns: minmax(0, 1fr); }
 }

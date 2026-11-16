@@ -111,6 +111,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const [acceptBusy, setAcceptBusy] = useState(false);
   const [acceptError, setAcceptError] = useState('');
   const [sideBySide, setSideBySide] = useState(false);
+  const [railOpen, setRailOpen] = useState(false);
   const [savedSnapshot, setSavedSnapshot] = useState('');
   const [savedAt, setSavedAt] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -165,7 +166,6 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const check = validateDraft(content, reviewed);
   const stepProblems = check.problems.filter((p)=>p.stepId===step.id);
   const completed = (s) => s.kind !== 'preview' && !!reviewed[s.id] && !check.problems.some((p)=>p.stepId===s.id);
-  const completedCount = steps.filter(completed).length;
   const focusProblem = (problem) => {
     const base = 'f-' + problem.stepId.replace(':','-') + '-' + problem.field;
     const container = document.getElementById(base);
@@ -333,7 +333,13 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const org = data.organization;
   const underReview = data.draft.status === 'in_review' && (!teamOrgId || org.review_version_id);
   const status = underReview ? 'in_review' : org.status;
-  const percent = Math.round(completedCount / Math.max(1,steps.length-1)*100);
+  const requiredFields = [
+    ...ORG_FIELDS.filter((field) => field.req).map((field) => 'organization/'+field.key),
+    ...content.projects.flatMap((project) => projectFields(project,content.projects.length)
+      .filter((field) => field.req).map((field) => 'project:'+project.id+'/'+field.key)),
+  ];
+  const problemFields = new Set(check.problems.map((p) => p.stepId+'/'+p.field));
+  const percent = Math.round(requiredFields.filter((field) => !problemFields.has(field)).length / requiredFields.length * 100);
   const progressProblems = step.kind === 'preview' ? check.problems : stepProblems;
   const saveLabel = saving ? t('form.editor_saving') : dirty ? t('form.editor_unsaved') :
     savedAt ? t('form.editor_saved_at',{time:new Intl.DateTimeFormat(i18n.lang,{hour:'2-digit',minute:'2-digit'}).format(savedAt)}) : t('form.editor_synced');
@@ -362,6 +368,8 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     </nav>
     </header>
     <div class="profile-editor-grid">
+    <button type="button" class="btn btn-outline profile-editor-rail-toggle" aria-expanded=${railOpen}
+      aria-controls="profile-editor-rail" onClick=${() => setRailOpen(!railOpen)}>${t('form.editor_progress')} · ${percent}%</button>
     <div class="profile-editor-main">
     ${underReview && html`<div class="notice">${t('form.locked_review')}</div>`}
     ${data.draft.status === 'rejected' && html`<div class="notice warn" role="status"><strong>${i18n.lang === 'pt' ? 'Inscrição recusada pela Abiquifi.' : 'Application rejected by Abiquifi.'}</strong> ${data.draft.review_comment}</div>`}
@@ -400,7 +408,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
       </div>
     </section>
     </div>
-    <aside class="profile-editor-rail">
+    <aside class=${cx('profile-editor-rail',railOpen && 'mobile-open')} id="profile-editor-rail">
       <div class="profile-editor-rail-card">
         <h2>${t('form.editor_progress')}</h2>
         <div class="profile-editor-meter"><progress value=${percent} max="100" aria-label=${t('form.editor_progress')}></progress><strong>${percent}%</strong></div>
