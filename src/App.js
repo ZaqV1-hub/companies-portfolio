@@ -5,12 +5,12 @@ import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261030-company-cta1';
 import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.js?v=20261030-company-cta1';
-import { AppShell } from './components/AppShell.js?v=20261027-company-help1';
+import { AppShell } from './components/AppShell.js?v=202611-profile-editor3';
 import { CompanyFeedbackModal } from './components/CompanyFeedbackModal.js?v=20261027-company-help1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261117-about1';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261117-about1';
 import { LoginPage } from './pages/LoginPage.js?v=20261026-layout2';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=202611-profile-editor2';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=202611-profile-editor3';
 import { InvitationPage } from './pages/company/InvitationPage.js?v=20261030-intake1';
 import { CompanySignupPage, CompanyEmailVerificationPage } from './pages/company/CompanySignupPage.js?v=20261030-validation2';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261117-about1';
@@ -71,7 +71,7 @@ function CompanyArea({ user, route, onLogout }) {
   } else {
     content = html`<${NotFound} />`;
   }
-  return html`<${AppShell} roleLabel=${t('app.company_role')} userLabel=${companyName || t('app.company_role')} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
+  return html`<${AppShell} compact=${section === 'profile'} roleLabel=${t('app.company_role')} userLabel=${companyName || t('app.company_role')} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
 }
 
 function TeamArea({ user, route, onLogout }) {
@@ -95,7 +95,7 @@ function TeamArea({ user, route, onLogout }) {
   else if (section === 'crm') content = html`<${CrmOverviewPage} />`;
   else if (section === 'documents') content = html`<${DocumentsPage} />`;
   else content = html`<${NotFound} />`;
-  return html`<${AppShell} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
+  return html`<${AppShell} compact=${section === 'orgs' && Boolean(route.parts[2])} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }
 
 function Routes() {

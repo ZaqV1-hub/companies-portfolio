@@ -910,7 +910,8 @@
     "editor_group_product": "Produto e tecnologia",
     "editor_group_research": "Pesquisa e marcos",
     "editor_group_finance": "Investimento e faturamento",
-    "editor_group_market": "Mercado e expansão"
+    "editor_group_market": "Mercado e expansão",
+    "editor_workspace_options": "Opções"
   },
   "review": {
     "queue_title": "Fila de revisão",

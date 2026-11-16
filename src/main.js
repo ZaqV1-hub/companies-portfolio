@@ -1,7 +1,7 @@
 // Entry point: loads translations and data, then mounts the app.
 import { html } from './lib/html.js';
 import { loadDictionaries } from './lib/i18n.js';
-import { App } from './App.js?v=202611-profile-editor2';
+import { App } from './App.js?v=202611-profile-editor3';
 
 async function start() {
   document.getElementById('root').textContent = 'Conectando ao portfólio...';

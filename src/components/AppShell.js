@@ -1,5 +1,5 @@
 // Logged-in layout (company area and team panel): navy sidebar + content.
-import { html } from '../lib/html.js';
+import { cx, html, useState } from '../lib/html.js';
 import { useI18n } from '../lib/i18n.js';
 import { navigate } from '../lib/router.js';
 import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
@@ -7,15 +7,19 @@ import { LangSwitch } from './LangSwitch.js?v=20261014-flags1';
 /**
  * @param {{roleLabel: string, userLabel: string, nav: {key: string, label: string, href: string, current?: boolean}[], onLogout: Function, onFeedback?: Function}} props
  */
-export function AppShell({ roleLabel, userLabel, nav, onLogout, onFeedback, children }) {
+export function AppShell({ roleLabel, userLabel, nav, onLogout, onFeedback, compact = false, children }) {
   const { t, lang } = useI18n();
+  const [optionsOpen, setOptionsOpen] = useState(false);
   const initials = userLabel.trim().split(/\s+/).slice(0, 2).map((part) => part[0]?.toUpperCase() || '').join('');
-  return html`<div class="shell">
+  return html`<div class=${cx('shell', compact && 'profile-editor-shell',optionsOpen && 'sidebar-options-open')}>
     <aside class="sidebar">
       <div class="sidebar-top"><img class="sidebar-program-logo" src="assets/img/bph-program-negative.png" alt="Brazilian Pharma & Health" />
         <div class="sidebar-workspace"><span class="sidebar-avatar" aria-hidden="true">${initials}</span><div>
           <div class="sidebar-role">${roleLabel}</div><div class="sidebar-user">${userLabel}</div>
-        </div></div></div>
+        </div></div>
+        ${compact && html`<button type="button" class="sidebar-editor-options btn btn-ghost-light" aria-expanded=${optionsOpen}
+          onClick=${() => setOptionsOpen(!optionsOpen)}>${t('form.editor_workspace_options')}</button>`}
+      </div>
       <nav class="nav">${nav.map((n) => n.onClick ? html`<button key=${n.key} type="button" onClick=${n.onClick}>${n.label}</button>` : html`
         <a key=${n.key} href=${n.href} aria-current=${n.current ? 'page' : null}
           onClick=${(event) => { if (event.button === 0 && !event.ctrlKey && !event.metaKey && !event.shiftKey && !event.altKey) { event.preventDefault(); navigate(n.href); } }}>${n.label}${n.badge ? html` <span class="nav-badge">${n.badge}</span>` : null}</a>`)}

@@ -79,6 +79,7 @@
 .profile-editor .editor-drop-zone { flex: 1 1 220px; display: grid; gap: 4px; min-height: 70px; place-content: center; text-align: center; border-style: dashed; background: #f7f9fc; }
 .editor-drop-zone small { color: var(--editor-muted); font-weight: 400; }
 .profile-editor .editor-drop-zone.dragging { border-color: #617813; background: #f0f7dc; }
+.profile-editor-shell .sidebar-editor-options { display: none; }
 
 @media (min-width: 1260px) {
   .profile-editor-rail { position: sticky; top: 156px; max-height: calc(100vh - 175px); overflow-y: auto; }
@@ -90,6 +91,12 @@
 }
 
 @media (max-width: 720px) {
+  .profile-editor-shell .sidebar { padding: 12px 16px; gap: 8px; }
+  .profile-editor-shell .sidebar-editor-options { display: inline-flex; padding: 7px 12px; }
+  .profile-editor-shell .sidebar-workspace { display: none; }
+  .profile-editor-shell:not(.sidebar-options-open) .sidebar-help,
+  .profile-editor-shell:not(.sidebar-options-open) .sidebar-foot { display: none; }
+  .profile-editor-shell .sidebar .nav { margin-top: 0; }
   .profile-editor-heading { position: static; }
   .profile-editor-header-actions { width: 100%; }
   .profile-editor .profile-editor-rail-toggle { display: inline-flex; justify-content: flex-start; grid-row: 1; }
