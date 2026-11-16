@@ -1259,7 +1259,22 @@
       "website": "Site",
       "origin": "Origem",
       "status": "Status"
-    }
+    },
+    "entry_title": "Novo contato de investidor",
+    "entry_steps": "Etapas do cadastro",
+    "entry_contact_hint": "Informe quem você contatou. Campos com asterisco são obrigatórios.",
+    "entry_institution_hint": "Escolha uma instituição existente ou informe o nome de uma nova.",
+    "entry_relationship_hint": "Vincule o contato à empresa ou ao programa e registre a origem do relacionamento.",
+    "entry_interaction_hint": "Registre quando e como foi o primeiro contato com o investidor.",
+    "entry_institution_optional": "Informações adicionais da instituição",
+    "entry_deal_optional": "Detalhes da possível negociação",
+    "entry_date_hint": "Use a data em que a conversa aconteceu, mesmo que tenha sido em um ano anterior.",
+    "entry_lookup": "Buscando contato…",
+    "entry_saving": "Salvando…",
+    "entry_invalid": "Confira a opção selecionada.",
+    "entry_save_error": "Não foi possível salvar o contato. As informações foram mantidas nesta tela. Tente novamente.",
+    "entry_interaction_save_error": "Não foi possível salvar a interação. Tente novamente.",
+    "entry_company_load_error": "Não foi possível carregar a lista de empresas."
   },
   "crmteam": {
     "title": "Registro de contatos",

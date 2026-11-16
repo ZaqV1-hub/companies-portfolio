@@ -15,8 +15,8 @@ import { InvitationPage } from './pages/company/InvitationPage.js?v=20261030-int
 import { CompanySignupPage, CompanyEmailVerificationPage } from './pages/company/CompanySignupPage.js?v=20261030-validation2';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=202611-profile-modals2';
 import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=202611-profile-modals2';
-import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
-import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
+import { NewContactPage } from './pages/crm/NewContactPage.js?v=202611-crm-entry1';
+import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=202611-crm-entry1';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';
 import { DocumentsPage } from './pages/team/DocumentsPage.js?v=20261102-pdf100mb1';
 import { InvestorAccountPage } from './pages/investor/InvestorAccountPage.js?v=20261022-phone1';
@@ -71,7 +71,7 @@ function CompanyArea({ user, route, onLogout }) {
   } else {
     content = html`<${NotFound} />`;
   }
-  return html`<${AppShell} compact=${section === 'profile'} roleLabel=${t('app.company_role')} userLabel=${companyName || t('app.company_role')} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
+  return html`<${AppShell} compact=${section === 'profile' || (section === 'contacts' && route.parts[2] === 'new')} roleLabel=${t('app.company_role')} userLabel=${companyName || t('app.company_role')} nav=${nav} onLogout=${onLogout} onFeedback=${() => setFeedbackOpen(true)}>${content}${feedbackOpen && html`<${CompanyFeedbackModal} user=${user} onClose=${() => setFeedbackOpen(false)} />`}<//>`;
 }
 
 function TeamArea({ user, route, onLogout }) {
@@ -95,7 +95,7 @@ function TeamArea({ user, route, onLogout }) {
   else if (section === 'crm') content = html`<${CrmOverviewPage} />`;
   else if (section === 'documents') content = html`<${DocumentsPage} />`;
   else content = html`<${NotFound} />`;
-  return html`<${AppShell} compact=${section === 'orgs' && Boolean(route.parts[2])} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
+  return html`<${AppShell} compact=${(section === 'orgs' && Boolean(route.parts[2])) || (section === 'crm' && route.parts[2] === 'new')} roleLabel=${t('app.team_role')} userLabel=${user.name} nav=${nav} onLogout=${onLogout}>${content}<//>`;
 }
 
 function Routes() {

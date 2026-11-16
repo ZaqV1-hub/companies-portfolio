@@ -1259,7 +1259,22 @@
       "website": "Website",
       "origin": "Origin",
       "status": "Status"
-    }
+    },
+    "entry_title": "New investor contact",
+    "entry_steps": "Contact entry steps",
+    "entry_contact_hint": "Enter who you contacted. Fields marked with an asterisk are required.",
+    "entry_institution_hint": "Choose an existing institution or enter the name of a new one.",
+    "entry_relationship_hint": "Link the contact to the company or programme and record how the relationship began.",
+    "entry_interaction_hint": "Record when and how you first contacted the investor.",
+    "entry_institution_optional": "Additional institution information",
+    "entry_deal_optional": "Potential deal details",
+    "entry_date_hint": "Use the date the conversation took place, including dates in previous years.",
+    "entry_lookup": "Looking up contact…",
+    "entry_saving": "Saving…",
+    "entry_invalid": "Check the selected value.",
+    "entry_save_error": "Could not save the contact. Your entries are still on this screen. Try again.",
+    "entry_interaction_save_error": "Could not save the interaction. Try again.",
+    "entry_company_load_error": "Could not load the company list."
   },
   "crmteam": {
     "title": "Contacts registry",

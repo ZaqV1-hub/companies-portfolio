@@ -9,7 +9,8 @@ import { continuityForYear } from '../../lib/crm.js';
 import { href } from '../../lib/router.js';
 import { UsdInput } from '../../components/form/inputs.js';
 import { ClassificationBadge, HelpBlock } from '../../components/crm/common.js';
-import { F, InteractionFields, MultiList, SelectList, interactionErrors } from './NewContactPage.js';
+import { F, InteractionFields, MultiList, SelectList, interactionErrors, validateInteractionEntry } from './NewContactPage.js?v=202611-crm-entry1';
+import { EditorDialog } from '../../components/form/EditorDialog.js?v=202611-profile-modals1';
 
 const ANCHOR = { role: 'fld-role', investor_type: 'fld-investor_type', niche: 'fld-niche', ticket: 'fld-ticket',
   interest_type: 'fld-interest_type', sectors: 'fld-sectors', description: 'fld-description', website: 'fld-website', origin: 'fld-origin', status: 'fld-status' };
@@ -24,16 +25,32 @@ function goTo(id) {
   setTimeout(() => el.classList.remove('flash'), 1600);
 }
 
-function NewInteraction({ relId, origins, onDone }) {
+function NewInteraction({ relId, origins, onDone, onClose }) {
   const { t } = useI18n();
   const [it, setIt] = useState({ date: todayISO(), description: '', type: null, apex_product: null, event: null });
   const [errors, setErrors] = useState({});
+  const [busy, setBusy] = useState(false);
+  const [failed, setFailed] = useState(false);
   const save = async () => {
-    const res = await api.addInteraction(relId, it);
-    if (res.ok) onDone(); else setErrors(interactionErrors(res.fields, t));
+    const problems = validateInteractionEntry(it,t);
+    setErrors(problems); setFailed(false);
+    if (busy || Object.keys(problems).length) return;
+    setBusy(true);
+    try {
+      const res = await api.addInteraction(relId,it);
+      if (res.ok) { onDone(); return; }
+      const mapped = interactionErrors(res.fields,t);
+      if (Object.keys(mapped).length) setErrors(mapped);
+      else setFailed(true);
+    } catch { setFailed(true); }
+    finally { setBusy(false); }
   };
-  return html`<div class="action-panel"><${InteractionFields} it=${it} setIt=${setIt} origins=${origins} errors=${errors} />
-    <button type="button" class="btn btn-lime" onClick=${save}>${t('crm.add_interaction')}</button></div>`;
+  return html`<${EditorDialog} title=${t('crm.actions_new_interaction')} action=${t('crm.add_interaction')} onConfirm=${save} onClose=${onClose} busy=${busy}>
+    <fieldset class="crm-entry-fields" disabled=${busy}>
+      <${InteractionFields} it=${it} setIt=${setIt} origins=${origins} errors=${errors} />
+    </fieldset>
+    ${failed && html`<p class="notice warn" role="alert">${t('crm.entry_interaction_save_error')}</p>`}
+  <//>`;
 }
 
 function Suggest({ relId, onDone }) {
@@ -159,7 +176,7 @@ export function ContactRecordPage({ relId, base, team }) {
     <div class="record-actions">
       ${['new_interaction', 'suggest', 'announce'].map((k) => html`<button key=${k} type="button" class=${cx('btn', panel === k ? 'btn-lime' : 'btn-outline', 'btn-lg')} onClick=${() => setPanel(panel === k ? null : k)}>${t('crm.actions_' + k)}</button>`)}
     </div>
-    ${panel === 'new_interaction' && html`<${NewInteraction} relId=${rel.id} origins=${rec.origins} onDone=${done} />`}
+    ${panel === 'new_interaction' && html`<${NewInteraction} relId=${rel.id} origins=${rec.origins} onDone=${done} onClose=${() => setPanel(null)} />`}
     ${panel === 'suggest' && html`<${Suggest} relId=${rel.id} onDone=${done} />`}
     ${panel === 'announce' && html`<${Announce} relId=${rel.id} onDone=${done} />`}
 

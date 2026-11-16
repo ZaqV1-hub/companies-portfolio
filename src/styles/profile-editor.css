@@ -100,6 +100,32 @@
 .profile-editor .editor-drop-zone.dragging { border-color: #617813; background: #f0f7dc; }
 .profile-editor-shell .sidebar-editor-options { display: none; }
 
+/* Investor contact entry uses the same step and card treatment as company profiles. */
+.crm-contact-entry { max-width: 920px; margin-inline: auto; }
+.crm-contact-entry > .page-title { margin: 10px 0 16px; }
+.crm-entry-steps ol { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; padding: 0; margin: 0 0 15px; list-style: none; }
+.crm-entry-steps button { display: flex; align-items: center; gap: 7px; width: 100%; min-height: 48px; padding: 8px; border: 0; border-top: 3px solid #dfe5ef; border-radius: 6px; background: transparent; color: var(--text-2); font-size: 13px; text-align: left; }
+.crm-entry-steps button[aria-current="step"] { border-top-color: var(--navy); background: #edf1f8; color: var(--navy); font-weight: 700; }
+.crm-entry-steps button span { display: grid; place-items: center; flex: 0 0 22px; height: 22px; border-radius: 50%; background: #e3e9f1; font-weight: 700; }
+.crm-entry-steps button[aria-current="step"] span { background: var(--navy); color: #fff; }
+.crm-entry-card { padding: 0; border: 1px solid #dfe5ef; overflow: hidden; }
+.crm-entry-card-head { padding: 18px clamp(16px,3vw,28px); border-bottom: 1px solid #dfe5ef; }
+.crm-entry-card-head h2 { margin: 0; }
+.crm-entry-card-head p { margin: 5px 0 0; color: #536078; }
+.crm-entry-fields { min-width: 0; padding: 0; margin: 0; border: 0; }
+.crm-entry-card > .crm-entry-fields { padding: 18px clamp(16px,3vw,28px); }
+.crm-entry-fields .crm-grid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px 18px; margin: 0; }
+.crm-entry-card section[hidden] { display: none; }
+.crm-entry-fields .field-label { min-height: 0; margin-bottom: 6px; }
+.crm-entry-fields .form-help { margin-top: 5px; }
+.crm-entry-pair { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+.crm-entry-optional { margin-top: 16px; border: 1px solid #dfe5ef; border-radius: 10px; background: #f8fafc; }
+.crm-entry-optional summary { padding: 12px 14px; cursor: pointer; color: var(--navy); font-weight: 650; }
+.crm-entry-optional > .crm-grid { padding: 8px 14px 14px; }
+.crm-entry-footer, .crm-entry-footer > div { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+.crm-entry-footer { border-top: 1px solid #dfe5ef; background: #f8f9fc; padding: 14px clamp(16px,3vw,28px); }
+.crm-entry-footer > div { justify-content: flex-end; }
+
 @media (min-width: 1260px) {
   .profile-editor-rail { position: sticky; top: 156px; max-height: calc(100vh - 175px); overflow-y: auto; }
 }
@@ -123,4 +149,6 @@
   .profile-editor-rail.mobile-open { display: grid; }
   .profile-editor .form-field, .profile-editor-section { scroll-margin-top: 24px; }
   .editor-language-field-themed .bilingual-input { grid-template-columns: minmax(0, 1fr); }
+  .crm-entry-steps ol { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .crm-entry-fields .crm-grid { grid-template-columns: minmax(0,1fr); }
 }

@@ -1,6 +1,4 @@
-// "Novo contato" (spec 2, 5.2 and 6.2): one screen, four blocks — Contact, Institution, Relationship, First interaction.
-// Typing an e-mail that already exists fills contact and institution; an existing institution is reused.
-import { cx, html, useEffect, useState } from '../../lib/html.js';
+import { cx, html, useEffect, useRef, useState } from '../../lib/html.js';
 import * as api from '../../services/api.js';
 import { useI18n } from '../../lib/i18n.js';
 import { todayISO } from '../../lib/format.js';
@@ -52,15 +50,16 @@ export function InteractionFields({ it, setIt, origins, errors = {} }) {
   const { t } = useI18n();
   const setType = (type) => setIt({ ...it, type, apex_product: it.apexTouched ? it.apex_product : (APEX_PRODUCT_FOR_TYPE[type] || null) });
   return html`<div class="crm-grid">
-    <${F} label=${t('crm.f_date')} level="req" error=${errors.date}><input class="input input-sm" type="date" max=${todayISO()} value=${it.date || ''} onInput=${(e) => setIt({ ...it, date: e.target.value })} /><//>
-    <${F} label=${t('crm.f_type')} level="rec"><${SelectList} list="interaction_types" value=${it.type} onChange=${setType} /><//>
+    <${F} label=${t('crm.f_date')} level="req" error=${errors.date}><input class="input input-sm" type="date" max=${todayISO()} value=${it.date || ''} onInput=${(e) => setIt({ ...it, date: e.target.value })} />
+      <span class="form-help">${t('crm.entry_date_hint')}</span><//>
+    <${F} label=${t('crm.f_type')} level="rec" error=${errors.type}><${SelectList} list="interaction_types" value=${it.type} onChange=${setType} /><//>
     <${F} label=${t('crm.f_description')} level="req" error=${errors.description} wide=${true}>
       <textarea class="input input-sm" rows="3" maxLength="500" value=${it.description || ''} onInput=${(e) => setIt({ ...it, description: e.target.value })}></textarea>
       <span class="counter">${(it.description || '').length}/500</span><//>
-    <${F} label=${t('crm.f_apex_product')} level="rec">
+    <${F} label=${t('crm.f_apex_product')} level="rec" error=${errors.apex_product}>
       <${SelectList} list="apex_products" value=${it.apex_product} onChange=${(v) => setIt({ ...it, apex_product: v, apexTouched: true })} />
       ${it.type && !it.apexTouched && it.apex_product && html`<span class="form-help">${t('crm.apex_suggested')}</span>`}<//>
-    <${F} label=${t('crm.f_event')} level="opt">
+    <${F} label=${t('crm.f_event')} level="opt" error=${errors.event}>
       <select class="input input-sm" value=${it.event || ''} onChange=${(e) => setIt({ ...it, event: e.target.value || null })}>
         <option value="">${t('form.choose')}</option>${origins.map((o) => html`<option key=${o} value=${o}>${o}</option>`)}</select><//>
   </div>`;
@@ -77,6 +76,37 @@ export function interactionErrors(fields, t) {
   return map;
 }
 
+const ENTRY_STEPS = [
+  { key:'contact', fields:['email','name','country','city'] },
+  { key:'institution', fields:['inst_name'] },
+  { key:'relationship', fields:['org','origin','status','deal'] },
+  { key:'interaction', fields:['date','description','type','apex_product','event'] },
+];
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+export function validateInteractionEntry(it, t) {
+  const errors = {};
+  if (!it.date) errors.date = t('crm.errors.required');
+  else if (it.date > todayISO()) errors.date = t('crm.errors.date_future');
+  if (!it.description.trim()) errors.description = t('crm.errors.required');
+  else if (it.description.length > 500) errors.description = t('crm.errors.description_long');
+  return errors;
+}
+
+function entryErrors(fields, t) {
+  const errors = interactionErrors(fields,t);
+  for (const field of fields || []) {
+    if (field === 'contact.email_invalid') errors.email = t('crm.errors.email_invalid');
+    else if (field.startsWith('contact.')) errors[field.slice(8)] ||= t('crm.errors.required');
+    else if (field === 'institution.name') errors.inst_name = t('crm.errors.required');
+    else if (['organization','organization_id'].includes(field)) errors.org = t('crm.errors.organization');
+    else if (field.startsWith('relationship.')) errors[field === 'relationship.deal_expectation' ? 'deal' : field.slice(13)] = t('crm.entry_invalid');
+    else if (field.startsWith('interaction.') && !['interaction.date','interaction.description'].includes(field)) errors[field.slice(12)] ||= t('crm.entry_invalid');
+  }
+  return errors;
+}
+
 export function NewContactPage({ team, base }) {
   const { t, lang } = useI18n();
   const [owners, setOwners] = useState([]);
@@ -91,63 +121,151 @@ export function NewContactPage({ team, base }) {
   const [instOptions, setInstOptions] = useState([]);
   const [errors, setErrors] = useState({});
   const [user, setUser] = useState(null);
+  const [step, setStep] = useState(0);
+  const [saving, setSaving] = useState(false);
+  const [savingError, setSavingError] = useState('');
+  const [lookupBusy, setLookupBusy] = useState(false);
+  const emailRequest = useRef(0);
+  const institutionRequest = useRef(0);
+  const saveLock = useRef(false);
+  const heading = useRef(null);
+  const panel = useRef(null);
+  const focusError = useRef(false);
+  const moveFocus = useRef(false);
 
   useEffect(() => {
-    api.getCurrentUser().then(setUser);
-    api.listContactRows().then((d) => setOrigins(d.origins));
-    if (team) api.listContactOwners().then(setOwners);
+    api.getCurrentUser().then(setUser).catch(() => {});
+    api.listContactRows().then((d) => setOrigins(d.origins || [])).catch(() => {});
+    if (team) api.listContactOwners().then(setOwners).catch(() => setSavingError(t('crm.entry_company_load_error')));
   }, [team]);
 
-  const lookupEmail = async () => {
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(contact.email)) return;
-    const res = await api.lookupContactByEmail(contact.email, orgId);
-    setFound(res);
-    if (res) {
-      setContact({ ...contact, ...Object.fromEntries(Object.entries(res.contact).filter(([k, v]) => ['name', 'country', 'city', 'role', 'phone'].includes(k) && v)) });
-      if (res.institution) { setInst({ ...inst, ...res.institution }); setInstFound(true); }
-    }
+  useEffect(() => {
+    if (!moveFocus.current) return;
+    moveFocus.current = false;
+    const controls = panel.current?.querySelectorAll('.has-error input, .has-error select, .has-error textarea');
+    const field = focusError.current && Array.from(controls || []).find((control) => control.getClientRects().length);
+    focusError.current = false;
+    (field || heading.current)?.focus({preventScroll:true});
+    (field || heading.current)?.scrollIntoView({block:field ? 'center' : 'start'});
+  }, [step,errors]);
+
+  const lookupEmail = async (email = contact.email, organization = orgId) => {
+    if (!EMAIL_PATTERN.test(email.trim())) return;
+    const request = ++emailRequest.current;
+    setLookupBusy(true);
+    try {
+      const result = await api.lookupContactByEmail(email.trim(),organization);
+      if (request !== emailRequest.current) return;
+      setFound(result);
+      if (result?.contact) {
+        setContact((current) => ({ ...current, ...Object.fromEntries(
+          ['name','country','city','role','phone'].filter((key) => result.contact[key]).map((key) => [key,result.contact[key]])
+        ) }));
+      }
+      if (result?.institution) {
+        institutionRequest.current++;
+        setInst((current) => ({ ...current,...result.institution })); setInstFound(true);
+      }
+    } catch { /* The contact can still be entered manually. */ }
+    finally { if (request === emailRequest.current) setLookupBusy(false); }
   };
   const onInstName = async (name) => {
-    setInst({ ...inst, name });
-    const opts = await api.searchInstitutions(name);
-    setInstOptions(opts);
-    const exact = opts.find((o) => o.name.toLowerCase() === name.trim().toLowerCase());
-    if (exact) {
-      setInst({ ...inst, ...exact });
-      setInstFound(true);
-      // existing institution suggests the contact's country and city (spec 2, 8)
-      setContact((c) => ({ ...c, country: c.country || exact.hq_country || '', city: c.city || exact.hq_city || '' }));
-    } else setInstFound(false);
+    setInst((current) => ({...current,name}));
+    const request = ++institutionRequest.current;
+    setInstFound(false);
+    if (!name.trim()) { setInstOptions([]); return; }
+    try {
+      const options = await api.searchInstitutions(name);
+      if (request !== institutionRequest.current) return;
+      setInstOptions(options);
+      const exact = options.find((o) => o.name.toLowerCase() === name.trim().toLowerCase());
+      if (exact) {
+        setInst((current) => ({ ...current,...exact })); setInstFound(true);
+        setContact((current) => ({ ...current,country:current.country || exact.hq_country || '',city:current.city || exact.hq_city || '' }));
+      }
+    } catch { if (request === institutionRequest.current) setInstOptions([]); }
   };
 
+  const validate = () => {
+    const problems = validateInteractionEntry(it,t);
+    for (const field of ['email','name','country','city']) if (!contact[field].trim()) problems[field] = t('crm.errors.required');
+    if (contact.email.trim() && !EMAIL_PATTERN.test(contact.email.trim())) problems.email = t('crm.errors.email_invalid');
+    if (!inst.name.trim()) problems.inst_name = t('crm.errors.required');
+    if (team && !orgId) problems.org = t('crm.errors.organization');
+    return problems;
+  };
+  const showErrors = (problems, target) => {
+    focusError.current = true; moveFocus.current = true;
+    setErrors(problems); setStep(target);
+  };
+  const switchStep = (target) => {
+    if (target === step || saving) return;
+    moveFocus.current = true; setStep(target);
+  };
+  const next = () => {
+    const problems = validate();
+    const current = Object.fromEntries(ENTRY_STEPS[step].fields.filter((key) => problems[key]).map((key) => [key,problems[key]]));
+    if (Object.keys(current).length) showErrors(current,step);
+    else { setErrors({}); switchStep(step+1); }
+  };
   const save = async () => {
-    const res = await api.createContactRecord({ organization_id: orgId, contact, institution: inst, relationship: rel, interaction: it });
-    if (res.ok) { navigate(base + '/' + res.relationship_id); return; }
-    if (res.error === 'already_exists') { setFound({ ...(found || {}), existing_relationship_id: res.relationship_id }); return; }
-    const map = interactionErrors(res.fields, t);
-    (res.fields || []).forEach((f) => {
-      if (f === 'contact.email_invalid') map.email = t('crm.errors.email_invalid');
-      else if (f.startsWith('contact.')) map[f.slice(8)] = t('crm.errors.required');
-      if (f === 'institution.name') map.inst_name = t('crm.errors.required');
-      if (f === 'organization') map.org = t('crm.errors.organization');
-    });
-    setErrors(map);
-    window.scrollTo(0, 0);
+    if (saveLock.current || lookupBusy) return;
+    const problems = validate();
+    const invalidStep = ENTRY_STEPS.findIndex(({fields}) => fields.some((field) => problems[field]));
+    if (invalidStep >= 0) { showErrors(problems,invalidStep); return; }
+    saveLock.current = true; setSaving(true); setSavingError(''); setErrors({});
+    try {
+      const res = await api.createContactRecord({ organization_id:orgId,contact:{ ...contact,email:contact.email.trim() },institution:inst,relationship:rel,interaction:it });
+      if (res.ok) { navigate(base+'/'+res.relationship_id); return; }
+      if (res.error === 'already_exists' && res.relationship_id) {
+        setFound((current) => ({ ...current,existing_relationship_id:res.relationship_id })); return;
+      }
+      const mapped = entryErrors(res.fields,t);
+      const target = ENTRY_STEPS.findIndex(({fields}) => fields.some((field) => mapped[field]));
+      if (target >= 0) showErrors(mapped,target);
+      else setSavingError(t('crm.entry_save_error'));
+    } catch { setSavingError(t('crm.entry_save_error')); }
+    finally { saveLock.current = false; setSaving(false); }
   };
 
-  const sc = (k) => (e) => setContact({ ...contact, [k]: e.target.value });
-  const si = (k) => (e) => setInst({ ...inst, [k]: e.target.value });
-  return html`<div class="crm-page">
+  const sc = (key) => (event) => {
+    const value = event.target.value;
+    if (key === 'email') {
+      emailRequest.current++;
+      setFound(null); setLookupBusy(false);
+    }
+    setContact((current) => ({...current,[key]:value}));
+  };
+  const si = (key) => (event) => {
+    const value = event.target.value;
+    setInst((current) => ({...current,[key]:value}));
+  };
+  const active = ENTRY_STEPS[step];
+  const originsForEntry = [...new Set([...(team ? ['Contato direto'] : []),...origins])];
+  return html`<div class="crm-page crm-contact-entry">
     <a class="btn-link" href=${href(base)}>${t('crm.back')}</a>
-    <h1 class="page-title" style=${{ marginTop: '10px' }}>${t('crm.new_contact').replace('+ ', '')}</h1>
-    <p class="page-subtitle">${t('crm.required_note')}</p>
-    ${found && html`<div class="notice">${t('crm.email_found')}
-      ${found.existing_relationship_id && html`<div><strong>${t('crm.email_has_rel')}</strong> <a href=${href(base + '/' + found.existing_relationship_id)}>${t('crm.open_record')} →</a></div>`}</div>`}
+    <h1 class="page-title">${t('crm.entry_title')}</h1>
+    <nav aria-label=${t('crm.entry_steps')} class="crm-entry-steps"><ol>
+      ${ENTRY_STEPS.map(({key}, index) => html`<li key=${key}><button type="button" disabled=${saving || lookupBusy} aria-current=${index === step ? 'step' : undefined} onClick=${() => switchStep(index)}>
+        <span aria-hidden="true">${index+1}</span>${t('crm.block_'+key)}
+      </button></li>`)}
+    </ol></nav>
 
-    <section class="form-card crm-block">
-      <h2 class="block-title">1 · ${t('crm.block_contact')}</h2>
+    <form class="form-card crm-entry-card" noValidate onSubmit=${(event) => { event.preventDefault(); if (saving || lookupBusy) return; if (step < ENTRY_STEPS.length-1) next(); else save(); }}>
+    <header class="crm-entry-card-head">
+      <h2 class="block-title" ref=${heading} tabIndex="-1">${t('crm.block_'+active.key)}</h2>
+      <p>${t('crm.entry_'+active.key+'_hint')}</p>
+    </header>
+    <fieldset class="crm-entry-fields" ref=${panel} disabled=${saving}>
+    ${savingError && html`<p class="notice warn" role="alert">${savingError}</p>`}
+    ${lookupBusy && html`<p class="form-help" role="status">${t('crm.entry_lookup')}</p>`}
+    ${found && html`<div class=${cx('notice',found.existing_relationship_id && 'warn')} role="status">
+      ${found.existing_relationship_id ? html`<strong>${t('crm.email_has_rel')}</strong> <a href=${href(base+'/'+found.existing_relationship_id)}>${t('crm.open_record')} →</a>` : t('crm.email_found')}
+    </div>`}
+
+    <section hidden=${step !== 0}>
       <div class="crm-grid">
-        <${F} label=${t('crm.f_email')} level="req" error=${errors.email}><input class="input input-sm" type="email" value=${contact.email} onInput=${sc('email')} onBlur=${lookupEmail} /><//>
+        <${F} label=${t('crm.f_email')} level="req" error=${errors.email}><input class="input input-sm" type="email" value=${contact.email} onInput=${sc('email')} onBlur=${() => lookupEmail()} /><//>
         <${F} label=${t('crm.f_name')} level="req" error=${errors.name}><input class="input input-sm" value=${contact.name} onInput=${sc('name')} /><//>
         <${F} label=${t('crm.f_country')} level="req" error=${errors.country}>
           <select class="input input-sm" value=${contact.country} onChange=${sc('country')}><option value="">${t('form.choose')}</option>
@@ -158,55 +276,61 @@ export function NewContactPage({ team, base }) {
       </div>
     </section>
 
-    <section class="form-card crm-block">
-      <h2 class="block-title">2 · ${t('crm.block_institution')}</h2>
-      ${instFound && html`<p class="form-help">${t('crm.institution_found')}</p>`}
+    <section hidden=${step !== 1}>
+      ${instFound && html`<p class="form-help" role="status">${t('crm.institution_found')}</p>`}
       <div class="crm-grid">
-        <${F} label=${t('crm.f_inst_name')} level="req" error=${errors.inst_name}>
+        <${F} label=${t('crm.f_inst_name')} level="req" error=${errors.inst_name} wide=${true}>
           <input class="input input-sm" list="inst-options" value=${inst.name} onInput=${(e) => onInstName(e.target.value)} />
           <datalist id="inst-options">${instOptions.map((o) => html`<option key=${o.id} value=${o.name} />`)}</datalist><//>
+      </div>
+      <details class="crm-entry-optional"><summary>${t('crm.entry_institution_optional')}</summary><div class="crm-grid">
         <${F} label=${t('crm.f_investor_type')} level="rec"><${SelectList} list="investor_types" value=${inst.investor_type} onChange=${(v) => setInst({ ...inst, investor_type: v })} /><//>
         <${F} label=${t('crm.f_niche')} level="rec"><${SelectList} list="niche" value=${inst.niche} onChange=${(v) => setInst({ ...inst, niche: v })} /><//>
-        <${F} label=${t('crm.f_ticket')} level="rec"><div class="row-fields">
-          <input class="input input-sm short" type="number" min="0" step="0.1" placeholder=${t('crm.f_ticket_min')} value=${inst.ticket_min_musd ?? ''} onInput=${(e) => setInst({ ...inst, ticket_min_musd: e.target.value === '' ? null : Number(e.target.value) })} />
-          <input class="input input-sm short" type="number" min="0" step="0.1" placeholder=${t('crm.f_ticket_max')} value=${inst.ticket_max_musd ?? ''} onInput=${(e) => setInst({ ...inst, ticket_max_musd: e.target.value === '' ? null : Number(e.target.value) })} /></div><//>
+        <div class="crm-field wide"><span class="field-label">${t('crm.f_ticket')}</span><div class="crm-entry-pair">
+          <${F} label=${t('crm.f_ticket_min')}><input class="input input-sm" type="number" min="0" step="0.1" value=${inst.ticket_min_musd ?? ''} onInput=${(e) => setInst({ ...inst, ticket_min_musd: e.target.value === '' ? null : Number(e.target.value) })} /><//>
+          <${F} label=${t('crm.f_ticket_max')}><input class="input input-sm" type="number" min="0" step="0.1" value=${inst.ticket_max_musd ?? ''} onInput=${(e) => setInst({ ...inst, ticket_max_musd: e.target.value === '' ? null : Number(e.target.value) })} /><//></div></div>
         <${F} label=${t('crm.f_interest_type')} level="rec"><${SelectList} list="interest_types" value=${inst.interest_type} onChange=${(v) => setInst({ ...inst, interest_type: v })} /><//>
         <${F} label=${t('crm.f_website')} level="rec"><input class="input input-sm" type="url" value=${inst.website || ''} onInput=${si('website')} /><//>
-        <${F} label=${t('crm.f_sectors')} level="rec" wide=${true}><${MultiList} list="sectors" value=${inst.sectors} onChange=${(v) => setInst({ ...inst, sectors: v })} /><//>
+        <div class="crm-field wide"><span class="field-label">${t('crm.f_sectors')}</span><${MultiList} list="sectors" value=${inst.sectors} onChange=${(v) => setInst({ ...inst, sectors: v })} /></div>
         <${F} label=${t('crm.f_description_original')} level="rec" wide=${true}><textarea class="input input-sm" rows="2" value=${inst.description_original || ''} onInput=${si('description_original')}></textarea><//>
         <${F} label=${t('crm.f_description_pt')} level="rec" wide=${true}><textarea class="input input-sm" rows="2" value=${inst.description_pt || ''} onInput=${si('description_pt')}></textarea><//>
-      </div>
+      </div></details>
     </section>
 
-    <section class="form-card crm-block">
-      <h2 class="block-title">3 · ${t('crm.block_relationship')}</h2>
+    <section hidden=${step !== 2}>
       <div class="crm-grid">
         <${F} label=${t('crm.f_owner_company')} level=${team ? 'req' : null} error=${errors.org}>
-          ${team ? html`<select class="input input-sm" value=${orgId} onChange=${(e) => setOrgId(e.target.value)}><option value="">${t('form.choose')}</option>
+          ${team ? html`<select class="input input-sm" value=${orgId} onChange=${(e) => { const id=e.target.value; setOrgId(id); setFound((previous) => previous?.contact ? {...previous,existing_relationship_id:null} : null); lookupEmail(contact.email,id); }}><option value="">${t('form.choose')}</option>
             ${owners.map((o) => html`<option key=${o.id} value=${o.id}>${o.name}</option>`)}</select>`
           : html`<input class="input input-sm" disabled value=${user ? user.organization_name || '' : ''} />`}<//>
         <${F} label=${t('crm.f_responsible')}><input class="input input-sm" disabled value=${user ? user.name : ''} /><//>
-        <${F} label=${t('crm.f_origin_full')} level="rec"><select class="input input-sm" value=${rel.origin || ''} onChange=${(e) => setRel({ ...rel, origin: e.target.value || null })}>
-          <option value="">${t('form.choose')}</option>${origins.map((o) => html`<option key=${o} value=${o}>${o}</option>`)}</select><//>
-        <${F} label=${t('crm.f_rel_status')} level="rec"><${SelectList} list="rel_status" value=${rel.status} onChange=${(v) => setRel({ ...rel, status: v })} /><//>
-        <${F} label=${t('crm.f_deal')} level="opt" wide=${true}><div class="row-fields wrap">
-          <${UsdInput} value=${rel.deal_expectation && rel.deal_expectation.min_usd} i18n=${{ t, lang }} placeholder=${t('form.min_usd')}
-            onChange=${(n) => setRel({ ...rel, deal_expectation: { ...(rel.deal_expectation || {}), min_usd: n } })} />
-          <${UsdInput} value=${rel.deal_expectation && rel.deal_expectation.max_usd} i18n=${{ t, lang }} placeholder=${t('form.max_usd')}
-            onChange=${(n) => setRel({ ...rel, deal_expectation: { ...(rel.deal_expectation || {}), max_usd: n } })} />
-          <${SelectList} list="deal_types" value=${rel.deal_expectation && rel.deal_expectation.type} onChange=${(v) => setRel({ ...rel, deal_expectation: { ...(rel.deal_expectation || {}), type: v } })} /></div><//>
-        <${F} label=${t('crm.f_classification')} wide=${true}><span class="form-help">Lead · ${t('crm.f_classification_note')}</span><//>
+        <${F} label=${t('crm.f_origin_full')} level="rec" error=${errors.origin}><select class="input input-sm" value=${rel.origin || ''} onChange=${(e) => setRel({ ...rel, origin: e.target.value || null })}>
+          <option value="">${t('form.choose')}</option>${originsForEntry.map((o) => html`<option key=${o} value=${o}>${o}</option>`)}</select><//>
+        <${F} label=${t('crm.f_rel_status')} level="rec" error=${errors.status}><${SelectList} list="rel_status" value=${rel.status} onChange=${(v) => setRel({ ...rel, status: v })} /><//>
       </div>
+      <details class="crm-entry-optional" open=${errors.deal ? true : undefined}><summary>${t('crm.entry_deal_optional')}</summary><div class="crm-grid">
+        <${F} label=${t('form.min_usd')} error=${errors.deal}><${UsdInput} value=${rel.deal_expectation?.min_usd} i18n=${{ t, lang }}
+          onChange=${(n) => setRel({ ...rel, deal_expectation: { ...(rel.deal_expectation || {}), min_usd: n } })} /><//>
+        <${F} label=${t('form.max_usd')}><${UsdInput} value=${rel.deal_expectation?.max_usd} i18n=${{ t, lang }}
+          onChange=${(n) => setRel({ ...rel, deal_expectation: { ...(rel.deal_expectation || {}), max_usd: n } })} /><//>
+        <${F} label=${t('crm.f_deal_type')}><${SelectList} list="deal_types" value=${rel.deal_expectation?.type} onChange=${(v) => setRel({ ...rel, deal_expectation: { ...(rel.deal_expectation || {}), type: v } })} /><//>
+      </div></details>
+      <p class="form-help">${t('crm.f_classification_note')}</p>
     </section>
 
-    <section class="form-card crm-block">
-      <h2 class="block-title">4 · ${t('crm.block_interaction')}</h2>
+    <section hidden=${step !== 3}>
       <${InteractionFields} it=${it} setIt=${setIt} origins=${origins} errors=${errors} />
     </section>
 
-    <div class="form-nav">
+    </fieldset>
+    <div class="crm-entry-footer">
       <a class="btn btn-outline" href=${href(base)}>${t('crm.cancel')}</a>
-      <button type="button" class="btn btn-lime btn-xl" onClick=${save}>${t('crm.save')}</button>
-    </div>
+      <div>
+        ${step > 0 && html`<button type="button" class="btn btn-outline" disabled=${saving || lookupBusy} onClick=${() => switchStep(step-1)}>${t('form.prev')}</button>`}
+        <button type="submit" class="btn btn-lime" disabled=${saving || lookupBusy || (step === ENTRY_STEPS.length-1 && !!found?.existing_relationship_id)}>
+          ${t(saving ? 'crm.entry_saving' : step < ENTRY_STEPS.length-1 ? 'form.next' : 'crm.save')}
+        </button>
+      </div>
+    </div></form>
   </div>`;
 }
