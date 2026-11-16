@@ -4,11 +4,11 @@ import * as api from '../../services/api.js?v=20261030-intake1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href, navigate } from '../../lib/router.js';
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField } from '../../lib/formSchema.js?v=20261117-about1';
-import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, projectFields, readField } from '../../lib/formSchema.js?v=202611-profile-modals1';
+import { collectTexts, displayLines, sameValue } from '../../lib/fieldDisplay.js?v=202611-profile-modals1';
 import { draftToPublic } from '../../lib/draftPreview.js?v=20261117-about1';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261117-about1';
-import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=202611-profile-modals1';
+import { InviteLanguageModal } from '../../components/InviteLanguageModal.js?v=202611-profile-modals1';
 import { ImageLightbox } from '../../components/ImageLightbox.js';
 
 export function ReviewQueuePage() {

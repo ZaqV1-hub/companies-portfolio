@@ -8,13 +8,13 @@ import { InvestorAuthModal, ResetPasswordPage } from './components/InvestorAuth.
 import { AppShell } from './components/AppShell.js?v=202611-profile-editor3';
 import { CompanyFeedbackModal } from './components/CompanyFeedbackModal.js?v=20261027-company-help1';
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261117-about1';
-import { ProfilePage } from './pages/public/ProfilePage.js?v=20261117-about1';
+import { ProfilePage } from './pages/public/ProfilePage.js?v=202611-profile-modals1';
 import { LoginPage } from './pages/LoginPage.js?v=20261026-layout2';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=202611-profile-editor3';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=202611-profile-modals1';
 import { InvitationPage } from './pages/company/InvitationPage.js?v=20261030-intake1';
 import { CompanySignupPage, CompanyEmailVerificationPage } from './pages/company/CompanySignupPage.js?v=20261030-validation2';
-import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261117-about1';
-import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=20261117-about1';
+import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=202611-profile-modals1';
+import { OrganizationsPage, ReviewPage, ReviewQueuePage } from './pages/team/ReviewPages.js?v=202611-profile-modals1';
 import { NewContactPage } from './pages/crm/NewContactPage.js?v=20261022-company-crm1';
 import { ContactRecordPage } from './pages/crm/ContactRecordPage.js?v=20261023-owner1';
 import { CrmOverviewPage } from './pages/team/CrmOverviewPage.js?v=20261023-workbook1';

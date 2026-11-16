@@ -21,11 +21,11 @@ export function displayLines(field, value, i18n) {
     case 'place': return value.city || value.state ? [[value.city, value.state].filter(Boolean).join(' / ')] : [];
     case 'focal': return value.name ? [[value.name, value.role, value.email, value.phone].filter(Boolean).join(' · ')] : [];
     case 'usd_range': return value.min || value.max ? [formatUSDRange(value, 'pt')] : [];
-    case 'pipeline': return value.map((p) => p.name + ' — ' + pt(p.indication));
-    case 'milestones': return value.map((m) => formatPeriod(m.period, 'pt') + ' — ' + pt(m.description));
+    case 'pipeline': return value.map((p) => [p.name,p.phase && L('pipeline_phase',p.phase),pt(p.indication)].filter(Boolean).join(' · '));
+    case 'milestones': return value.map((m) => [formatPeriod(m.period,'pt'),m.status && L('milestone_state',m.status),pt(m.description)].filter(Boolean).join(' · '));
     case 'rounds': return value.map((r) => [L('round_stage', r.stage), formatPeriod(r.period, 'pt'), usd(r.amount_usd), pt(r.purpose)].filter(Boolean).join(' · '));
-    case 'raised': return value.none ? ['Nenhum valor captado'] : value.items.map((r) => L('raised_source', r.source) + ': ' + usd(r.amount_usd));
-    case 'revenue': return value.pre_revenue ? ['Pré-receita'] : value.amount_usd ? [usd(value.amount_usd) + (value.year ? ' (' + value.year + ')' : '')] : [];
+    case 'raised': return value.none ? ['Nenhum valor captado'] : value.items.map((r) => [L('raised_source',r.source), r.note, r.year, usd(r.amount_usd)].filter(Boolean).join(' · '));
+    case 'revenue': return value.pre_revenue ? ['Pré-receita'] : value.amount_usd != null ? [usd(value.amount_usd) + (value.year ? ' (' + value.year + ')' : '')] : [];
     case 'exports_c': return value.none ? ['Não exporta'] : value.amount_usd ? [usd(value.amount_usd) + (value.year ? ' (' + value.year + ')' : '')] : [];
     case 'exports_pct': return value.pct != null ? [value.pct + '% — ' + (value.destinations || []).map((d) => L('markets', d)).join(', ')] : [];
     case 'clients': return value.count || (value.profiles || []).length ? [[value.count ? value.count + ' clientes' : '', (value.profiles || []).map((p) => L('client_profiles', p)).join(', ')].filter(Boolean).join(' · ')] : [];

@@ -1,6 +1,6 @@
 // Validation of a profile draft (spec 1, 5.2 and 5.6). Runs in the browser for instant feedback and
 // MUST run again on the server before accepting "Enviar para revisão" (see docs/HANDOFF_CODEX.md).
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField } from './formSchema.js?v=20261117-about1';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, MILESTONE_STATES, ORG_FIELDS, PIPELINE_PHASES, formSteps, projectFields, readField } from './formSchema.js?v=202611-profile-modals1';
 
 export const USD_MESSAGE_KEY = 'form.usd_error'; // "Informe o valor em dólares americanos, apenas números"
 
@@ -73,6 +73,8 @@ export function fieldProblems(field, value) {
         const a = t === 'pipeline' ? it.name : t === 'portfolio' ? textPt(it.category) : t === 'interests' ? textPt(it.area) : it.period && it.period.year;
         const b = t === 'pipeline' ? textPt(it.indication) : t === 'milestones' ? textPt(it.description) : textPt(it.description);
         if (blank(a) || blank(b)) out.push({ code: 'item_incomplete', item: i + 1 });
+        if (t === 'pipeline' && Object.hasOwn(it,'phase') && !PIPELINE_PHASES.includes(it.phase)) out.push({ code:'pipeline_phase_required', item:i+1 });
+        if (t === 'milestones' && Object.hasOwn(it,'status') && !MILESTONE_STATES.includes(it.status)) out.push({ code:'milestone_status_required', item:i+1 });
         const limit = t === 'milestones' ? 150 : 200;
         if (t !== 'pipeline' && textPt(it.description).length > limit) out.push({ code: 'too_long', max: limit, item: i + 1 });
       });

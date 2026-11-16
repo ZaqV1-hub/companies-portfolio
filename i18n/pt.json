@@ -451,6 +451,18 @@
       "yes": "Sim",
       "left": "Saiu",
       "unknown": "Desconhecido"
+    },
+    "pipeline_phase": {
+      "discovery": "Descoberta",
+      "preclinical": "Pré-clínico",
+      "phase_1": "Fase I",
+      "phase_2": "Fase II",
+      "phase_3": "Fase III"
+    },
+    "milestone_state": {
+      "completed": "Concluído",
+      "in_progress": "Em andamento",
+      "upcoming": "Previsto"
     }
   },
   "filters": {
@@ -528,7 +540,7 @@
     },
     "pipeline": {
       "label": "Pipeline",
-      "help": "Outros produtos em desenvolvimento: nome e indicação."
+      "help": "Outros produtos em desenvolvimento além do principal."
     },
     "patents_filed": {
       "label": "Patentes depositadas",
@@ -866,7 +878,9 @@
       "round_period_required": "Na rodada {item}, informe o ano ou período previsto para a captação.",
       "round_amount_required": "Na rodada {item}, informe o valor que sua empresa busca captar em USD, maior que zero. Se ainda não definiu esse valor, salve o rascunho e preencha antes de enviar alterações para revisão.",
       "revenue_amount_required": "Você informou o ano, mas falta o faturamento da sua empresa nesse período. Preencha o valor em USD. Se não houve faturamento, informe 0.",
-      "revenue_year_required": "Informe a qual ano se refere o faturamento da sua empresa, por exemplo, 2025."
+      "revenue_year_required": "Informe a qual ano se refere o faturamento da sua empresa, por exemplo, 2025.",
+      "pipeline_phase_required": "Selecione a fase do produto.",
+      "milestone_status_required": "Selecione a situação do marco."
     },
     "revenue_pending_pre": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se a empresa ainda não começou a faturar, marque a opção de pré-receita acima.",
     "revenue_pending": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se não houve faturamento nesse ano, informe 0.",
@@ -911,7 +925,30 @@
     "editor_group_research": "Pesquisa e marcos",
     "editor_group_finance": "Investimento e faturamento",
     "editor_group_market": "Mercado e expansão",
-    "editor_workspace_options": "Opções"
+    "editor_workspace_options": "Opções",
+    "editor_add_pipeline": "Adicionar produto ao pipeline",
+    "editor_edit_pipeline": "Editar produto do pipeline",
+    "editor_add_milestones": "Adicionar marco",
+    "editor_edit_milestones": "Editar marco",
+    "editor_add_rounds": "Adicionar rodada buscada",
+    "editor_edit_rounds": "Editar rodada buscada",
+    "editor_add_raised": "Adicionar valor captado",
+    "editor_edit_raised": "Editar valor captado",
+    "editor_add_leaders": "Adicionar pessoa à liderança",
+    "editor_edit_leaders": "Editar pessoa da liderança",
+    "editor_add_gallery": "Adicionar foto à galeria",
+    "editor_edit_gallery": "Editar foto da galeria",
+    "editor_add_revenue": "Adicionar faturamento",
+    "editor_edit_revenue": "Editar faturamento",
+    "editor_name_code": "Nome ou código",
+    "editor_phase": "Fase",
+    "editor_code_example": "Ex.: PRD-305",
+    "editor_investor_name": "Nome do investidor ou programa",
+    "editor_save_item": "Salvar alterações",
+    "editor_placeholder_pt": "Em português",
+    "editor_placeholder_en": "Em inglês",
+    "editor_gallery_needs_image": "Escolha uma imagem.",
+    "editor_gallery_needs_caption": "Informe a legenda em português."
   },
   "review": {
     "queue_title": "Fila de revisão",

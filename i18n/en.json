@@ -451,6 +451,18 @@
       "yes": "Yes",
       "left": "Left",
       "unknown": "Unknown"
+    },
+    "pipeline_phase": {
+      "discovery": "Discovery",
+      "preclinical": "Pre-clinical",
+      "phase_1": "Phase I",
+      "phase_2": "Phase II",
+      "phase_3": "Phase III"
+    },
+    "milestone_state": {
+      "completed": "Completed",
+      "in_progress": "In Progress",
+      "upcoming": "Upcoming"
     }
   },
   "filters": {
@@ -528,7 +540,7 @@
     },
     "pipeline": {
       "label": "Pipeline",
-      "help": "Other products in development: name and indication."
+      "help": "Other products in development alongside the lead product."
     },
     "patents_filed": {
       "label": "Patents filed",
@@ -866,7 +878,9 @@
       "round_period_required": "For round {item}, enter the expected funding year or period.",
       "round_amount_required": "For round {item}, enter the amount your company seeks to raise in USD, greater than zero. If it is not defined yet, save your draft and complete it before submitting changes for review.",
       "revenue_amount_required": "You entered a year, but your company’s revenue for that period is missing. Enter the amount in USD. If there was no revenue, enter 0.",
-      "revenue_year_required": "Enter the year your company’s revenue relates to, for example, 2025."
+      "revenue_year_required": "Enter the year your company’s revenue relates to, for example, 2025.",
+      "pipeline_phase_required": "Select the product stage.",
+      "milestone_status_required": "Select the milestone status."
     },
     "revenue_pending_pre": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If the company has not started generating revenue, select the pre-revenue option above.",
     "revenue_pending": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If there was no revenue that year, enter 0.",
@@ -911,7 +925,30 @@
     "editor_group_research": "Research and milestones",
     "editor_group_finance": "Investment and revenue",
     "editor_group_market": "Markets and expansion",
-    "editor_workspace_options": "Options"
+    "editor_workspace_options": "Options",
+    "editor_add_pipeline": "Add pipeline product",
+    "editor_edit_pipeline": "Edit pipeline product",
+    "editor_add_milestones": "Add milestone",
+    "editor_edit_milestones": "Edit milestone",
+    "editor_add_rounds": "Add fundraising round",
+    "editor_edit_rounds": "Edit fundraising round",
+    "editor_add_raised": "Add funding received",
+    "editor_edit_raised": "Edit funding received",
+    "editor_add_leaders": "Add a leadership team member",
+    "editor_edit_leaders": "Edit leadership team member",
+    "editor_add_gallery": "Add a gallery photo",
+    "editor_edit_gallery": "Edit gallery photo",
+    "editor_add_revenue": "Add annual revenue",
+    "editor_edit_revenue": "Edit annual revenue",
+    "editor_name_code": "Name or code",
+    "editor_phase": "Stage",
+    "editor_code_example": "E.g. PRD-305",
+    "editor_investor_name": "Investor or programme name",
+    "editor_save_item": "Save changes",
+    "editor_placeholder_pt": "In Portuguese",
+    "editor_placeholder_en": "In English",
+    "editor_gallery_needs_image": "Choose an image.",
+    "editor_gallery_needs_caption": "Enter a caption in Portuguese."
   },
   "review": {
     "queue_title": "Review queue",

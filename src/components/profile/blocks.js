@@ -59,7 +59,7 @@ function Milestones({ items, i18n }) {
   return html`<div class="panel" id="key_milestones">
     <div class="eyebrow" style=${{ marginBottom: '20px' }}>${i18n.t('block.key_milestones')}</div>
     <div>${sortedMilestones(items).map((m, i) => {
-      const st = milestoneStatus(m.period);
+      const st = m.status || milestoneStatus(m.period);
       return html`<div class="timeline-row" key=${i}>
         <div class="timeline-rail"><div class=${'timeline-dot ' + st}></div><div class="timeline-line"></div></div>
         <div class="timeline-content">
@@ -166,7 +166,7 @@ function mainA(org, f, i18n) {
       </div>
     </section>`,
     present(f.pipeline) && html`<${Block} key="pl" id="pipeline" title=${t('block.pipeline')}>
-      <ul class="list">${f.pipeline.map((p, i) => html`<li key=${i}><strong>${p.name}</strong>${present(p.indication) && html`<${Text} value=${p.indication} i18n=${i18n} />`}</li>`)}</ul>
+      <ul class="list">${f.pipeline.map((p, i) => html`<li key=${i}><strong>${p.name}</strong>${p.phase && html` · ${i18n.label('pipeline_phase',p.phase)}`}${present(p.indication) && html`<${Text} value=${p.indication} i18n=${i18n} />`}</li>`)}</ul>
     <//>`,
     (present(f.patents_filed) || present(f.patents_granted) || present(f.fto)) && html`<${Block} key="ip" id="ip_status" title=${t('block.ip_status')}>
       ${present(f.patents_filed) && html`<${Sub} title=${t('profile.patents_filed')}><${Text} value=${f.patents_filed} i18n=${i18n} /><//>`}

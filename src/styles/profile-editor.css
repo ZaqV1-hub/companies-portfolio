@@ -69,13 +69,32 @@
 .profile-editor-item-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
 .profile-editor-item-actions .btn { padding: 6px 10px; }
 .profile-editor-add { width: 100%; margin-top: 9px; border-style: dashed; color: #354a7d; }
-.profile-editor-dialog { width: min(520px, calc(100% - 24px)); max-height: calc(100dvh - 24px); padding: 24px; border: 1px solid #dfe5ef; border-radius: 14px; color: var(--navy); box-shadow: 0 16px 52px #141b343d; }
-.profile-editor-dialog::backdrop { background: #141b3466; }
-.profile-editor-dialog-body { margin: 16px 0; }
-.profile-editor-dialog-body > .row-fields { flex-wrap: wrap; }
-.profile-editor-dialog-body > .row-fields > .mini { flex: 1 1 170px; min-width: 0; }
-.profile-editor-dialog-body > .row-fields > .mini.grow { flex-basis: 100%; }
-.profile-editor-dialog-actions { display: flex; justify-content: end; flex-wrap: wrap; gap: 8px; }
+.profile-editor-dialog { --editor-line: #dfe5ef; --editor-muted: #536078; width: min(640px, calc(100% - 28px)); max-height: calc(100dvh - 28px); padding: 0; border: 0; border-radius: 16px; color: var(--navy); background: #fff; box-shadow: 0 24px 60px #141b3459; overflow: hidden; }
+.profile-editor-dialog[open] { display: flex; flex-direction: column; }
+.profile-editor-dialog.compact { width: min(450px, calc(100% - 28px)); }
+.profile-editor-dialog::backdrop { background: #141b3480; }
+.profile-editor-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; padding: 20px 24px 15px; border-bottom: 1px solid var(--editor-line); }
+.profile-editor-dialog-header h2 { margin: 0; font: 700 18px/1.4 var(--font-heading); }
+.profile-editor-dialog-header p { margin: 4px 0 0; color: var(--editor-muted); font-size: 13px; overflow-wrap: anywhere; }
+.profile-editor-dialog-close { flex: none; border: 0; border-radius: 7px; width: 30px; height: 30px; background: transparent; color: var(--editor-muted); font-size: 21px; line-height: 1; }
+.profile-editor-dialog-close:hover { background: #eef2f7; }
+.profile-editor-dialog-body { min-height: 0; overflow: auto; padding: 20px 24px; }
+.profile-editor-dialog-body > .row-fields { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; }
+.profile-editor-dialog-body > .row-fields > .mini { min-width: 0; }
+.profile-editor-dialog-body .mini > span:first-child { font-size: 14px; color: var(--navy); font-weight: 600; }
+.profile-editor-dialog-body > .field-error { margin: 12px 0 0; }
+.profile-editor-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 8px; padding: 14px 24px; border-top: 1px solid var(--editor-line); background: #f8f9fc; }
+.profile-editor-dialog-danger { background: #aa292e; color: #fff; border-color: #aa292e; }
+.profile-editor-dialog .editor-language-field-themed { padding: 0; overflow: hidden; background: #fff; }
+.profile-editor-dialog .editor-language-tabs { margin: 0; padding: 0 8px; align-items: center; border-bottom: 1px solid var(--editor-line); background: #f6f8fb; }
+.profile-editor-dialog .editor-language-tabs button { padding: 8px 10px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; }
+.profile-editor-dialog .editor-language-tabs button[aria-pressed=true] { border-bottom-color: var(--navy); }
+.profile-editor-dialog .editor-language-tabs .counter { margin-left: auto; padding-right: 6px; }
+.profile-editor-dialog .editor-language-field-themed .input { border: 0; border-radius: 0; }
+.profile-editor-dialog .editor-language-field-themed .input:focus { outline-offset: -2px; }
+.profile-editor-dialog .editor-language-field-themed textarea { min-height: 100px; }
+.editor-language-field-themed .one-language .text-wrap > .counter { display: none; }
+.editor-language-tabs .counter { margin-left: auto; align-self: center; }
 .profile-editor .editor-drop-zone { flex: 1 1 220px; display: grid; gap: 4px; min-height: 70px; place-content: center; text-align: center; border-style: dashed; background: #f7f9fc; }
 .editor-drop-zone small { color: var(--editor-muted); font-weight: 400; }
 .profile-editor .editor-drop-zone.dragging { border-color: #617813; background: #f0f7dc; }

@@ -6,14 +6,14 @@ import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { href, navigate } from '../../lib/router.js';
 import { getCompanyPreview, setCompanyPreview, clearCompanyPreview } from '../../lib/companyPreviewState.js';
-import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=20261117-about1';
-import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261117-about1';
+import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, readField, writeField } from '../../lib/formSchema.js?v=202611-profile-modals1';
+import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=202611-profile-modals1';
 import { draftToPublic } from '../../lib/draftPreview.js?v=20261117-about1';
 import { subtitle } from '../../lib/profileModel.js?v=20261117-about1';
-import { FieldInput, ProfileEditorFields } from '../../components/form/inputs.js?v=202611-profile-editor1';
-import { EditorDialog } from '../../components/form/EditorDialog.js';
-import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
-import { ProfileView } from '../../components/profile/ProfileView.js?v=20261117-about1';
+import { FieldInput, ProfileEditorFields } from '../../components/form/inputs.js?v=202611-profile-modals1';
+import { EditorDialog } from '../../components/form/EditorDialog.js?v=202611-profile-modals1';
+import { InviteLanguageModal } from '../../components/InviteLanguageModal.js?v=202611-profile-modals1';
+import { ProfileView } from '../../components/profile/ProfileView.js?v=202611-profile-modals1';
 
 function problemText(i18n, p) {
   return (p.part ? i18n.t('form.'+p.part)+': ' : '') + i18n.t('form.errors.' + p.code, p);
@@ -380,9 +380,8 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     ${inviteNotice && html`<div class=${inviteNotice.ok ? 'notice' : 'notice warn'} role=${inviteNotice.ok ? 'status' : 'alert'}>${inviteNotice.text}</div>`}
     ${inviteOpen && html`<${InviteLanguageModal} email=${data.organization.invitation_email} busy=${inviteBusy} error=${inviteNotice && !inviteNotice.ok ? inviteNotice.text : null} onClose=${() => { setInviteOpen(false); setInviteNotice(null); }} onConfirm=${saveAndInvite} />`}
 
-    ${submitOpen && html`<${EditorDialog} title=${t('form.editor_confirm_submit')} action=${t('form.submit')} busy=${submitting}
+    ${submitOpen && html`<${EditorDialog} compact=${true} title=${t('form.editor_confirm_submit')} description=${t('form.editor_submit_prompt')} action=${t('form.submit')} busy=${submitting}
       onConfirm=${submit} onClose=${() => setSubmitOpen(false)}>
-      <p>${t('form.editor_submit_prompt')}</p>
       ${submitError && html`<div class="notice warn" role="alert">${t('form.preview_submit_error')}</div>`}
     <//>`}
     <section class="form-card">

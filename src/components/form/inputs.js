@@ -2,11 +2,11 @@
 // Every widget receives {field, value, onChange, i18n, disabled} and calls onChange(newValue).
 import { createContext, cx, html, useContext, useEffect, useRef, useState } from '../../lib/html.js';
 import { formatUSD } from '../../lib/format.js';
-import { UFS } from '../../lib/formSchema.js?v=20261117-about1';
+import { MILESTONE_STATES, PIPELINE_PHASES, UFS } from '../../lib/formSchema.js?v=202611-profile-modals1';
 import { BRAZIL_CITIES } from '../../lib/brazilCities.js';
-import { fieldProblems } from '../../lib/profileValidation.js?v=20261117-about1';
+import { fieldProblems } from '../../lib/profileValidation.js?v=202611-profile-modals1';
 import { uploadImage } from '../../services/api.js';
-import { EditorDialog } from './EditorDialog.js';
+import { EditorDialog } from './EditorDialog.js?v=202611-profile-modals1';
 import { useI18n } from '../../lib/i18n.js';
 
 export const ProfileEditorFields = createContext(null);
@@ -62,24 +62,26 @@ function Counter({ n, max }) {
 }
 
 /** Both language versions are edited together and kept in the same draft. */
-export function TextInput({ field, value, onChange, disabled, id }) {
+export function TextInput({ field, value, onChange, disabled, id, label, multiline:forceMultiline, placeholder }) {
   const { t, lang } = useI18n();
   const editor = useContext(ProfileEditorFields);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
   const activeLanguage = selectedLanguage || lang;
   const v = value && typeof value === 'object' ? value : { pt: value || '', en: '' };
-  const multiline = !field.max || field.max > 100;
+  const multiline = forceMultiline ?? (!field.max || field.max > 100);
   const chooseLanguage = (language) => setSelectedLanguage(language);
   return html`<div class=${cx('editor-language-field', editor && 'editor-language-field-themed')}
     onFocus=${(event) => { if (event.target.dataset.language) chooseLanguage(event.target.dataset.language); }}>
     ${editor && !editor.sideBySide && html`<div class="editor-language-tabs" role="group" aria-label=${t('form.editor_text_language')}>
       ${['pt','en'].map((language) => html`<button type="button" key=${language} aria-pressed=${activeLanguage === language}
         onClick=${() => chooseLanguage(language)}><span class=${cx('editor-language-dot', v[language]?.trim() && 'filled')} aria-hidden="true"></span>${language.toUpperCase()}</button>`)}
+      <${Counter} n=${(v[activeLanguage] || '').length} max=${field.max} />
     </div>`}
     <div class=${cx('bilingual-input', editor && !editor.sideBySide && 'one-language')}>${['pt', 'en'].map((language) => {
     const text = v[language] || '';
     const props = { id: language === 'pt' ? id : id && id + '-en', class: 'input input-sm', value: text, disabled,
-      'aria-label': t('fields.'+field.key+'.label')+' ('+language.toUpperCase()+')',
+      'aria-label': (label || t('fields.'+field.key+'.label'))+' ('+language.toUpperCase()+')',
+      placeholder: placeholder ? t('form.editor_placeholder_'+language) : undefined,
       'data-language': language,
       maxLength: field.hardLimit ? field.max : field.max ? field.max + 50 : undefined, onInput: (e) => onChange({ ...v, [language]: e.target.value }) };
     return html`<div class="text-wrap" key=${language} hidden=${!!editor && !editor.sideBySide && activeLanguage !== language}><span class="language-label">${language.toUpperCase()}</span>
@@ -176,6 +178,7 @@ function Rows({ items, field, onChange, disabled, i18n, max, blank, render }) {
   const canAdd = !disabled && (!max || list.length < max);
   if (editor) {
     const label = t('fields.'+field.key+'.label');
+    const namedDialog = ['pipeline','milestones','rounds','raised','leaders'].includes(field.type);
     const open = (index, removing = false) => {
       setError(null);
       setEditing({ index, value:index === list.length ? blank() : list[index], removing });
@@ -201,8 +204,9 @@ function Rows({ items, field, onChange, disabled, i18n, max, blank, render }) {
         const title = typeof item === 'string' ? item : item.name || i18n.tx(item.category || item.area || item.description || item.indication || item);
         const detail = item.amount_usd == null ? i18n.tx(item.role) : formatUSD(item.amount_usd,i18n.lang);
         const fallback = item.stage ? i18n.label('round_stage',item.stage) : item.source ? i18n.label('raised_source',item.source) : t('form.editor_item',{n:i+1});
+        const phase = item.phase && i18n.label('pipeline_phase',item.phase);
         return html`<div class="profile-editor-list-row" key=${i}>
-          <div><strong>${title || fallback}</strong>${detail && html`<small>${detail}</small>`}</div>
+          <div><strong>${title || fallback}</strong>${(phase || detail) && html`<small>${[phase,detail].filter(Boolean).join(' · ')}</small>`}</div>
           ${!disabled && html`<div class="profile-editor-item-actions">
             <button type="button" class="btn btn-outline" onClick=${() => open(i)}>${t('form.editor_edit')}</button>
             <button type="button" class="btn-link" onClick=${() => open(i,true)}>${t('form.remove')}</button>
@@ -211,11 +215,12 @@ function Rows({ items, field, onChange, disabled, i18n, max, blank, render }) {
       })}
       ${canAdd && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => open(list.length)}>+ ${t('form.add')}</button>`}
       ${editing && html`<${EditorDialog}
-        title=${editing.removing ? t('form.editor_remove_item') : label}
-        action=${editing.removing ? t('form.remove') : t('form.editor_apply')}
+        title=${editing.removing ? t('form.editor_remove_item') : namedDialog ? t('form.editor_'+(editing.index === list.length ? 'add_' : 'edit_')+field.type) : label}
+        description=${editing.removing ? t('form.editor_remove_prompt') : t('fields.'+field.key+'.help')}
+        action=${editing.removing ? t('form.remove') : t(editing.index === list.length ? 'form.add' : 'form.editor_save_item')}
+        compact=${editing.removing} danger=${editing.removing}
         onConfirm=${confirm} onClose=${() => setEditing(null)}>
-        ${editing.removing ? html`<p>${t('form.editor_remove_prompt')}</p>`
-          : html`<div class="row-fields">${render(editing.value, (value) => { setError(null); setEditing({...editing,value}); })}</div>`}
+        ${!editing.removing && html`<div class="row-fields">${render(editing.value, (value) => { setError(null); setEditing({...editing,value}); })}</div>`}
         ${error && html`<div class="field-error" role="alert">${error}</div>`}
       <//>`}
     </div>`;
@@ -229,18 +234,15 @@ function Rows({ items, field, onChange, disabled, i18n, max, blank, render }) {
   </div>`;
 }
 
-const tPt = (v) => (v && typeof v === 'object' ? v : { pt: v || '', en: '' });
-
-function Mini({ label, children, grow }) {
-  return html`<label class=${cx('mini', grow && 'grow')}><span>${label}</span>${children}</label>`;
+function Mini({ label, children, grow, group }) {
+  const tag = group ? 'div' : 'label';
+  return html`<${tag} class=${cx('mini', grow && 'grow')}><span>${label}</span>${children}<//>`;
 }
 
-function TextMini({ value, onChange, max, disabled }) {
-  const v = tPt(value);
-  return html`<div class="bilingual-input">${['pt','en'].map((language) => html`<div class="text-wrap" key=${language}>
-    <span class="language-label">${language.toUpperCase()}</span>
-    <input class="input input-sm" value=${v[language] || ''} disabled=${disabled} onInput=${(e) => onChange({ ...v, [language]:e.target.value })} />
-    ${max && html`<${Counter} n=${(v[language] || '').length} max=${max} />`}</div>`)}</div>`;
+function TextMini({ value, onChange, max, disabled, label, multiline }) {
+  const { t } = useI18n();
+  return html`<${TextInput} field=${{max,hardLimit:true}} value=${value} onChange=${onChange} disabled=${disabled}
+    label=${label || t('form.description')} multiline=${!!multiline} placeholder=${true} />`;
 }
 
 // Image sizes shown in the form are recommendations; the API validates and optimizes uploads.
@@ -303,33 +305,105 @@ function ImageInput({ field, value, onChange, i18n, disabled }) {
   </div>`;
 }
 
-function GalleryInput({ value, onChange, i18n, disabled }) {
+function GalleryPhotoDialog({ item, adding, i18n, onClose, onSave }) {
+  const t = i18n.t;
+  const [caption, setCaption] = useState(item.caption);
+  const [file, setFile] = useState(null);
+  const [preview, setPreview] = useState(null);
   const [err, setErr] = useState(null);
-  const [uploadIndex, setUploadIndex] = useState(null);
-  const busy = uploadIndex !== null;
-  const list = value || [];
-  const pick = (index) => async (file) => {
+  const [busy, setBusy] = useState(false);
+  useEffect(() => {
     if (!file) return;
-    setUploadIndex(index); setErr(null);
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [file]);
+  const save = async () => {
+    if (!file && !item.url) { setErr('editor_gallery_needs_image'); return; }
+    if (!(typeof caption === 'string' ? caption : caption?.pt)?.trim()) { setErr('editor_gallery_needs_caption'); return; }
+    setBusy(true); setErr(null);
     try {
-      const url = await readImage(file, IMAGE_RULES.gallery, 'gallery');
-      onChange(index === list.length ? list.concat([{ url, caption: { pt: '', en: '' } }])
-        : list.map((item, position) => position === index ? { ...item, url } : item));
-    } catch (x) { setErr(['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
-    finally { setUploadIndex(null); }
+      const url = file ? await readImage(file, IMAGE_RULES.gallery, 'gallery') : item.url;
+      onSave({ ...item,url,caption });
+    } catch (x) {
+      setErr(['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed');
+      setBusy(false);
+    }
   };
-  return html`<div class="rows gallery-input">
+  return html`<${EditorDialog} title=${t(adding ? 'form.editor_add_gallery' : 'form.editor_edit_gallery')} description=${t('fields.gallery.help')}
+    action=${t(busy ? 'form.uploading' : adding ? 'form.add' : 'form.editor_save_item')} onConfirm=${save} onClose=${onClose} busy=${busy}>
+    <div class="row-fields">
+      <div class="image-input gallery">
+        ${(preview || item.url) && html`<${ImagePreview} key=${preview || item.url} url=${preview || item.url} i18n=${i18n} />`}
+        <${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} dropZone=${true} label=${t(preview || item.url ? 'form.replace' : 'form.upload')}
+          onFile=${(selected) => { if (selected) { setFile(selected); setErr(null); } }} />
+      </div>
+      <${Mini} label=${t('form.caption')+' *'} group=${true}><${TextMini} label=${t('form.caption')} value=${caption} max=${120}
+        disabled=${busy} onChange=${(value) => { setCaption(value); setErr(null); }} /><//>
+    </div>
+    ${err && html`<div class="field-error" role="alert">${t('form.'+err)}</div>`}
+  <//>`;
+}
+
+function GalleryInput({ value, onChange, i18n, disabled }) {
+  const [editing, setEditing] = useState(null);
+  const [removing, setRemoving] = useState(null);
+  const t = i18n.t;
+  const list = value || [];
+  return html`<div class="profile-editor-list gallery-input">
     ${list.map((g, i) => html`<div class="row-item" key=${i}>
       <${ImagePreview} key=${g.url} url=${g.url} i18n=${i18n} />
-      <div class="row-fields"><${Mini} label=${i18n.t('form.caption') + ' *'} grow=${true}>
-        <${TextMini} value=${g.caption} disabled=${disabled || busy} max=${120} onChange=${(c) => onChange(list.map((x, j) => (j === i ? { ...x, caption: c } : x)))} /><//></div>
+      <div class="row-fields"><strong>${i18n.tx(g.caption) || t('form.editor_gallery_needs_caption')}</strong></div>
       ${!disabled && html`<div class="gallery-image-actions">
-        <${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onFile=${pick(i)} label=${i === uploadIndex ? i18n.t('form.uploading') : i18n.t('form.replace')} />
-        <button type="button" class="btn-link" disabled=${busy} onClick=${() => onChange(list.filter((_, j) => j !== i))}>${i18n.t('form.remove')}</button>
+        <button type="button" class="btn btn-outline" onClick=${() => setEditing(i)}>${t('form.editor_edit')}</button>
+        <button type="button" class="btn-link" onClick=${() => setRemoving(i)}>${t('form.remove')}</button>
       </div>`}
     </div>`)}
-    ${!disabled && list.length < 6 && html`<${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onFile=${pick(list.length)} dropZone=${true} label=${uploadIndex === list.length ? i18n.t('form.uploading') : i18n.t('form.upload')} />`}
-    ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
+    ${!disabled && list.length < 6 && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => setEditing(list.length)}>+ ${t('form.editor_add_gallery')}</button>`}
+    ${editing !== null && html`<${GalleryPhotoDialog} item=${list[editing] || {url:'',caption:{pt:'',en:''}}}
+      adding=${editing === list.length} i18n=${i18n} onClose=${() => setEditing(null)} onSave=${(item) => {
+        onChange(editing === list.length ? list.concat([item]) : list.map((g,i) => i === editing ? item : g));
+        setEditing(null);
+      }} />`}
+    ${removing !== null && html`<${EditorDialog} compact=${true} danger=${true} title=${t('form.editor_remove_item')} description=${t('form.editor_remove_prompt')}
+      action=${t('form.remove')} onClose=${() => setRemoving(null)} onConfirm=${() => { onChange(list.filter((_,i) => i !== removing)); setRemoving(null); }} />`}
+  </div>`;
+}
+
+function RevenueInput({ field, value, onChange, i18n, disabled }) {
+  const t = i18n.t;
+  const v = value || {};
+  const [draft, setDraft] = useState(null);
+  const [error, setError] = useState(null);
+  const [removing, setRemoving] = useState(false);
+  const hasRevenue = v.amount_usd != null || Boolean(v.year);
+  const save = () => {
+    const problem = fieldProblems(field, draft)[0];
+    if (!draft.year && draft.amount_usd == null) { setError(t('form.errors.revenue_amount_required')); return; }
+    if (problem) { setError(t('form.errors.'+problem.code,problem)); return; }
+    onChange(draft); setDraft(null);
+  };
+  return html`<div>
+    ${field.allowPre && html`<label class="check-line"><input type="checkbox" checked=${!!v.pre_revenue} disabled=${disabled} onChange=${(e) => onChange(e.target.checked ? { pre_revenue:true } : {})} /> ${t('form.pre_revenue')}</label>`}
+    ${!v.pre_revenue && html`
+      ${hasRevenue ? html`<div class="profile-editor-list-row"><div><strong>${v.amount_usd != null ? formatUSD(v.amount_usd,i18n.lang) : '—'}</strong>${v.year && html`<small>${v.year}</small>`}</div>
+        ${!disabled && html`<div class="profile-editor-item-actions">
+          <button type="button" class="btn btn-outline" onClick=${() => {setError(null);setDraft({...v});}}>${t('form.editor_edit')}</button>
+          <button type="button" class="btn-link" onClick=${() => setRemoving(true)}>${t('form.remove')}</button>
+        </div>`}</div>`
+      : html`<p class="form-help">${t(field.allowPre ? 'form.revenue_pending_pre' : 'form.revenue_pending')}</p>
+        ${!disabled && html`<button type="button" class="btn btn-outline profile-editor-add" onClick=${() => {setError(null);setDraft({});}}>+ ${t('form.editor_add_revenue')}</button>`}`}
+    `}
+    ${draft && html`<${EditorDialog} title=${t(hasRevenue ? 'form.editor_edit_revenue' : 'form.editor_add_revenue')} description=${t('fields.revenue.help')}
+      action=${t(hasRevenue ? 'form.editor_save_item' : 'form.add')} onConfirm=${save} onClose=${() => setDraft(null)}>
+      <div class="row-fields">
+        <${Mini} label=${t('form.year')+' *'}><${IntInput} value=${draft.year} min=${2000} max=${2100} onChange=${(year) => {setError(null);setDraft({...draft,year});}} /><//>
+        <${Mini} label=${t('form.amount_usd')+' *'}><${UsdInput} value=${draft.amount_usd} i18n=${i18n} onChange=${(amount_usd) => {setError(null);setDraft({...draft,amount_usd});}} /><//>
+      </div>
+      ${error && html`<div class="field-error" role="alert">${error}</div>`}
+    <//>`}
+    ${removing && html`<${EditorDialog} compact=${true} danger=${true} title=${t('form.editor_remove_item')} description=${t('form.editor_remove_prompt')}
+      action=${t('form.remove')} onClose=${() => setRemoving(false)} onConfirm=${() => {onChange({});setRemoving(false);}} />`}
   </div>`;
 }
 
@@ -385,38 +459,37 @@ export function FieldInput(props) {
         <${Mini} label=${t('max_usd')}><${UsdInput} value=${v.max} i18n=${i18n} disabled=${disabled} onChange=${(n) => onChange({ ...v, max: n })} /><//>
       </div>`;
     }
-    case 'pipeline': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', indication: { pt: '', en: '' } })}
-      render=${(it, set) => html`<${Mini} label=${t('name')}><input class="input input-sm" value=${it.name} disabled=${disabled} onInput=${(e) => set({ ...it, name: e.target.value })} /><//>
-        <${Mini} label=${t('indication')} grow=${true}><${TextMini} value=${it.indication} disabled=${disabled} onChange=${(x) => set({ ...it, indication: x })} /><//>`} />`;
-    case 'milestones': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ period: {}, description: { pt: '', en: '' } })}
-      render=${(it, set) => html`<${Mini} label=${t('period')}><${PeriodInput} value=${it.period} i18n=${i18n} disabled=${disabled} onChange=${(p) => set({ ...it, period: p })} /><//>
-        <${Mini} label=${t('description')} grow=${true}><${TextMini} value=${it.description} max=${150} disabled=${disabled} onChange=${(x) => set({ ...it, description: x })} /><//>`} />`;
+    case 'pipeline': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', phase:null, indication: { pt: '', en: '' } })}
+      render=${(it, set) => html`<${Mini} label=${t('editor_name_code')+' *'}>
+          <input class="input input-sm" value=${it.name} maxLength="60" placeholder=${t('editor_code_example')} disabled=${disabled} onInput=${(e) => set({ ...it, name: e.target.value })} /><//>
+        <${Mini} label=${t('editor_phase')+(Object.hasOwn(it,'phase')?' *':'')}>
+          <${Select} list="pipeline_phase" options=${PIPELINE_PHASES} value=${it.phase} i18n=${i18n} disabled=${disabled} onChange=${(phase) => set({ ...it, phase })} /><//>
+        <${Mini} label=${t('indication')+' *'} group=${true} grow=${true}><${TextMini} label=${t('indication')} value=${it.indication}
+          multiline=${true} max=${100} disabled=${disabled} onChange=${(x) => set({ ...it, indication: x })} /><//>`} />`;
+    case 'milestones': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ period: {}, status:null, description: { pt: '', en: '' } })}
+      render=${(it, set) => html`<${Mini} label=${t('period')+' *'} group=${true}><${PeriodInput} value=${it.period} i18n=${i18n} disabled=${disabled} onChange=${(p) => set({ ...it, period: p })} /><//>
+        <${Mini} label=${t('status')+(Object.hasOwn(it,'status')?' *':'')}><${Select} list="milestone_state" options=${MILESTONE_STATES} value=${it.status} i18n=${i18n} disabled=${disabled} onChange=${(status) => set({ ...it, status })} /><//>
+        <${Mini} label=${t('description')+' *'} group=${true} grow=${true}><${TextMini} value=${it.description} max=${150} multiline=${true} disabled=${disabled} onChange=${(x) => set({ ...it, description: x })} /><//>`} />`;
     case 'rounds': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ stage: '', period: {}, amount_usd: null, purpose: { pt: '', en: '' } })}
       render=${(it, set) => html`<${Mini} label=${t('stage')}><${Select} list="round_stage" options=${LIST_OPTIONS.round_stage} value=${it.stage} i18n=${i18n} disabled=${disabled} onChange=${(s) => set({ ...it, stage: s })} /><//>
-        <${Mini} label=${t('period')}><${PeriodInput} value=${it.period} i18n=${i18n} disabled=${disabled} onChange=${(p) => set({ ...it, period: p })} /><//>
+        <${Mini} label=${t('period')} group=${true}><${PeriodInput} value=${it.period} i18n=${i18n} disabled=${disabled} onChange=${(p) => set({ ...it, period: p })} /><//>
         <${Mini} label=${t('amount_usd')}><${UsdInput} value=${it.amount_usd} i18n=${i18n} disabled=${disabled} onChange=${(n) => set({ ...it, amount_usd: n })} /><//>
-        <${Mini} label=${t('purpose')} grow=${true}><${TextMini} value=${it.purpose} max=${100} disabled=${disabled} onChange=${(x) => set({ ...it, purpose: x })} /><//>`} />`;
+        <${Mini} label=${t('purpose')} group=${true} grow=${true}><${TextMini} label=${t('purpose')} value=${it.purpose} max=${100} multiline=${true} disabled=${disabled} onChange=${(x) => set({ ...it, purpose: x })} /><//>`} />`;
     case 'raised': {
       const v = value || { items: [], none: false };
       const total = v.items.reduce((s, r) => s + (r.amount_usd || 0), 0);
       return html`<div>
         <label class="check-line"><input type="checkbox" checked=${v.none} disabled=${disabled} onChange=${(e) => onChange({ items: e.target.checked ? [] : v.items, none: e.target.checked })} /> ${t('none_raised')}</label>
         ${!v.none && html`<${Rows} field=${field} items=${v.items} onChange=${(items) => onChange({ ...v, items })} disabled=${disabled} i18n=${i18n} blank=${() => ({ source: '', amount_usd: null })}
-          render=${(it, set) => html`<${Mini} label=${t('source')}><${Select} list="raised_source" options=${LIST_OPTIONS.raised_source} value=${it.source} i18n=${i18n} disabled=${disabled} onChange=${(s) => set({ ...it, source: s })} /><//>
+          render=${(it, set) => html`<${Mini} label=${t('source')+' *'}><${Select} list="raised_source" options=${LIST_OPTIONS.raised_source} value=${it.source} i18n=${i18n} disabled=${disabled} onChange=${(s) => set({ ...it, source: s })} /><//>
+            <${Mini} label=${t('editor_investor_name')}><input class="input input-sm" maxLength="80" value=${it.note || ''} disabled=${disabled} onInput=${(e) => set({ ...it, note:e.target.value })} /><//>
+            <${Mini} label=${t('year')}><${IntInput} value=${it.year} min=${1900} max=${2100} disabled=${disabled} onChange=${(year) => set({ ...it, year })} /><//>
             <${Mini} label=${t('amount_usd')}><${UsdInput} value=${it.amount_usd} i18n=${i18n} disabled=${disabled} onChange=${(n) => set({ ...it, amount_usd: n })} /><//>`} />
           <div class="total-line">${t('total')}: <strong>${formatUSD(total, i18n.lang)}</strong></div>`}
       </div>`;
     }
     case 'revenue': {
-      const v = value || {};
-      return html`<div>
-        ${field.allowPre && html`<label class="check-line"><input type="checkbox" checked=${!!v.pre_revenue} disabled=${disabled} onChange=${(e) => onChange(e.target.checked ? { pre_revenue: true } : {})} /> ${t('pre_revenue')}</label>`}
-        ${!v.pre_revenue && v.amount_usd == null && html`<p class="form-help">${t(field.allowPre ? 'revenue_pending_pre' : 'revenue_pending')}</p>`}
-        ${!v.pre_revenue && html`<div class="row-fields">
-          <${Mini} label=${t('amount_usd')}><${UsdInput} value=${v.amount_usd} i18n=${i18n} disabled=${disabled} onChange=${(n) => onChange({ ...v, amount_usd: n })} /><//>
-          <${Mini} label=${t('year')}><${IntInput} value=${v.year} min=${2000} max=${2100} disabled=${disabled} onChange=${(y) => onChange({ ...v, year: y })} /><//>
-        </div>`}
-      </div>`;
+      return html`<${RevenueInput} ...${props} />`;
     }
     case 'exports_c': {
       const v = value || {};
@@ -461,9 +534,9 @@ export function FieldInput(props) {
     case 'plain_list': return html`<${Rows} field=${field} items=${value} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ''}
       render=${(it, set) => html`<${Mini} label=${t('name')} grow=${true}><input class="input input-sm" value=${it} disabled=${disabled} onInput=${(e) => set(e.target.value)} /><//>`} />`;
     case 'leaders': return html`<${Rows} field=${field} items=${value} max=${4} onChange=${onChange} disabled=${disabled} i18n=${i18n} blank=${() => ({ name: '', role: { pt: '', en: '' }, experience: { pt: '', en: '' } })}
-      render=${(it, set) => html`<${Mini} label=${t('name') + ' *'}><input class="input input-sm" value=${it.name} disabled=${disabled} onInput=${(e) => set({ ...it, name: e.target.value })} /><//>
-        <${Mini} label=${t('role') + ' *'}><${TextMini} value=${it.role} disabled=${disabled} onChange=${(x) => set({ ...it, role: x })} /><//>
-        <${Mini} label=${t('experience')} grow=${true}><${TextMini} value=${it.experience} max=${150} disabled=${disabled} onChange=${(x) => set({ ...it, experience: x })} /><//>`} />`;
+      render=${(it, set) => html`<${Mini} label=${t('name') + ' *'}><input class="input input-sm" maxLength="80" value=${it.name} disabled=${disabled} onInput=${(e) => set({ ...it, name: e.target.value })} /><//>
+        <${Mini} label=${t('role') + ' *'} group=${true}><${TextMini} label=${t('role')} value=${it.role} max=${60} disabled=${disabled} onChange=${(x) => set({ ...it, role: x })} /><//>
+        <${Mini} label=${t('experience')} group=${true} grow=${true}><${TextMini} label=${t('experience')} value=${it.experience} max=${150} disabled=${disabled} onChange=${(x) => set({ ...it, experience: x })} /><//>`} />`;
     default: return html`<em>${field.type}</em>`;
   }
 }
