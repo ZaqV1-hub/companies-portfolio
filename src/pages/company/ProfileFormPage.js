@@ -1,7 +1,7 @@
 // Company area · step-by-step profile form (spec 1, sections 4.2 and 5).
 // Steps: Organization → one per project → Leadership → Images → Preview & submit.
 import { cx, html, useEffect, useMemo, useState } from '../../lib/html.js';
-import * as api from '../../services/api.js?v=20261030-intake1';
+import * as api from '../../services/api.js?v=20261116-company-profile1';
 import { LangProvider, useI18n } from '../../lib/i18n.js';
 import { formatDate } from '../../lib/format.js';
 import { navigate } from '../../lib/router.js';
@@ -10,7 +10,7 @@ import { IMAGE_FIELDS, LEADERSHIP_FIELD, ORG_FIELDS, formSteps, projectFields, r
 import { fieldProblems, validateDraft } from '../../lib/profileValidation.js?v=20261110-financial-help1';
 import { draftToPublic } from '../../lib/draftPreview.js';
 import { subtitle } from '../../lib/profileModel.js';
-import { FieldInput } from '../../components/form/inputs.js?v=20261110-financial-help1';
+import { FieldInput } from '../../components/form/inputs.js?v=20261116-company-profile1';
 import { InviteLanguageModal } from '../../components/InviteLanguageModal.js';
 import { ProfileView } from '../../components/profile/ProfileView.js?v=20261102-mobile1';
 
@@ -74,6 +74,7 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const i18n = useI18n();
   const { t } = i18n;
   const [data, setData] = useState(null);
+  const [loadError, setLoadError] = useState(false);
   const [content, setContent] = useState(null);
   const [reviewed, setReviewed] = useState({});
   const [toast, setToast] = useState(null);
@@ -85,13 +86,21 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
   const [acceptBusy, setAcceptBusy] = useState(false);
   const [acceptError, setAcceptError] = useState('');
 
-  const load = () => (teamOrgId ? api.getTeamOrganizationForm(teamOrgId) : api.getMyProfileForm()).then((d) => {
-    const preview = teamOrgId ? null : getCompanyPreview();
-    setData(d); setContent(preview?.content || d.draft.content); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
-  });
+  const load = async () => {
+    setLoadError(false);
+    try {
+      const d = await (teamOrgId ? api.getTeamOrganizationForm(teamOrgId) : api.getMyProfileForm());
+      const preview = teamOrgId ? null : getCompanyPreview();
+      const draftContent = preview?.content || d.draft.content;
+      setData(d); setContent(draftContent); setReviewed(preview?.reviewed || d.draft.reviewed_steps || {});
+    } catch {
+      setLoadError(true);
+    }
+  };
   useEffect(() => { load(); }, []);
 
   const steps = useMemo(() => (content ? formSteps(content) : []), [content]);
+  if (loadError && !content) return html`<div class="empty-state" role="alert"><strong>${t('form.load_error')}</strong><button type="button" class="btn btn-lime" onClick=${load}>${t('orgs.retry')}</button></div>`;
   if (!data || !content) return html`<div>${t('common.loading')}</div>`;
 
   const locked = ['in_review','rejected'].includes(data.draft.status);
@@ -137,15 +146,15 @@ export function ProfileFormPage({ stepParam, onNavigateStep, teamOrgId }) {
     setReviewed({ ...reviewed, [id]: value });
     setBlockedStep(null);
   };
-  const updateOrg = (field, value) => setContent({ ...content, organization: writeField(content.organization, field, value) });
-  const updateProject = (pid, field, value) => setContent({
-    ...content,
-    projects: content.projects.map((p) => {
+  const updateOrg = (field, value) => setContent((current) => ({ ...current, organization: writeField(current.organization, field, value) }));
+  const updateProject = (pid, field, value) => setContent((current) => ({
+    ...current,
+    projects: current.projects.map((p) => {
       if (p.id !== pid) return p;
       if (field.key === 'summary') return { ...p, summary: value };
       return { ...p, fields: writeField(p.fields, field, value) };
     }),
-  });
+  }));
 
   const save = async () => {
     const res = await saveDraft();

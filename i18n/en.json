@@ -149,7 +149,8 @@
     "nav_orgs": "Organizations",
     "nav_crm": "Contacts registry",
     "nav_settings": "Settings",
-    "nav_documents": "Documents"
+    "nav_documents": "Documents",
+    "session_load_error": "Could not check your session. Please try again."
   },
   "profile_type": {
     "A": "Drug Discovery & Product Development",
@@ -468,7 +469,7 @@
     },
     "logo_url": {
       "label": "Logo",
-      "help": "Recommended size: 512 px or more. JPG, PNG, WebP or SVG; a transparent background works best. Up to 20 MB."
+      "help": "Recommended: 512 px or more on the longest side, with a transparent background. JPG, PNG, WebP or SVG, up to 20 MB. The entire logo is shown on the profile."
     },
     "description": {
       "label": "Description",
@@ -740,15 +741,15 @@
     },
     "cover_url": {
       "label": "Profile background photo",
-      "help": "Recommended size: 1920 × 720 px. JPG, PNG or WebP, up to 20 MB. The platform optimizes the photo and applies its dark blue tone."
+      "help": "Recommended: a wide 1920 × 720 px image. JPG, PNG or WebP, up to 20 MB. The preview shows the entire image. The profile cover has a blue filter and may crop the edges to fill the background."
     },
     "product_image_url": {
       "label": "Lead product photo",
-      "help": "Recommended size: 1200 px or more on the longer side. JPG, PNG or WebP, up to 20 MB. The platform optimizes the photo."
+      "help": "Recommended: 1200 px or more on the longest side. JPG, PNG or WebP, up to 20 MB. The entire image fits, including portrait and square formats."
     },
     "gallery": {
       "label": "Photo gallery",
-      "help": "Up to 6 own images with captions. Recommended size: 1600 px or more on the longer side. JPG, PNG or WebP, up to 20 MB each."
+      "help": "Up to 6 images with captions. Recommended: 1600 px or more on the longest side. JPG, PNG or WebP, up to 20 MB per image. Photos are shown in full."
     }
   },
   "form": {
@@ -861,7 +862,10 @@
       "revenue_year_required": "Enter the year your company’s revenue relates to, for example, 2025."
     },
     "revenue_pending_pre": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If the company has not started generating revenue, select the pre-revenue option above.",
-    "revenue_pending": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If there was no revenue that year, enter 0."
+    "revenue_pending": "Your company’s revenue has not been entered yet. Enter the amount and reference year. If there was no revenue that year, enter 0.",
+    "open_image": "Open larger image",
+    "image_preview_failed": "Could not load this image.",
+    "load_error": "Could not load the profile. Please try again."
   },
   "review": {
     "queue_title": "Review queue",

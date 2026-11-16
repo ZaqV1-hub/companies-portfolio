@@ -1,6 +1,6 @@
 // Root component: language provider, session and hash routes.
 import { html, useEffect, useState } from './lib/html.js';
-import * as api from './services/api.js?v=20261030-intake1';
+import * as api from './services/api.js?v=20261116-company-profile1';
 import { LangProvider, useI18n } from './lib/i18n.js';
 import { href, navigate, useRoute } from './lib/router.js';
 import { TopBar } from './components/TopBar.js?v=20261030-company-cta1';
@@ -10,7 +10,7 @@ import { CompanyFeedbackModal } from './components/CompanyFeedbackModal.js?v=202
 import { DirectoryPage } from './pages/public/DirectoryPage.js?v=20261102-doc-scroll1';
 import { ProfilePage } from './pages/public/ProfilePage.js?v=20261102-mobile1';
 import { LoginPage } from './pages/LoginPage.js?v=20261026-layout2';
-import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261110-financial-help1';
+import { ProfileFormPage } from './pages/company/ProfileFormPage.js?v=20261116-company-profile1';
 import { InvitationPage } from './pages/company/InvitationPage.js?v=20261030-intake1';
 import { CompanySignupPage, CompanyEmailVerificationPage } from './pages/company/CompanySignupPage.js?v=20261030-validation2';
 import { CompanyPreviewPage } from './pages/company/CompanyPreviewPage.js?v=20261102-mobile1';
@@ -100,14 +100,49 @@ function TeamArea({ user, route, onLogout }) {
 
 function Routes() {
   const route = useRoute();
-  const { setLang } = useI18n();
+  const { t, setLang } = useI18n();
   useEffect(() => { if (route.areaLang) setLang(route.areaLang, { persist: false }); }, [route.areaLang]);
   const [user, setUser] = useState(undefined);
-  useEffect(() => { api.getCurrentUser().then(setUser).catch(() => setUser(null)); }, []);
+  const [sessionError, setSessionError] = useState(false);
+  const checkSession = () => {
+    setSessionError(false);
+    api.getCurrentUser().then(setUser).catch(() => setSessionError(true));
+  };
+  useEffect(checkSession, []);
+  const [first, second] = route.parts;
+  const workspaceOpen = (first === 'company' && user?.role === 'company_user') || (first === 'team' && user?.role === 'team');
+  useEffect(() => {
+    if (!workspaceOpen) return;
+    let lastRefresh = Date.now();
+    let pending;
+    const refresh = () => {
+      clearTimeout(pending);
+      pending = undefined;
+      lastRefresh = Date.now();
+      api.keepWorkspaceSession().catch(() => {});
+    };
+    const activity = () => {
+      const delay = 30000 - (Date.now() - lastRefresh);
+      if (delay <= 0) refresh();
+      else if (pending === undefined) pending = setTimeout(refresh, delay);
+    };
+    const finishActivity = () => { if (document.hidden && pending !== undefined) refresh(); };
+    const expired = () => setUser(null);
+    const events = ['pointerdown', 'keydown', 'scroll'];
+    for (const event of events) window.addEventListener(event, activity, { capture:true, passive:true });
+    document.addEventListener('visibilitychange', finishActivity);
+    window.addEventListener('cp:session-expired', expired);
+    return () => {
+      clearTimeout(pending);
+      for (const event of events) window.removeEventListener(event, activity, true);
+      document.removeEventListener('visibilitychange', finishActivity);
+      window.removeEventListener('cp:session-expired', expired);
+    };
+  }, [workspaceOpen, user?.id]);
+  if (sessionError) return html`<div class="section empty-state" role="alert"><strong>${t('app.session_load_error')}</strong><button type="button" class="btn btn-lime" onClick=${checkSession}>${t('orgs.retry')}</button></div>`;
   if (user === undefined) return html`<div class="section">Carregando...</div>`;
 
   const logout = async () => { await api.logout(); setUser(null); navigate('/'); };
-  const [first, second] = route.parts;
 
   if (first === 'company' || first === 'team') {
     const role = first === 'company' ? 'company_user' : 'team';

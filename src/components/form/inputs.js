@@ -191,6 +191,24 @@ async function readImage(file, { types }, kind) {
   return uploadImage(file, kind);
 }
 
+function ImagePreview({ url, i18n }) {
+  const [size, setSize] = useState(null);
+  const [failed, setFailed] = useState(false);
+  return html`<div class="image-preview-card">
+    <a class="image-preview" href=${url} target="_blank" rel="noopener noreferrer" aria-label=${i18n.t('form.open_image')}>
+      <img src=${url} alt="" onLoad=${({currentTarget:img}) => setSize(`${img.naturalWidth} × ${img.naturalHeight} px`)} onError=${() => setFailed(true)} />
+    </a>
+    ${size && html`<small>${size}</small>`}
+    ${failed && html`<small class="field-error">${i18n.t('form.image_preview_failed')}</small>`}
+  </div>`;
+}
+
+function ImagePicker({ types, busy, label, onChange }) {
+  return html`<label class=${cx('btn btn-outline image-picker', busy && 'uploading')}>
+    <input type="file" class="image-file-input" aria-label=${label} disabled=${busy} accept=${types.join(',')} onChange=${onChange} />${label}
+  </label>`;
+}
+
 function ImageInput({ field, value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
   const [busy, setBusy] = useState(false);
@@ -203,32 +221,40 @@ function ImageInput({ field, value, onChange, i18n, disabled }) {
     e.target.value = '';
   };
   return html`<div class=${cx('image-input', field.kind)}>
-    ${value && html`<div class="image-preview" style=${{ backgroundImage: "url('" + value + "')" }}></div>`}
-    ${!disabled && html`<label class=${cx('btn btn-outline', busy && 'uploading')}><input type="file" hidden disabled=${busy} accept=${rules.types.join(',')} onChange=${pick} />${busy ? i18n.t('form.uploading') : value ? i18n.t('form.replace') : i18n.t('form.upload')}</label>`}
-    ${value && !disabled && !field.req && html`<button type="button" class="btn-link" onClick=${() => onChange(null)}>${i18n.t('form.remove')}</button>`}
+    ${value && html`<${ImagePreview} key=${value} url=${value} i18n=${i18n} />`}
+    ${!disabled && html`<${ImagePicker} types=${rules.types} busy=${busy} onChange=${pick} label=${busy ? i18n.t('form.uploading') : value ? i18n.t('form.replace') : i18n.t('form.upload')} />`}
+    ${value && !disabled && !field.req && html`<button type="button" class="btn-link" disabled=${busy} onClick=${() => onChange(null)}>${i18n.t('form.remove')}</button>`}
     ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
   </div>`;
 }
 
 function GalleryInput({ value, onChange, i18n, disabled }) {
   const [err, setErr] = useState(null);
-  const [busy, setBusy] = useState(false);
+  const [uploadIndex, setUploadIndex] = useState(null);
+  const busy = uploadIndex !== null;
   const list = value || [];
-  const add = async (e) => {
+  const pick = (index) => async (e) => {
     if (!e.target.files[0]) return;
-    setBusy(true); setErr(null);
-    try { const url = await readImage(e.target.files[0], IMAGE_RULES.gallery, 'gallery'); onChange(list.concat([{ url, caption: { pt: '', en: '' } }])); } catch (x) { setErr(x.message === 'invalid_svg' ? 'image_type' : ['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
-    finally { setBusy(false); }
+    setUploadIndex(index); setErr(null);
+    try {
+      const url = await readImage(e.target.files[0], IMAGE_RULES.gallery, 'gallery');
+      onChange(index === list.length ? list.concat([{ url, caption: { pt: '', en: '' } }])
+        : list.map((item, position) => position === index ? { ...item, url } : item));
+    } catch (x) { setErr(['image_type','image_too_big'].includes(x.message) ? x.message : 'image_upload_failed'); }
+    finally { setUploadIndex(null); }
     e.target.value = '';
   };
-  return html`<div class="rows">
+  return html`<div class="rows gallery-input">
     ${list.map((g, i) => html`<div class="row-item" key=${i}>
-      <div class="gallery-thumb" style=${{ backgroundImage: "url('" + g.url + "')" }}></div>
+      <${ImagePreview} key=${g.url} url=${g.url} i18n=${i18n} />
       <div class="row-fields"><${Mini} label=${i18n.t('form.caption') + ' *'} grow=${true}>
-        <${TextMini} value=${g.caption} disabled=${disabled} max=${120} onChange=${(c) => onChange(list.map((x, j) => (j === i ? { ...x, caption: c } : x)))} /><//></div>
-      ${!disabled && html`<button type="button" class="btn-link row-remove" onClick=${() => onChange(list.filter((_, j) => j !== i))}>${i18n.t('form.remove')}</button>`}
+        <${TextMini} value=${g.caption} disabled=${disabled || busy} max=${120} onChange=${(c) => onChange(list.map((x, j) => (j === i ? { ...x, caption: c } : x)))} /><//></div>
+      ${!disabled && html`<div class="gallery-image-actions">
+        <${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onChange=${pick(i)} label=${i === uploadIndex ? i18n.t('form.uploading') : i18n.t('form.replace')} />
+        <button type="button" class="btn-link" disabled=${busy} onClick=${() => onChange(list.filter((_, j) => j !== i))}>${i18n.t('form.remove')}</button>
+      </div>`}
     </div>`)}
-    ${!disabled && list.length < 6 && html`<label class=${cx('btn btn-outline add-row', busy && 'uploading')}><input type="file" hidden disabled=${busy} accept=${IMAGE_RULES.gallery.types.join(',')} onChange=${add} />${busy ? i18n.t('form.uploading') : i18n.t('form.upload')}</label>`}
+    ${!disabled && list.length < 6 && html`<${ImagePicker} types=${IMAGE_RULES.gallery.types} busy=${busy} onChange=${pick(list.length)} label=${uploadIndex === list.length ? i18n.t('form.uploading') : i18n.t('form.upload')} />`}
     ${err && err !== 'none' && html`<span class="field-error">${i18n.t('form.' + err)}</span>`}
   </div>`;
 }

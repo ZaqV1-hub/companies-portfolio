@@ -2,17 +2,19 @@
 // docs/HANDOFF_CODEX.md; state and authorization live on the API server.
 async function request(path, { method = 'GET', body } = {}) {
   let response;
+  const signal = method === 'GET' ? AbortSignal.timeout(12000) : undefined;
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
       response = await fetch(`/api${path}`, {
         method,
+        signal,
         credentials: 'same-origin',
         cache: method === 'GET' ? 'no-store' : 'default',
         headers: body === undefined ? undefined : { 'Content-Type': 'application/json' },
         body: body === undefined ? undefined : JSON.stringify(body),
       });
     } catch (error) {
-      if (method !== 'GET' || attempt === 3) throw error;
+      if (method !== 'GET' || attempt === 3 || signal?.aborted) throw error;
       await new Promise((resolve) => setTimeout(resolve, 2000));
       continue;
     }
@@ -25,6 +27,9 @@ async function request(path, { method = 'GET', body } = {}) {
   if (response.status === 204) return undefined;
   const result = await response.json().catch(() => null);
   if (!response.ok) {
+    if (response.status === 401 && !path.startsWith('/me?') && result?.error === 'unauthenticated') {
+      window.dispatchEvent(new Event('cp:session-expired'));
+    }
     const error = new Error(result?.error || `http_${response.status}`);
     error.status = response.status;
     error.data = result;
@@ -55,6 +60,7 @@ export async function listPublicDocuments(lang = 'pt') { return request(`/public
 export async function getCurrentUser() { try { return await request(`/me?fresh=${Date.now()}`); } catch (error) { if (error.status === 401) return null; throw error; } }
 export async function login(email, password, role) { return post('/auth/login', { email, password, role }); }
 export async function logout() { return post('/auth/logout'); }
+export async function keepWorkspaceSession() { return post('/me/activity'); }
 
 export async function getMyProfileForm() { return request('/me/profile-form'); }
 export async function saveMyProfileDraft(content, reviewedSteps) { return put('/me/profile-draft', { content, reviewed_steps: reviewedSteps }); }

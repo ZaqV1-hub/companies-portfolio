@@ -22,6 +22,8 @@ const app = express();
 const port = Number(process.env.API_PORT || 4317);
 const investorSessionMs = 7 * 24 * 60 * 60 * 1000;
 const investorBrowseMs = 24 * 60 * 60 * 1000;
+const workspaceIdleMs = 60 * 60 * 1000;
+const isWorkspaceUser = (role) => role === 'company_user' || role === 'team';
 const tokenHash = (token) => crypto.createHash('sha256').update(token).digest('hex');
 
 if (!process.env.SESSION_SECRET || process.env.SESSION_SECRET.length < 32) {
@@ -46,10 +48,15 @@ app.use(session({
   name: 'cp.sid',
   secret: process.env.SESSION_SECRET,
   store: new MySQLSessionStore(pool),
+  rolling: true,
   resave: false,
   saveUninitialized: false,
   cookie: { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', maxAge: Number(process.env.SESSION_TTL_SECONDS || 28800) * 1000 },
 }));
+app.use('/api', (req, _res, next) => {
+  if (isWorkspaceUser(req.session.user?.role)) req.session.cookie.maxAge = workspaceIdleMs;
+  next();
+});
 app.use('/api', (req,res,next) => {
   if (!['POST','PUT','PATCH','DELETE'].includes(req.method) || !req.get('origin')) return next();
   try { const expected=process.env.PUBLIC_ORIGIN?new URL(process.env.PUBLIC_ORIGIN).host:(req.get('x-forwarded-host')||req.get('host'));if (new URL(req.get('origin')).host.toLowerCase() !== String(expected).toLowerCase()) return res.status(403).json({ error:'origin_forbidden' }); }
@@ -77,7 +84,8 @@ function requireRole(...roles) {
   return async (req, res, next) => {
     try {
       const user = await sessionUser(req);
-      if (!user || !roles.includes(user.role)) return res.status(403).json({ error: 'forbidden' });
+      if (!user) return res.status(401).json({ error: 'unauthenticated' });
+      if (!roles.includes(user.role)) return res.status(403).json({ error: 'forbidden' });
       req.user = user;
       next();
     } catch (error) { routeError(res, error); }
@@ -147,6 +155,7 @@ app.get('/api/me', async (req, res) => {
   try { const user = await sessionUser(req); if (!user) return res.status(401).json({ error: 'unauthenticated' }); res.json(safeUser(user, user.organization_name)); }
   catch (error) { routeError(res, error); }
 });
+app.post('/api/me/activity', requireRole('company_user', 'team'), (_req, res) => res.status(204).end());
 app.post('/api/auth/login', loginLimiter, async (req, res) => {
   try {
     const email = String(req.body.email || '').trim().toLowerCase();
@@ -156,6 +165,7 @@ app.post('/api/auth/login', loginLimiter, async (req, res) => {
     if (['investor','company_user'].includes(user.role) && !user.email_verified_at) return res.json({ ok: false, error: 'not_verified', user_id: user.id });
     await new Promise((resolve, reject) => req.session.regenerate((err) => err ? reject(err) : resolve()));
     req.session.user = { id: user.id, role: user.role };
+    if (isWorkspaceUser(user.role)) req.session.cookie.maxAge = workspaceIdleMs;
     if (user.role === 'investor') { req.session.investorAuthenticatedAt = Date.now(); req.session.cookie.maxAge = investorSessionMs; }
     res.json({ ok: true, user: safeUser(user,user.organization_name) });
   } catch (error) { routeError(res, error); }
@@ -208,6 +218,7 @@ app.post('/api/company/signup/verify', loginLimiter, async (req, res) => {
     await db.commit();
     await new Promise((resolve,reject)=>req.session.regenerate((error)=>error?reject(error):resolve()));
     req.session.user = {id:user.id,role:'company_user'};
+    req.session.cookie.maxAge = workspaceIdleMs;
     res.json({ok:true,user:safeUser({...user,email_verified_at:new Date()})});
   } catch (error) { await db.rollback();routeError(res,error); }
   finally { db.release(); }
@@ -1011,29 +1022,41 @@ const getOpenDraft = async (db, orgId) => {
 };
 
 app.get('/api/me/profile-form', requireRole('company_user'), async (req, res) => {
-  const db=await pool.getConnection();
+  let db;
   try {
-    await db.beginTransaction();
     const orgId = req.user.organization_id;
-    const [orgRows] = await db.execute('SELECT * FROM organizations WHERE id=? FOR UPDATE', [orgId]);
-    if (!orgRows.length) { await db.rollback(); return res.status(404).json({ error: 'not_found' }); }
-    const org = orgRows[0];
-    const firstValidation = !org.last_approved_at && org.intake_mode === 'legacy';
-    const [projects] = await db.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [orgId]);
-    const [imports] = firstValidation ? await db.execute('SELECT project_id,field,mode,previous_answer FROM form_imports WHERE organization_id=?', [orgId]) : [[]];
-    let draft = await getOpenDraft(db, orgId);
+    const [orgRows] = await pool.execute('SELECT * FROM organizations WHERE id=?', [orgId]);
+    if (!orgRows.length) return res.status(404).json({ error: 'not_found' });
+    let org = orgRows[0];
+    let draft = await getOpenDraft(pool, orgId);
     if (!draft) {
-      const content = initialProfileSnapshot(org, projects, imports);
+      db = await pool.getConnection();
+      await db.beginTransaction();
+      const [lockedRows] = await db.execute('SELECT * FROM organizations WHERE id=? FOR UPDATE', [orgId]);
+      if (!lockedRows.length) { await db.rollback(); return res.status(404).json({ error: 'not_found' }); }
+      org = lockedRows[0];
+      draft = await getOpenDraft(db, orgId);
+    }
+    const firstValidation = !org.last_approved_at && org.intake_mode === 'legacy';
+    const reader = db || pool;
+    const [projects] = firstValidation || !draft
+      ? await reader.execute('SELECT id,profile_type,sort_order,summary,fields FROM projects WHERE organization_id=? ORDER BY sort_order', [orgId]) : [[]];
+    const [imports] = firstValidation ? await reader.execute('SELECT project_id,field,mode,previous_answer FROM form_imports WHERE organization_id=?', [orgId]) : [[]];
+    const initialContent = firstValidation || !draft ? initialProfileSnapshot(org, projects, imports) : null;
+    if (!draft) {
+      const content = initialContent;
       draft = { id: `pv-${crypto.randomUUID()}`, organization_id: orgId, kind: 'draft', status: 'filling', content, reviewed_steps: {}, created_at: new Date(), updated_at: new Date() };
       await db.execute('INSERT INTO profile_versions (id,organization_id,kind,status,content,reviewed_steps,created_at,updated_at) VALUES (?,?,?,?,?,?,UTC_TIMESTAMP(),UTC_TIMESTAMP())',
         [draft.id, orgId, draft.kind, draft.status, jsonColumn(content), jsonColumn({})]);
     }
-    await db.commit();
+    if (db) await db.commit();
     res.json({ organization: { id: org.id,name: org.name,status: org.status,public_state: org.public_state,last_approved_at: org.last_approved_at,intake_mode:org.intake_mode,custom_tags:org.custom_tags || [] }, draft,
       imports: imports.map(({ project_id, field, mode, previous_answer }) => ({ project_id,field,mode,previous_answer })), firstValidation,
-      initialContent: firstValidation ? initialProfileSnapshot(org, projects, imports) : null });
-  } catch (error) { await db.rollback();routeError(res, error); }
-  finally {db.release();}
+      initialContent: firstValidation ? initialContent : null });
+  } catch (error) {
+    if (db) await db.rollback().catch(() => {});
+    routeError(res, error);
+  } finally { db?.release(); }
 });
 
 app.post('/api/me/feedback', requireRole('company_user'), feedbackLimiter, async (req, res) => {
@@ -1392,6 +1415,7 @@ app.post('/api/company/invitation/accept', signupLimiter, async (req, res) => {
     await db.commit();
     await new Promise((resolve,reject) => req.session.regenerate((error) => error ? reject(error) : resolve()));
     req.session.user = { id,role:'company_user' };
+    req.session.cookie.maxAge = workspaceIdleMs;
     res.json({ ok:true,user:{ id,role:'company_user',name,email:invitation.email,organization_id:invitation.organization_id } });
   } catch (error) { await db.rollback(); routeError(res,error); }
   finally { db.release(); }

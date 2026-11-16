@@ -149,7 +149,8 @@
     "nav_orgs": "Organizações",
     "nav_crm": "Registro de contatos",
     "nav_settings": "Configurações",
-    "nav_documents": "Documentos"
+    "nav_documents": "Documentos",
+    "session_load_error": "Não foi possível consultar sua sessão. Tente novamente."
   },
   "profile_type": {
     "A": "Desenvolvimento de produto",
@@ -468,7 +469,7 @@
     },
     "logo_url": {
       "label": "Logo",
-      "help": "Tamanho recomendado: 512 px ou mais. JPG, PNG, WebP ou SVG; fundo transparente é ideal. Até 20 MB."
+      "help": "Recomendação: 512 px ou mais no lado maior, com fundo transparente. JPG, PNG, WebP ou SVG, até 20 MB. A logo inteira aparece no perfil."
     },
     "description": {
       "label": "Descrição",
@@ -740,15 +741,15 @@
     },
     "cover_url": {
       "label": "Foto de fundo do perfil",
-      "help": "Tamanho recomendado: 1920 × 720 px. JPG, PNG ou WebP, até 20 MB. A plataforma otimiza a foto e aplica o tom azul escuro."
+      "help": "Recomendação: imagem horizontal de 1920 × 720 px. JPG, PNG ou WebP, até 20 MB. A prévia mostra a foto inteira. No perfil, a capa recebe um filtro azul e pode perder partes das bordas para preencher o fundo."
     },
     "product_image_url": {
       "label": "Foto do produto principal",
-      "help": "Tamanho recomendado: 1200 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB. A plataforma otimiza a foto."
+      "help": "Recomendação: 1200 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB. A imagem é encaixada sem cortar, mesmo em formato vertical ou quadrado."
     },
     "gallery": {
       "label": "Galeria de fotos",
-      "help": "Até 6 imagens próprias com legenda. Tamanho recomendado: 1600 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB cada."
+      "help": "Até 6 imagens com legenda. Recomendação: 1600 px ou mais no lado maior. JPG, PNG ou WebP, até 20 MB por imagem. As fotos são exibidas inteiras."
     }
   },
   "form": {
@@ -861,7 +862,10 @@
       "revenue_year_required": "Informe a qual ano se refere o faturamento da sua empresa, por exemplo, 2025."
     },
     "revenue_pending_pre": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se a empresa ainda não começou a faturar, marque a opção de pré-receita acima.",
-    "revenue_pending": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se não houve faturamento nesse ano, informe 0."
+    "revenue_pending": "O faturamento da sua empresa ainda não foi informado. Preencha o valor e o ano de referência. Se não houve faturamento nesse ano, informe 0.",
+    "open_image": "Abrir imagem em tamanho maior",
+    "image_preview_failed": "Não foi possível carregar esta imagem.",
+    "load_error": "Não foi possível carregar o perfil. Tente novamente."
   },
   "review": {
     "queue_title": "Fila de revisão",
