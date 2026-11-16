@@ -51,6 +51,15 @@ if (-not $SourceRoot) { $SourceRoot = (Resolve-Path (Join-Path $PSScriptRoot '..
 # Public front: only these go to the IIS folder (docs, tools, server, seed and originals stay out).
 $FrontDirs = @('src', 'i18n', 'assets', 'vendor')
 $FrontFiles = @('index.html')
+$ApiSharedFiles = @('src\lib\crm.js', 'src\lib\formSchema.js', 'src\lib\profileValidation.js')
+
+function Copy-ApiSharedFiles([string] $From, [string] $To) {
+  foreach ($file in $ApiSharedFiles) {
+    $destination = Join-Path $To $file
+    New-Item -ItemType Directory -Path (Split-Path -Parent $destination) -Force | Out-Null
+    Copy-Item -LiteralPath (Join-Path $From $file) -Destination $destination -Force
+  }
+}
 
 function Write-Step([string] $Message) {
   Write-Host ''
@@ -119,7 +128,7 @@ if (-not $revision) {
 Write-Host "Source:   $SourceRoot"
 Write-Host "Revision: $revision"
 
-foreach ($item in @($FrontFiles + $FrontDirs + @('server', 'server\package-lock.json', 'data\seed'))) {
+foreach ($item in @($FrontFiles + $FrontDirs + $ApiSharedFiles + @('server', 'server\package-lock.json', 'data\seed'))) {
   if (-not (Test-Path -LiteralPath (Join-Path $SourceRoot $item))) { throw "Missing in the checkout: $item" }
 }
 foreach ($path in @($SiteRoot, $AppRoot, $BackupRoot)) {
@@ -143,6 +152,7 @@ if ($DryRun) {
   Write-Step 'DRY RUN: listing what would change (nothing is copied, stopped or backed up)'
   Invoke-Mirror (Join-Path $SourceRoot 'server') (Join-Path $AppRoot 'server') @('/XD', 'node_modules', 'logs', 'uploads', '/XF', '.env', '*.env')
   Invoke-Mirror (Join-Path $SourceRoot 'data\seed') (Join-Path $AppRoot 'data\seed')
+  foreach ($file in $ApiSharedFiles) { Write-Host "Shared API file: $file" }
   foreach ($dir in $FrontDirs) { Invoke-Mirror (Join-Path $SourceRoot $dir) (Join-Path $SiteRoot $dir) }
   Write-Host 'Dry run finished.'
   return
@@ -154,6 +164,7 @@ $backup = Join-Path $BackupRoot "companiesportfolio-auto-$stamp"
 Write-Step "Backing up to $backup"
 New-Item -ItemType Directory -Path $backup | Out-Null
 Invoke-Mirror $SiteRoot (Join-Path $backup 'site')
+Copy-ApiSharedFiles $AppRoot (Join-Path $backup 'api-shared')
 if (Test-Path -LiteralPath (Join-Path $AppRoot 'server')) {
   Invoke-Mirror (Join-Path $AppRoot 'server') (Join-Path $backup 'api-server') @('/XD', 'logs', 'uploads')
 }
@@ -173,6 +184,7 @@ try {
   Write-Step 'Copying server\ and data\seed\'
   Invoke-Mirror (Join-Path $SourceRoot 'server') (Join-Path $AppRoot 'server') @('/XD', 'node_modules', 'logs', 'uploads', '/XF', '.env', '*.env')
   Invoke-Mirror (Join-Path $SourceRoot 'data\seed') (Join-Path $AppRoot 'data\seed')
+  Copy-ApiSharedFiles $SourceRoot $AppRoot
 
   Write-Step 'Installing API dependencies (npm ci)'
   Invoke-Node @($NpmCli, 'ci', '--omit=dev', '--include=optional', '--no-audit', '--no-fund') (Join-Path $AppRoot 'server')
@@ -216,6 +228,7 @@ try {
       if (Test-Path -LiteralPath (Join-Path $backup 'api-data-seed')) {
         Invoke-Mirror (Join-Path $backup 'api-data-seed') (Join-Path $AppRoot 'data\seed')
       }
+      Copy-ApiSharedFiles (Join-Path $backup 'api-shared') $AppRoot
       Start-Api
       Wait-Health $LocalHealthUrl
     }
