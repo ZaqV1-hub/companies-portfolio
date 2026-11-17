@@ -101,7 +101,6 @@
 .profile-editor-shell .sidebar-editor-options { display: none; }
 
 /* Investor contact entry uses the same step and card treatment as company profiles. */
-.crm-contact-entry { max-width: 920px; }
 .crm-contact-entry > .page-title { margin: 10px 0 16px; }
 .crm-entry-steps ol { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; padding: 0; margin: 0 0 15px; list-style: none; }
 .crm-entry-steps button { display: flex; align-items: center; gap: 7px; width: 100%; min-height: 48px; padding: 8px; border: 0; border-top: 3px solid #dfe5ef; border-radius: 6px; background: transparent; color: var(--text-2); font-size: 13px; text-align: left; }
